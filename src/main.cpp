@@ -526,7 +526,7 @@ void setup() {
     mqtt_client.setServer(mqtt_broker, mqtt_port);
     mqtt_client.setKeepAlive(60);
     mqtt_client.setCallback(mqttEventHandler);
-    connectToMQTT();
+
 #pragma endregion
 
     // initialize digital pin LED_BUILTIN as an output.
@@ -686,10 +686,12 @@ bool turn_finished =
     true;  // to check if the turn is finish and a new can lanched
 
 void loop() {
-    if (!mqtt_client.connected()) {
-        connectToMQTT();
+    if (WiFi.status() == WL_CONNECTED) {
+        if (!mqtt_client.connected()) {
+            connectToMQTT();
+        }
+        mqtt_client.loop();
     }
-    mqtt_client.loop();
 
     mg_mgr_poll(&mgr, 1000);
     
