@@ -520,6 +520,11 @@ void setup() {
                    "Starting HTTP listener on " + httpUrl);
     mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
 
+    String dnsURL = "udp://" + WiFi.softAPIP().toString() + ":" + String(DNS_PORT);  
+    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
+                    "Starting DNS listener on " + dnsURL);
+    mg_listen(&mgr, dnsURL.c_str(), dnsEventHandler, NULL);
+    
     // Set Root CA certificate
     client.setCACert(ca_cert);
 
