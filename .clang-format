@@ -1,0 +1,38 @@
+---
+# Use LLVM coding style as base, one of: LLVM, Google, Chromium, Microsoft, GNU, WebKit, Mozilla
+BasedOnStyle: LLVM
+
+# Indentation settings
+IndentWidth: 4            # Number of spaces to use for each indentation level
+TabWidth: 4               # Width of a tab character (in spaces)
+UseTab: Never             # Use spaces instead of tabs (Options: Always, Never, ForIndentation)
+
+# Brace placement
+BreakBeforeBraces: Attach  # Places braces on a new line (Options: Attach, Linux, Stroustrup, Allman, GNU)
+
+# Column width for wrapping code
+ColumnLimit: 150           # Maximum number of columns per line
+
+# Formatting options for functions
+AllowShortFunctionsOnASingleLine: Inline  # Allow empty functions to be on a single line
+
+# Namespace indentation settings
+NamespaceIndentation: All  # Indent inside namespaces (Options: None, Inner, All)
+
+# Pointer and reference alignment
+PointerAlignment: Right     # Align pointers to the type (Options: Left, Right, Middle)
+
+# Spaces in control statements
+SpaceBeforeParens: ControlStatements # Add a space before parentheses in control statements (if, for, while)
+
+# Trailing commas in container literals
+Cpp11BracedListStyle: true  # Format braced lists consistently in C++11 mode
+
+# Reflow comments
+ReflowComments: true       # Reflow long comments to fit within the column limit
+
+# Include sorting
+SortIncludes: true         # Sort #include directives alphabetically
+
+# Constructor initializer lists formatting
+ConstructorInitializerAllOnOneLineOrOnePerLine: true

@@ -1,4 +1,10 @@
+#include "custom_functions.h"
+#include "driver.h"
+#include "fs_interface.h"
+#include "global_variables.h"
+#include "io.h"
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <FS.h>
 #include <LittleFS.h>
 #include <PubSubClient.h>
@@ -6,12 +12,6 @@
 #include <WiFiClientSecure.h>
 #include <mongoose.h>
 #include <mongoose_config.h>
-#include <ArduinoJson.h>
-#include "custom_functions.h"
-#include "driver.h"
-#include "fs_interface.h"
-#include "global_variables.h"
-#include "io.h"
 
 // **********CREATE OBJECTS**********
 // For stepper motor
@@ -26,36 +26,24 @@ WiFiClientSecure client;
 PubSubClient mqtt_client(client);
 
 // **********ENUMS**********
-enum toolType {
-    FULLREV,
-    HALFREV
-};
+enum toolType { FULLREV, HALFREV };
 toolType tool_type = FULLREV;
 
-enum turnMode {
-    STOP,
-    SINGLE,
-    INFINITE
-};
+enum turnMode { STOP, SINGLE, INFINITE };
 turnMode turn_mode = STOP;
 
-enum userInput {
-    START_SINGLE,
-    START_INFINITE,
-    STOP_INFINITE,
-    SETTINGS
-};  // in Json user_mode
+enum userInput { START_SINGLE, START_INFINITE, STOP_INFINITE, SETTINGS }; // in Json user_mode
 userInput user_input = STOP_INFINITE;
 
 enum motorState {
-    SINGLE_START,   // starts the single turn
-    SINGLE_ROTATE,  // durning forward movement
-    SINGLE_PAUSE,   // pause at hit position
+    SINGLE_START,  // starts the single turn
+    SINGLE_ROTATE, // durning forward movement
+    SINGLE_PAUSE,  // pause at hit position
     SINGLE_PAUSE_BACK,
-    ROTATE_BACK,  // moving from hit to home pos
+    ROTATE_BACK, // moving from hit to home pos
 
-    INFINITE_ROTATE,  // starts the stepper1.rotate
-    INFINITE_BACK     // brings the tool to the home pos after the rotate
+    INFINITE_ROTATE, // starts the stepper1.rotate
+    INFINITE_BACK    // brings the tool to the home pos after the rotate
 };
 motorState motor_state = SINGLE_START;
 
@@ -189,8 +177,7 @@ void handleSubmitRearPos(struct mg_connection *c, struct mg_http_message *hm) {
     front_pos = front_pos + std::abs(stepper1.currentPosition());
     stepper1.set_Zero();
     rear_pos_defined = true;
-    Serial.println("rear_pos submitted at: " + String(0) +
-                   " front_pos: " + String(front_pos));
+    Serial.println("rear_pos submitted at: " + String(0) + " front_pos: " + String(front_pos));
     mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "OK");
 }
 
@@ -264,7 +251,7 @@ void handleSendCofig(struct mg_connection *c, struct mg_http_message *hm) {
 
         // Wait for connection
         unsigned long startTime = millis();
-        const unsigned long timeout = 10000;  // 10 seconds timeout
+        const unsigned long timeout = 10000; // 10 seconds timeout
         while (WiFi.status() != WL_CONNECTED) {
             if (millis() - startTime >= timeout) {
                 Serial.println("Failed to connect to WiFi: Timeout");
@@ -286,8 +273,7 @@ void handleSendCofig(struct mg_connection *c, struct mg_http_message *hm) {
         //************* Re-Init Web Server *******************
         // starting http server
         String httpUrl = "http://" + WiFi.localIP().toString() + ":" + String(HTTP_PORT);
-        Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
-                       "Starting HTTP listener on " + httpUrl);
+        Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
         mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
 
         // starting https server
@@ -339,20 +325,20 @@ static void dnsEventHandler(struct mg_connection *c, int ev, void *ev_data) {
     if (ev == MG_EV_OPEN) {
         c->is_hexdumping = 1;
     } else if (ev == MG_EV_READ) {
-        struct mg_dns_rr rr;  // Parse first question, offset 12 is header size
+        struct mg_dns_rr rr; // Parse first question, offset 12 is header size
         size_t n = mg_dns_parse_rr(c->recv.buf, c->recv.len, 12, true, &rr);
         MG_INFO(("DNS request parsed, result=%d", (int)n));
         if (n > 0) {
             char buf[512];
             struct mg_dns_header *h = (struct mg_dns_header *)buf;
-            memset(buf, 0, sizeof(buf));                                   // Clear the whole datagram
-            h->txnid = ((struct mg_dns_header *)c->recv.buf)->txnid;       // Copy tnxid
-            h->num_questions = mg_htons(1);                                // We use only the 1st question
-            h->num_answers = mg_htons(1);                                  // And only one answer
-            h->flags = mg_htons(0x8400);                                   // Authoritative response
-            memcpy(buf + sizeof(*h), c->recv.buf + sizeof(*h), n);         // Copy question
-            memcpy(buf + sizeof(*h) + n, dns_answer, sizeof(dns_answer));  // And answer
-            mg_send(c, buf, 12 + n + sizeof(dns_answer));                  // And send it!
+            memset(buf, 0, sizeof(buf));                                  // Clear the whole datagram
+            h->txnid = ((struct mg_dns_header *)c->recv.buf)->txnid;      // Copy tnxid
+            h->num_questions = mg_htons(1);                               // We use only the 1st question
+            h->num_answers = mg_htons(1);                                 // And only one answer
+            h->flags = mg_htons(0x8400);                                  // Authoritative response
+            memcpy(buf + sizeof(*h), c->recv.buf + sizeof(*h), n);        // Copy question
+            memcpy(buf + sizeof(*h) + n, dns_answer, sizeof(dns_answer)); // And answer
+            mg_send(c, buf, 12 + n + sizeof(dns_answer));                 // And send it!
         }
         mg_iobuf_del(&c->recv, 0, c->recv.len);
     }
@@ -472,13 +458,18 @@ void print_infinite_speed() {
 
 void setup() {
     io_setup();
+
+    // initialize digital pin LED_BUILTIN as an output.
+    pinMode(19, OUTPUT);
+    stepper1.set_Zero();
+    stepper1.setSpeed(CALIBRATION_SPEED);
+
     Serial.begin(115200);
 
     // Setting up littlefs File System, required for HTML and dataloggin
-    if (!LittleFS.begin()) {  // Mounts the littlefs file system and handle littlefs
+    if (!LittleFS.begin()) { // Mounts the littlefs file system and handle littlefs
         // Errors:I
-        Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
-                       "An Error has occurred while mounting SPIFFS");
+        Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "An Error has occurred while mounting SPIFFS");
         return;
     }
 
@@ -516,15 +507,13 @@ void setup() {
 
     // starting http server in access point mode
     String httpUrl = "http://" + WiFi.softAPIP().toString() + ":" + String(HTTP_PORT);
-    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
-                   "Starting HTTP listener on " + httpUrl);
+    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
     mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
 
-    String dnsURL = "udp://" + WiFi.softAPIP().toString() + ":" + String(DNS_PORT);  
-    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
-                    "Starting DNS listener on " + dnsURL);
+    String dnsURL = "udp://" + WiFi.softAPIP().toString() + ":" + String(DNS_PORT);
+    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting DNS listener on " + dnsURL);
     mg_listen(&mgr, dnsURL.c_str(), dnsEventHandler, NULL);
-    
+
     // Set Root CA certificate
     client.setCACert(ca_cert);
 
@@ -533,11 +522,6 @@ void setup() {
     mqtt_client.setCallback(mqttEventHandler);
 
 #pragma endregion
-
-    // initialize digital pin LED_BUILTIN as an output.
-    pinMode(19, OUTPUT);
-    stepper1.set_Zero();
-    stepper1.setSpeed(CALIBRATION_SPEED);
 }
 
 void connectToWiFi() {
@@ -576,8 +560,7 @@ void connectToWiFi() {
                 Serial.println(WiFi.localIP());
                 // starting http server
                 String httpUrl = "http://" + WiFi.localIP().toString() + ":" + String(HTTP_PORT);
-                Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
-                               "Starting HTTP listener on " + httpUrl);
+                Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
                 mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
 
                 // starting https server
@@ -648,7 +631,7 @@ void mqttEventHandler(char *topic, byte *payload, unsigned int length) {
     if (String(topic) == "esp32/motorState") {
         // Assuming the payload has a key "state" for motorState topic
         if (doc.containsKey("state")) {
-            const char* state = doc["state"];
+            const char *state = doc["state"];
             Serial.print("Motor State: ");
             Serial.println(state);
             if (String(state) == "START_SINGLE") {
@@ -668,7 +651,7 @@ void mqttEventHandler(char *topic, byte *payload, unsigned int length) {
             return;
         }
 
-        const char* type = doc["type"];
+        const char *type = doc["type"];
         int speed = doc["speed"];
 
         Serial.println(String(type) + ": " + speed);
@@ -681,14 +664,12 @@ void mqttEventHandler(char *topic, byte *payload, unsigned int length) {
 }
 
 int distance_to_go = 0;
-int half_ref_delay =
-    1000;  // how long the motor should wait after a half revolution in ms
+int half_ref_delay = 1000; // how long the motor should wait after a half revolution in ms
 int position_to_travel = 0;
 long stop_time = 0;
 long start_single_pause = 0;
 long start_single_pause_back = 0;
-bool turn_finished =
-    true;  // to check if the turn is finish and a new can lanched
+bool turn_finished = true; // to check if the turn is finish and a new can lanched
 
 void loop() {
     if (WiFi.status() == WL_CONNECTED) {
@@ -699,7 +680,7 @@ void loop() {
     }
 
     mg_mgr_poll(&mgr, 1000);
-    
+
     print_stepper_position();
     print_single_speed();
     print_infinite_speed();
@@ -819,9 +800,9 @@ void loop() {
                     stepper1.stop();
                 }
             }
-            if (tool_type == FULLREV) {  // In Fullrev mode the zero pos is reset
-                                         //--> otherwise the
-                                         // position will sum up over every rotation
+            if (tool_type == FULLREV) { // In Fullrev mode the zero pos is reset
+                                        //--> otherwise the
+                                        // position will sum up over every rotation
                 turn_mode = STOP;
                 stepper1.set_Zero();
                 turn_finished = true;
