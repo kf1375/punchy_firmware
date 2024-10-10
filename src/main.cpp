@@ -422,6 +422,50 @@ static void httpEventHandler(struct mg_connection *c, int ev, void *ev_data) {
     }
 }
 
+void networkTask(void *pvParameters) {
+    //************* Web Server *******************
+    // initialize mongoose event manager
+    mg_mgr_init(&mgr);
+
+    // initialize mongoose static filesystem
+    s_http_serve_opts = {
+        .root_dir = "/",
+        .ssi_pattern = "",
+        .extra_headers = "",
+        .mime_types = "",
+        .page404 = NULL,
+        .fs = &littlefs_interface,
+    };
+
+    connectToWiFi();
+
+    // starting http server in access point mode
+    String httpUrl = "http://" + WiFi.softAPIP().toString() + ":" + String(HTTP_PORT);
+    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
+    mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
+
+    String dnsURL = "udp://" + WiFi.softAPIP().toString() + ":" + String(DNS_PORT);
+    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting DNS listener on " + dnsURL);
+    mg_listen(&mgr, dnsURL.c_str(), dnsEventHandler, NULL);
+
+    // Set Root CA certificate
+    client.setCACert(ca_cert);
+
+    mqtt_client.setServer(mqtt_broker, mqtt_port);
+    mqtt_client.setKeepAlive(60);
+    mqtt_client.setCallback(mqttEventHandler);
+
+    while (true) {
+        if (WiFi.status() == WL_CONNECTED) {
+            if (!mqtt_client.connected()) {
+                connectToMQTT();
+            }
+            mqtt_client.loop();
+        }
+
+        mg_mgr_poll(&mgr, 1000);
+    }
+}
 #pragma endregion
 
 /**
@@ -482,46 +526,13 @@ void setup() {
         file = root.openNextFile();
     }
 
-// ***** WIFI *****
-#pragma region Wifi Setup
+    // ***** WIFI SETUP *****
     WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP(ap_ssid, ap_password);
+    WiFi.softAP(ap_ssid);
     Serial.println("Access Point Started");
     Serial.println(WiFi.softAPIP());
 
-    //************* Web Server *******************
-    // initialize mongoose event manager
-    mg_mgr_init(&mgr);
-
-    // initialize mongoose static filesystem
-    s_http_serve_opts = {
-        .root_dir = "/",
-        .ssi_pattern = "",
-        .extra_headers = "",
-        .mime_types = "",
-        .page404 = NULL,
-        .fs = &littlefs_interface,
-    };
-
-    connectToWiFi();
-
-    // starting http server in access point mode
-    String httpUrl = "http://" + WiFi.softAPIP().toString() + ":" + String(HTTP_PORT);
-    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
-    mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
-
-    String dnsURL = "udp://" + WiFi.softAPIP().toString() + ":" + String(DNS_PORT);
-    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting DNS listener on " + dnsURL);
-    mg_listen(&mgr, dnsURL.c_str(), dnsEventHandler, NULL);
-
-    // Set Root CA certificate
-    client.setCACert(ca_cert);
-
-    mqtt_client.setServer(mqtt_broker, mqtt_port);
-    mqtt_client.setKeepAlive(60);
-    mqtt_client.setCallback(mqttEventHandler);
-
-#pragma endregion
+    xTaskCreatePinnedToCore(networkTask, "networkTask", 50000, NULL, 0, NULL, 0);
 }
 
 void connectToWiFi() {
@@ -530,6 +541,7 @@ void connectToWiFi() {
     if (readCredentials(ssid, password)) {
         // search for ssid
         Serial.println("Scanning for WiFi networks...");
+        WiFi.disconnect(true);
         int n = WiFi.scanNetworks();
         Serial.println("Scan done.");
         bool ssidFound = false;
@@ -672,18 +684,9 @@ long start_single_pause_back = 0;
 bool turn_finished = true; // to check if the turn is finish and a new can lanched
 
 void loop() {
-    if (WiFi.status() == WL_CONNECTED) {
-        if (!mqtt_client.connected()) {
-            connectToMQTT();
-        }
-        mqtt_client.loop();
-    }
-
-    mg_mgr_poll(&mgr, 1000);
-
-    print_stepper_position();
-    print_single_speed();
-    print_infinite_speed();
+    // print_stepper_position();
+    // print_single_speed();
+    // print_infinite_speed();
 
     if (automatic_mode) {
         // nextTURNTime(millis());
@@ -720,7 +723,7 @@ void loop() {
     if (turn_mode == STOP) {
         if (stepper1.distanceToGo() == 0) {
             digitalWrite(ENA_PIN, LOW);
-            Serial.println("Motor disabled");
+            // Serial.println("Motor disabled");
         } else {
             digitalWrite(DIR_PIN, HIGH);
             delayMicroseconds(220);
