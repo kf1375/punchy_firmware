@@ -151,17 +151,21 @@ void handleCloseSettings(struct mg_connection *c, struct mg_http_message *hm) {
 }
 
 void handleArrowUp(struct mg_connection *c, struct mg_http_message *hm) {
+    digitalWrite(ENA_PIN, LOW); // Enable the driver motor
     stepper1.setRampLen(3);
     stepper1.move(15);
     stepper1.setRampLen(0);
+    digitalWrite(ENA_PIN, HIGH); // Disable the driver motor
     Serial.println("Arrow up button pressed");
     mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "OK");
 }
 
 void handleArrowDown(struct mg_connection *c, struct mg_http_message *hm) {
+    digitalWrite(ENA_PIN, LOW); // Enable the driver motor
     stepper1.setRampLen(3);
     stepper1.move(-15);
     stepper1.setRampLen(0);
+    digitalWrite(ENA_PIN, HIGH); // Disable the driver motor
     Serial.println("Arrow down button pressed");
     mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "OK");
 }
@@ -719,24 +723,10 @@ void loop() {
         }
     }
 
-    // enable, disable stepper motor to safe energy and avoid heating up the motor
-    if (turn_mode == STOP) {
-        if (stepper1.distanceToGo() == 0) {
-            digitalWrite(ENA_PIN, LOW);
-            // Serial.println("Motor disabled");
-        } else {
-            digitalWrite(DIR_PIN, HIGH);
-            delayMicroseconds(220);
-            digitalWrite(ENA_PIN, HIGH);
-            digitalWrite(DIR_PIN, LOW);
-            Serial.println("Motor enabled for positioning");
-        }
+    if (stepper1.distanceToGo()) {
+        digitalWrite(ENA_PIN, LOW); // Enable the driver motor
     } else {
-        digitalWrite(DIR_PIN, HIGH);
-        delayMicroseconds(220);
-        digitalWrite(ENA_PIN, HIGH);
-        digitalWrite(DIR_PIN, LOW);
-        Serial.println("Motor enabled");
+        digitalWrite(ENA_PIN, HIGH); // Disable the driver motor
     }
 
 // ***************SINGLE TURN MODE******************
@@ -748,9 +738,6 @@ void loop() {
         if (motor_state == SINGLE_START) {
             stepper1.setSpeed(single_speed);
             if (tool_type == HALFREV) {
-                digitalWrite(DIR_PIN, LOW);
-                delay(2);
-                digitalWrite(DIR_PIN, HIGH);
                 stepper1.moveTo(front_pos);
                 motor_state = SINGLE_ROTATE;
                 Serial.println("180");
@@ -764,7 +751,6 @@ void loop() {
         // loops in this mode as long as the stepper is moving --> starts to count
         // for the break
         if (motor_state == SINGLE_ROTATE) {
-            // Serial.println(stepper1.currentPosition());
             stepper1.setSpeed(single_speed);
             if (stepper1.distanceToGo() == 0) {
                 motor_state = SINGLE_PAUSE;
