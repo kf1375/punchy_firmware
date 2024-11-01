@@ -1,454 +1,181 @@
-body {
-  margin: 0 auto;
-}
-
-h1 {
-  font-family: Arial;
-  font-size: 45px;
-  text-align: center;
-  line-height: 1.5em;
-  letter-spacing: 0em;
-  margin-bottom: 5px;
-  color: #505050;
-}
-
-h2 {
-  font-family: Arial;
-  font-size: 28px;
-  color: #505050;
-}
-
-form {
-  font-family: Arial;
-}
-
-/*Settings*/
-.settings-btn {
-  background-color: #e3af88;
-}
-
-.btn-settings {
-  margin: 15px;
-}
-
-/* Highcharts */
-.chart-container {
-  width: 1200px;
-  margin: 0 auto;
-  max-width: 100%;
-  padding: 0 15px;
-}
-div#chart-force {
-  margin-top: 60px;
-}
-
-*,
-::after,
-::before {
+/* Reset margin and padding */
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
-h1::after {
-  content: "";
-  width: 50px;
-  height: 2px;
-  background: #505050;
-  margin: 0 auto;
-  display: block;
+
+/* Body styling */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #63b0e4, #a976ec);
+  font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji"
 }
+
+/* Main container styling */
+.container {
+  background-color: #f1faff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 450px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.dialog {
+  background-color: #f1faff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.tab-content {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-tab-bar {
+  display: flex;
+  align-items: stretch;
+  border-radius: 6px;
+  padding: 10px;
+  background-color: #e5e7eb;
+  gap: 10px;
+}
+
+.tab-link {
+  flex-grow: 1;
+  border-radius: 6px;
+}
+
+.settingSection {
+  justify-items: center;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-radius: 12px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #e5e7eb;
+}
+
+.turn-modes-containter {
+  display: flex;
+  width: 200px;
+  gap: 10px;
+}
+
+.turn-modes-button {
+  border-radius: 12px;
+  background-color: #e5e7eb;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  color: #252525 !important;
+}
+
+.position-button {
+  border-radius: 12px;
+  background-color: #0F0F0F;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  color: #fff !important;
+}
+
+/* Header styling */
 .header {
-  display: flex;
-  flex-direction: row;
-  justify-content: right;
-  padding: 32px;
-}
-
-.header img {
-  width: 162px;
-}
-
-.header-btns-container {
-  display: flex;
-  gap: 12px;
-}
-
-.header-btns-container button {
-  width: 120px;
-}
-
-.btn {
-  cursor: pointer;
-  background-color: #e1d3c8;
-  padding: 8px 24px;
-  border-radius: 4px;
-  border: 4px;
-  height: 40px;
-  margin: 15px;
-}
-
-.btn:hover {
-  background-color: #e3af88 !important;
-}
-
-.title-manual-mode {
-  /* display: flex;
-  flex-direction: column;
-  align-items: center;*/
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.manual-paramters-btn-container {
-  margin-top: 8px;
-  margin-bottom: 16px;
-}
-
-.start-manual-mode {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-.manual-start-btn {
-  background-color: #e3af88;
-}
-
-.manual-start-btn:hover {
-  background-color: #e1d3c8;
-}
-
-.automatic-mode {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 36px;
-  width: 100vw;
-}
-
-.title-automatic-mode {
-  /*display: flex;
-  flex-direction: column;
-  align-items: center;*/
-  text-align: center;
-  margin-bottom: 16px;
-  width: 100vw;
-}
-
-.start-program {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-.start-btn {
-  background-color: #97a9c6;
-}
-
-.start-btn:hover {
-  background-color: #e1d3c8;
-}
-
-.stop-program {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-.stop-btn {
-  background-color: #ec6f6f;
-  /* border-radius: 100%;
-  height: 120px;
-  width: 120px;
-  color: white;
   font-size: 24px;
-  text-transform: uppercase;*/
+  font-weight: bold;
+  color: #2A2A72;
+  margin-bottom: 20px;
 }
 
-.stop-btn:hover {
-  background-color: #f55252;
-}
-
-.cards {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-.parameter-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px;
-  width: 300px;
-  padding: 15px;
-  background-color: #f2e9e0;
+/* Button styling */
+.button {
+  width: 100%;
+  padding: 10px;
   border-radius: 8px;
-  margin-top: 30px;
-}
-
-.btn-manual {
-  background-color: #e3af88;
-}
-
-.btn-manual:hover {
-  background-color: #e1d3c8;
-}
-
-.parameter-card h4 {
-  font-size: 18px;
-  color: #000;
-}
-
-.manual-paramater-form {
-  margin-bottom: 16px;
-  display: flex;
-  gap: 0px;
-}
-
-.manual-paramater-form input {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
   border: none;
-  border-radius: 2px 0px 0px 2px;
-  padding: 4px 4px 4px 8px;
-}
-
-.manual-paramater-form input:focus-visible {
-  outline-style: inherit;
-}
-
-.input-submit {
-  background-color: #e3af88;
-  border-radius: 0px 2px 2px 0px !important;
-  width: 40px;
-  padding: 0px !important;
+  margin-top: 10px;
   cursor: pointer;
-}
-
-.download-log {
-  display: flex;
-  justify-content: center;
-}
-/*Acordion*/
-.accordion > input[type="checkbox"] {
-  position: absolute;
-  left: -100vw;
-}
-
-.accordion .handle-container {
-  overflow-y: hidden;
-  height: 0;
-  transition: height 0.3s ease;
-}
-
-.accordion > input[type="checkbox"]:checked ~ .handle-container {
-  height: auto;
-  overflow: visible;
-}
-
-.accordion label {
   display: block;
 }
 
-/*
- Styling Accordion
-*/
-.accordion {
-  margin-bottom: 1em;
+.button-single {
+  background-color: #0F0F0F;
 }
 
-.accordion > input[type="checkbox"]:checked ~ .handle-container {
-  padding: 15px;
-  border-top: 0;
+.button-infinite {
+  background-color: #28A745;
 }
 
-.accordion .handle {
-  margin: 0;
-  font-size: 1.125em;
-  line-height: 1.2em;
+/* Speed label styling */
+.speed-label {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #4d4d4d;
 }
 
-.accordion label {
-  cursor: pointer;
-  font-weight: normal;
-  padding: 15px;
-}
-
-.accordion label:hover,
-.accordion label:focus {
-  background: #f2e9e06b;
-}
-
-.accordion .handle label::after {
-  content: "\02795"; /* Unicode character for "plus" sign (+) */
-  display: inline-block;
-  margin-right: 10px;
-  font-size: 0.58em;
-  line-height: 1.556em;
-  vertical-align: middle;
-}
-
-.accordion > input[type="checkbox"]:checked ~ .handle label::after {
-  content: "\2796"; /* Unicode character for "minus" sign (-) */
-}
-/*Accordion Style End*/
-
-/* Styling for the sliders */
+/* Slider styling */
 .slider {
   width: 100%;
-  /* Adjust the width as necessary */
-  height: 20px;
-  /* Slider thickness */
-  background: #d3d3d3;
-  /* Background color */
+  margin: 10px 0;
+  appearance: none;
+  height: 4px;
+  background: #ddd;
+  border-radius: 5px;
   outline: none;
-  /* Remove outline to avoid a border when clicked */
-  opacity: 0.7;
-  /* Slightly transparent by default */
-  border-radius: 15px;
-  transition: opacity 0.2s;
-  /* Smooth transition for hover effect */
 }
 
-.slider:hover {
-  opacity: 1;
-  /* Fully opaque when hovered */
-}
-
-.slider-group {
-  width: 95%;
-  margin-top: 20px;
-  /* Full width for the slider group */
-}
-
-.slider-group label {
-  display: block;
-  /* Make label a block to add space */
-  text-align: center;
-  /* Center the label text */
-  margin-top: 10px;
-  /* Add space above the label */
-}
-
-/* Style for the slider thumb (the draggable circle) */
 .slider::-webkit-slider-thumb {
-  width: 30px;
-  /* Width and height of the thumb */
-  height: 30px;
-  background: f14907;
-  /* Thumb color */
-  cursor: pointer;
-  /* Cursor changes to a pointer when hovered */
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: #333;
   border-radius: 50%;
-  /* Circular shape */
-  border: 0;
-  /* Remove default border */
+  cursor: pointer;
 }
 
 .slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
-  background: #e3af88;
-  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  background-color: #333;
   border-radius: 50%;
-  border: 0;
+  cursor: pointer;
 }
 
-.city {
-  display: none;
+/* Settings and Login button styling */
+.top-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
 
-/* Additional styles for the settings container and buttons */
-.settings-container {
-  display: none;
-  /* Initially hidden */
-  position: fixed;
-  /* Fixed position relative to the viewport */
-  top: 50%;
-  /* Center vertically */
-  left: 50%;
-  /* Center horizontally */
-  transform: translate(-50%, -50%);
-  /* Offset the container by half its width and height to center it */
-  min-width: 300px;
-  /* Minimum width */
-  min-height: 200px;
-  /* Minimum height */
+.top-buttons button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #ffffff;
   border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 20px;
-  /* Increased padding */
-  background-color: white;
-  z-index: 10;
-  box-sizing: border-box;
-  /* Include padding and border in the element's total width and height */
+  cursor: pointer;
+  font-size: 14px;
 }
 
-.arrow-button {
-  display: block;
-  margin: 10px auto;
-  background-color: #e3af88;
-  text-align: center;
-  font-size: 24px;
-  /* Green border for arrow buttons */
+/* Current motor speeds box */
+.speed-info {
+  text-align: left;
+  background-color: #e6f0ff;
+  border-radius: 8px;
   padding: 10px;
-  border-radius: 5px;
-  width: 70%;
-  /* Set a specific width */
-  height: 50px;
-  /* Set a specific height */
-  line-height: 25px;
-  /* Center the arrow vertically */
-  box-sizing: border-box;
-  /* Include padding and border in the element's total dimensions */
-}
-
-.submit-button {
-  display: block;
-  margin: 10px auto;
-  background-color: #e3af88;
-  text-align: center;
-  font-size: 20px;
-  padding: 10px;
-  border-radius: 5px;
-  width: 70%;
-  /* Set a specific width */
-  height: 50px;
-  /* Set a specific height */
-  line-height: 25px;
-  /* Center the arrow vertically */
-  box-sizing: border-box;
-  /* Include padding and border in the element's total dimensions */
-}
-
-@media screen and (max-width: 800px) {
-  .list-form .form-item {
-    width: 100%;
-  }
-  h1 {
-    font-size: 45px;
-    line-height: 1.5em;
-  }
-  h2 {
-    font-size: 28px;
-  }
-  header img {
-    width: 100px;
-  }
-}
-
-@media (max-width: 800px) {
-  .start-program {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .start-btn {
-    min-width: 192px;
-  }
-}
-
-@media (max-width: 800px) {
-  .header-btns-container {
-    flex-direction: row;
-    justify-content: center;
-    gap: 12px;
-  }
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
 }

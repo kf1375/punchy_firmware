@@ -1,530 +1,96 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <script src="https://code.highcharts.com/highcharts.js"></script> -->
-    <script src="toggleButtonsAndSlider.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stepper Control</title>
     <link rel="stylesheet" href="w3.css">
     <link rel="stylesheet" href="control-panel.css">
 </head>
-
 <body>
-    <header id="masthead" class="header">
-        <!--  <div class="branding">
-            <a href="#">
-                <img src="logo"> <!-- https://randomnerdtutorials.com/display-images-esp32-esp8266-web-server/ 
-            </a>
-        </div>
-    -->
-        <div class="header-btns-container">
-            <!-- https://www.w3schools.com/w3css/w3css_modal.asp -->
-            <button onclick="document.getElementById('id01').style.display='block'" class="btn">Settings</button>
-            <button onclick="document.getElementById('id02').style.display='block'" class="btn">Login</button>
-        </div>
-    </header>
+    <div class="container">
+        <div class="header">Stepper Control</div>
 
-    <div id="id01" class="w3-modal">
-        <!-- https://www.w3schools.com/w3css/w3css_modal.asp -->
-        <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-            <header class="w3-container w3-blue">
-                <span onclick="document.getElementById('id01').style.display='none'"
-                    class="w3-button w3-blue w3-xlarge w3-display-topright">&times;</span>
-                <h3>Settings</h3>
+        <div class="top-buttons">
+            <button onclick="openSettingsDialog()">Settings</button>
+            <button onclick="openLoginDialog()">Login</button>
+        </div>
+
+        <button class="button button-single" onclick="toggleCheckbox('single_turn_start')">Start Single Turn</button>
+        <div class="speed-label">Single Speed: <span id="single-speed-value">10</span></div>
+        <input type="range" id="single-speed" min="0" max="100" value="10" class="slider" oninput="updateSpeed('single')">
+
+        <button class="button button-infinite" onclick="toggleStart_Stop_infinite()">Start Infinite Turn</button>
+        <div class="speed-label">Infinite Speed: <span id="infinite-speed-value">10</span></div>
+        <input type="range" id="infinite-speed" min="0" max="100" value="10" class="slider" oninput="updateSpeed('infinite')">
+
+        <div class="speed-info">
+            <p>Current Motor Speeds:</p>
+            <p>Single Turn Speed: <span id="current-single-speed">10</span></p>
+            <p>Infinite Turn Speed: <span id="current-infinite-speed">10</span></p>
+            <p>Max Half Turn Speed: <span id="current-max-single-speed">100</span></p>
+            <p>Max Full Turn Speed: <span id="current-max-infinite-speed">100</span></p>
+        </div>
+    </div>
+
+    <!-- Settings Dialog -->
+    <div id="settingsDialog" class="w3-modal">
+        <div class="w3-modal-content w3-animate-zoom w3-card-4 dialog">
+            <header class="w3-container"> 
+                <span onclick="closeSettingsDialog()" 
+                class="w3-button w3-xlarge w3-display-topright">&times;</span>
+                <h2>Settings</h2>
             </header>
-
-            <div class="w3-bar w3-border-bottom">
-                <button class="tablink w3-bar-item w3-button" onclick="openTab(event, 'ToolType')">Tool Type</button>
-                <button class="tablink w3-bar-item w3-button" onclick="openTab(event, 'MotorPosition')">Motor
-                    Position</button>
-                <button class="tablink w3-bar-item w3-button" onclick="openTab(event, 'Network')">Network</button>
-
-            </div>
-
-            <div id="ToolType" class="w3-container city">
-                <div class="btn-settings">
-                    <button id="half" class="btn btn-manual" onclick="setActiveButton('half');">
-                        Half
-                    </button>
-                    <button id="full" class="btn btn-manual" onclick="setActiveButton('full');">
-                        Full
-                    </button>
+            <div class="w3-container">
+                <!-- Tabs -->
+                <div class="w3-bar settings-tab-bar">
+                    <button class="w3-bar-item w3-button tab-link w3-white" onclick="openTab(event, 'TurnSettings')">Turn Settings</button>
+                    <button class="w3-bar-item w3-button tab-link" onclick="openTab(event, 'MaxSpeed')">Max Speed</button>
                 </div>
-            </div>
 
-            <div id="MotorPosition" class="w3-container city">
-                <div class="btn-settings">
-                    <div>
-                        <button class="arrow-button" onclick="toggleCheckbox('arrowUp')">&#9650; UP</button>
-                        <button class="arrow-button" onclick="toggleCheckbox('arrowDown')">&#9660; DOWN</button>
-                    </div>
-                    <div>
-                        <button class="button-large submit-button" onclick="toggleCheckbox('submitFrontPos')">Submit
-                            Front</button>
-                        <button class="button-large submit-button" onclick="toggleCheckbox('submitRearPos')">Submit
-                            Rear</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="Network" class="w3-container city">
-                <div class="grid-container">
-                    <p>IP-Address</p>
-                    <input type="text" placeholder="30" name="usrname" required>
-                    <p>Subnet</p>
-                    <input type="text" placeholder="30" name="usrname" required>
-                    <p>SSID</p>
-                    <input type="text" placeholder="30" name="usrname" required>
-                </div>
-            </div>
-
-            <div class="w3-container w3-light-grey w3-padding">
-                <!--   <button class="w3-button w3-right w3-green w3-border"
-                    onclick="document.getElementById('id02').style.display='none'">Save</button> -->
-                <button class="w3-button w3-right w3-white w3-border"
-                    onclick="document.getElementById('id01').style.display='none'">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="id02" class="w3-modal">
-        <!-- https://www.w3schools.com/w3css/w3css_modal.asp -->
-        <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
-
-            <div class="w3-center"><br>
-                <span onclick="document.getElementById('id02').style.display='none'"
-                    class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
-                <img src="logo" alt="Avatar" style="width:30%" class="w3-circle w3-margin-top">
-            </div>
-
-            <form class="w3-container" action="/action_page.php">
-                <div class="w3-section">
-                    <label><b>Username</b></label>
-                    <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username"
-                        name="usrname" required>
-                    <label><b>Password</b></label>
-                    <input class="w3-input w3-border" type="password" placeholder="Enter Password" name="psw" required>
-                    <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">Login</button>
-                    <input class="w3-check w3-margin-top" type="checkbox" checked="checked"> Remember me
-                </div>
-            </form>
-
-            <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
-                <button onclick="document.getElementById('id02').style.display='none'" type="button"
-                    class="w3-button w3-red">Cancel</button>
-                <span class="w3-right w3-padding w3-hide-small">Forgot <a href="#">password?</a></span>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="main-page">
-        <div class="title-container">
-            <h1>Stepper Tester</h1>
-        </div>
-        <div class="manual-mode">
-            <section class="accordion">
-                <input type="checkbox" name="collapse" id="handle1" checked="checked">
-                <div class="title-manual-mode handle">
-                    <label for="handle1">
-                        <h2>Manual Mode</h2>
-                        <p>Set your individual paramaters</p>
-                    </label>
-                </div>
-                <div class="manual-parameters handle-container">
-                    <div class="download-log">
-                        <button id="toggleLoggingButton" class="btn" onclick="toggleLogging()">Start Logging</button>
-                    </div>
-                    <div class="cards">
-                        <div class="parameter-card">
-                            <h4>
-                                Single-Rotation
-                            </h4>
-                            <!--For displaying the value of the actual paramter?-->
-                            <button type="button" class="btn btn-manual" onclick="toggleCheckbox('single_turn_start');">
-                                Start Turn
-                            </button>
-                            <span id="base_sin"></span>
-                            <!-- Single Speed Slider -->
-                            <div class="slider-group flex-row">
-                                <input type="range" min="10" max="100" value="10" class="slider" id="singleSpeedSlider"
-                                    oninput="handleSingleSliderChange(this.value);">
-                            </div>
+                <!-- Tab Content -->
+                <div id="TurnSettings" class="w3-container tab-content">
+                    <div class="settingSection">
+                        <h4>Turn Setting</h4>
+                        <div class="turn-modes-containter">
+                            <button class="button turn-modes-button" onclick="setActiveButton('half')">Half Turn</button>
+                            <button class="button turn-modes-button" onclick="setActiveButton('full')">Full Turn</button>
                         </div>
-                        <div class="parameter-card">
-                            <h4>
-                                Infinite-Rotation
-                            </h4>
-                            <!--For displaying the value of the actual paramter?-->
-                            <button id="infinite_start_stop_button" class="btn btn-manual"
-                                onclick="toggleStart_Stop_infinite()">Start Turn</button>
-
-                            <span id="base_sin"></span>
-                            <!-- Infinte Speed Slider -->
-                            <div class="slider-group flex-row">
-                                <input type="range" min="10" max="100" value="10" class="slider"
-                                    id="infiniteSpeedSlider" oninput="handleInfiniteSliderChange(this.value);">
-                            </div>
+                    </div>
+                    <div class="settingSection">
+                        <h4>Position Control</h4>
+                        <div class="turn-modes-containter">
+                            <button class="button position-button" onclick="toggleCheckbox('arrowUp')">▲ Up</button>
+                            <button class="button position-button" onclick="toggleCheckbox('arrowDown')">▼ Down</button>
+                        </div>
+                        <div class="turn-modes-containter">
+                            <button class="button position-button" onclick="toggleCheckbox('submitFrontPos')">Set Front</button>
+                            <button class="button position-button" onclick="toggleCheckbox('submitRearPos')">Set Rear</button>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
 
-
-
-        <!-- Container for settings -->
-        <div class="settings-container" id="settingsContainer">
-            <div>
-                <button class="arrow-button" onclick="toggleCheckbox('arrowUp')">&#9650; UP</button>
-                <button class="arrow-button" onclick="toggleCheckbox('arrowDown')">&#9660; DOWN</button>
-            </div>
-            <div>
-                <button class="button-large submit-button" onclick="toggleCheckbox('submitFrontPos')">Submit Front
-                    Pos.</button>
-                <button class="button-large submit-button" onclick="toggleCheckbox('submitRearPos')">Submit Rear
-                    Pos.</button>
+                <div id="MaxSpeed" class="w3-container tab-content" style="display:none">
+                    <div class="settingSection">
+                        <h4>Max Speed Settings</h4>
+                        <div class="speed-label">Max Half Turn Speed: <span id="max-single-speed-value">100</span></div>
+                        <input type="range" id="max-single-speed" min="0" max="1000" value="100" class="slider" oninput="updateMaxSpeed('single')">
+                        <div class="speed-label">Max Full Turn Speed: <span id="max-infinite-speed-value">100</span></div>
+                        <input type="range" id="max-infinite-speed" min="0" max="1000" value="100" class="slider" oninput="updateMaxSpeed('infinite')">
+                    </div>
+                </div>
             </div>
         </div>
-        <!--Highcharts
-    <div id="chart-force" class="chart-container"></div>
     </div>
--->
 
-        <!--Script-->
-        <script>
-            //functions to enable the toggling of the bottons and the operation modes
+    <!-- Login Dialog -->
+    <div id="loginDialog" class="w3-modal dialog">
+        <header class="w3-container"> 
+            <span onclick="closeLoginDialog()" 
+            class="w3-button w3-xlarge w3-display-topright">&times;</span>
+        </header>
 
-            let step_respo_mode = false;
-            let step_respo_Start = false;
-            let loggingEnabled = false;
-            let singleSpeed = 0;
-            let infiniteSpeed = 0;
-            let logData = [];
-
-            function toggleStep_Repo_Mode() {
-                step_respo_mode = !step_respo_mode;
-
-                if (step_respo_mode) {
-                    ModeON();
-                    document.getElementById("buttonSTEP1").style.backgroundColor = "red";
-                    document.getElementById("buttonSTEP1").style.borderColor = "red";
-                } else {
-                    ModeOFF();
-                    document.getElementById("buttonSTEP1").style.backgroundColor = "green";
-                    document.getElementById("buttonSTEP1").style.borderColor = "green";
-                }
-
-            }
-
-            // function to enable the toggling of the start/stop button
-            function toggleStart_Stop() {
-                step_respo_Start = !step_respo_Start;
-
-                if (step_respo_Start) {
-                    ResponseStop();
-                    document.getElementById("buttonSTEP2").style.backgroundColor = "red";
-                    document.getElementById("buttonSTEP2").style.borderColor = "red";
-                } else {
-                    ResponseStart();
-                    document.getElementById("buttonSTEP2").style.backgroundColor = "green";
-                    document.getElementById("buttonSTEP2").style.borderColor = "green";
-                }
-
-            }
-
-            function ModeON() {
-                toggleCheckbox('stepRespoModeON');
-            }
-
-            function ModeOFF() {
-                toggleCheckbox('stepRespoModeOFF');
-            }
-
-            function ResponseStop() {
-                toggleCheckbox('responseStart');
-            }
-
-            document.getElementsByClassName("tablink")[0].click();
-            function openTab(evt, tabName) {
-                var i, x, tablinks;
-                x = document.getElementsByClassName("city");
-                for (i = 0; i < x.length; i++) {
-                    x[i].style.display = "none";
-                }
-                tablinks = document.getElementsByClassName("tablink");
-                for (i = 0; i < x.length; i++) {
-                    tablinks[i].classList.remove("w3-light-grey");
-                }
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.classList.add("w3-light-grey");
-            }
-
-            let infinite_start = false;
-
-            function toggleCheckbox(x) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/" + x, true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        if (loggingEnabled) {
-                            if (x === 'single_turn_start' || x === 'infinite_turn_start' || x === 'infinite_turn_stop') {
-                                logData.push({"timestamp": getCurrentFormattedTime(), "command": x, "single_speed": singleSpeed, "infinite_speed": infiniteSpeed});
-                            }
-                        }
-                    }
-                };
-                xhr.send();
-            }
-
-            // function to toggle Half and Full Button
-            function setActiveButton(selectedButtonId) {
-                if (selectedButtonId === "half") {
-                    toggleCheckbox("half");
-                    document.getElementById("half").style.backgroundColor = "#f14907";
-                    document.getElementById("half").style.borderColor = "#f14907";
-                    document.getElementById("full").style.backgroundColor = "#e3af88";
-                    document.getElementById("full").style.borderColor = "#e3af88";
-                }
-                if (selectedButtonId === "full") {
-                    toggleCheckbox("full");
-                    document.getElementById("full").style.backgroundColor = "#f14907";
-                    document.getElementById("full").style.borderColor = "#f14907";
-                    document.getElementById("half").style.backgroundColor = "#e3af88";
-                    document.getElementById("half").style.borderColor = "#e3af88";
-                }
-            }
-
-            // function to enable the toggling of the start/stop button
-            function toggleStart_Stop_infinite() {
-                infinite_start = !infinite_start;
-
-                if (infinite_start) {
-                    toggleCheckbox("infinite_turn_start");
-                    document.getElementById(
-                        "infinite_start_stop_button"
-                    ).style.backgroundColor = "#f14907";
-                    document.getElementById("infinite_start_stop_button").style.borderColor =
-                        "#f14907";
-                } else {
-                    toggleCheckbox("infinite_turn_stop");
-                    document.getElementById(
-                        "infinite_start_stop_button"
-                    ).style.backgroundColor = "#e3af88";
-                    document.getElementById("infinite_start_stop_button").style.borderColor =
-                        "#e3af88";
-                }
-            }
-
-            // **************CODE FOR THE SLIDER****************
-            function handleSingleSliderChange(value) {
-                sendSliderValueToESP32("setSingleSpeed", value);
-                singleSpeed = value;
-            }
-
-            function handleInfiniteSliderChange(value) {
-                sendSliderValueToESP32("setInfiniteSpeed", value);
-                infiniteSpeed = value;
-            }
-
-            function sendSliderValueToESP32(endpoint, value) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/" + endpoint + "?value=" + value, true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        console.log("Response: " + xhr.responseText); // Optional: Handle response
-                    }
-                };
-                xhr.send();
-            }
-
-            // function sendSliderValueToESP32(endpoint, value) {
-            //   var xhr = new XMLHttpRequest();
-            //   xhr.open("GET", "http://100.100.100.100/" + endpoint + "?value=" + value, true);
-            //   xhr.onreadystatechange = function () {
-            //     if (xhr.readyState == 4 && xhr.status == 200) {
-            //       console.log("Response: " + xhr.responseText); // Optional: Handle response
-            //     }
-            //   };
-            //   xhr.send();
-            // }
-
-            // Toggle the display of the settings container
-
-            // Immediately-invoked Function Expression (IIFE) to set initial state
-            (function () {
-                var settings = document.getElementById("settingsContainer");
-                settings.style.display = "none"; // Make sure this matches the initial CSS state
-            })();
-
-            function toggleSettings() {
-                var settings = document.getElementById("settingsContainer");
-                if (settings.style.display === "none") {
-                    settings.style.display = "block";
-                    toggleCheckbox("openSettings");
-                } else {
-                    settings.style.display = "none";
-                    toggleCheckbox("closeSettings");
-                }
-            }
-
-            function toggleLogging() {
-                loggingEnabled =!loggingEnabled;
-                const button = document.getElementById("toggleLoggingButton");
-                if (loggingEnabled) {
-                    button.innerHTML = "Stop logging";
-                    button.style.backgroundColor = "#ec6f6f";
-                    button.classList.add('hover');
-                    clearLog()
-                } else {
-                    button.innerHTML = "Start logging";
-                    button.style.backgroundColor = "#e1d3c8";
-                    button.classList.add('hover');
-                    downloadLog();
-                }
-            }
-
-            function downloadLog() {
-                if (logData.length > 0) {
-                    // Generate CSV file
-                    generateCSV(); 
-                    logData = [];
-                }
-		    }
-
-            function clearLog() {
-                logData = [];
-            }
-
-            // Function to generate CSV file
-            function generateCSV() {
-                // Generate CSV content from received data
-                let csvContent = "TimeStamp,Command,Single Speed,Infinite Speed\n";
-                logData.forEach(data => {
-                    csvContent += `${data.timestamp},${data.command},${data.single_speed},${data.infinite_speed}\n`;
-                });
-
-                // Create Blob object from CSV content
-                let blob = new Blob([csvContent], { type: 'text/csv' });
-
-                // Create download link
-                let link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = 'log.csv';
-                link.click();
-            }
-
-            function getCurrentFormattedTime() {
-                const now = new Date();
-                
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so add 1
-                const day = String(now.getDate()).padStart(2, '0');
-                
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-
-                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-            }
-
-            //    function ResponseStart() {
-            //        toggleCheckbox('responseStop');
-            //    }
-            //
-            //
-            //    // Highcharts code
-            //
-            //    var chartF = new Highcharts.Chart({
-            //        chart: { renderTo: 'chart-force' },
-            //        title: { text: 'Force' },
-            //        tooltip: {
-            //            enabled: false
-            //        },
-            //        series: [{
-            //            showInLegend: false,
-            //            color: 'green',
-            //            data: [],
-            //            marker: {
-            //                enabled: false
-            //            }
-            //        },
-            //        {
-            //            showInLegend: false,
-            //            color: 'blue',
-            //            data: [],
-            //            marker: {
-            //                enabled: false
-            //            }
-            //        }],
-            //        plotOptions: {
-            //            line: {
-            //                animation: false,
-            //                dataLabels: { enabled: false }
-            //            },
-            //            series: { enableMouseTracking: false }
-            //        },
-            //        xAxis: {
-            //            type: 'datetime',
-            //            dateTimeLabelFormats: { second: '%H:%M:%S' }
-            //        },
-            //        yAxis: {
-            //            title: { text: 'Force [dN]' },
-            //            max: 50,
-            //            min: -10
-            //
-            //        },
-            //        credits: { enabled: false }
-            //    });
-            //
-            //    function connectWebSocket() {
-            //        socket = new WebSocket('ws://' + window.location.hostname + ':81/');
-            //        socket.onmessage = function (event) {
-            //            var myObj = JSON.parse(event.data);
-            //            var keys = Object.keys(myObj);
-            //
-            //            var base_sin = Number(myObj["base_sin"]);
-            //            document.getElementById("base_sin").innerHTML = base_sin;
-            //            var f_sin = Number(myObj["f_sin"]);
-            //            document.getElementById("f_sin").innerHTML = f_sin;
-            //            var amp_sin = Number(myObj["amp_sin"]);
-            //            document.getElementById("amp_sin").innerHTML = amp_sin;
-            //
-            //            if (chartF.series) {
-            //                for (var i = 0; i < keys.length; i++) {
-            //                    var x = (new Date()).getTime();
-            //                    const key = keys[i];
-            //                    var y = Number(myObj[key]);
-            //                    if (chartF.series[i]) {
-            //                        if (chartF.series[i].data.length > 400) {
-            //                            chartF.series[i].addPoint([x, y], true, true, true);
-            //                        } else {
-            //                            chartF.series[i].addPoint([x, y], true, false, true);
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        };
-            //        socket.onopen = function () {
-            //            console.log('WebSocket connected');
-            //        };
-            //
-            //        socket.onclose = function () {
-            //            console.log('WebSocket closed, reconnecting...');
-            //            setTimeout(connectWebSocket, 1000); // Try to reconnect after 1 second
-            //        };
-            //    }
-            //    connectWebSocket();
-            //
-            //    function toggleCheckbox(x) {
-            //        var xhr = new XMLHttpRequest();
-            //        xhr.open("GET", "/" + x, true);
-            //        xhr.send(); 4
-            //    }
-            //
-            // https://www.w3schools.com/w3css/w3css_modal.asp:
-
-        </script>
+    </div>
+    <script src="script.js"></script>
 </body>
-
 </html>
