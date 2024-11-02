@@ -29,7 +29,7 @@ function updateMaxSpeed(type) {
 
 // Open settings dialog
 function openSettingsDialog() {
-    document.getElementById('settingsDialog').style.display = 'block';
+    document.getElementById('settingsDialog').style.display = 'flex';
 }
 
 // Close settings dialog
@@ -39,7 +39,7 @@ function closeSettingsDialog() {
 
 // Open login dialog
 function openLoginDialog() {
-    document.getElementById('loginDialog').style.display = 'block';
+    document.getElementById('loginDialog').style.display = 'flex';
 }
 
 // Close settings dialog
