@@ -17,20 +17,42 @@ body {
 
 /* Main container styling */
 .container {
+  display: flex;
+  flex: 1;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 40px;
+  margin-right: 40px;
+  flex-direction: column;
+  align-items: stretch;
   background-color: #f1faff;
   border-radius: 12px;
   padding: 20px;
-  width: 450px;
+  min-width: 300px;
+  max-width: 500px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: center;
+  /* align-items: center; */
+}
+
+.w3-modal {
+  /* min-height: 100vh; */
+  justify-content: center;
+  align-items: center;
 }
 
 .dialog {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  margin-left: 40px;
+  margin-right: 40px;
+  min-width: 300px;
+  max-width: 500px;
   background-color: #f1faff;
   border-radius: 12px;
   padding: 20px;
-  width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
@@ -53,9 +75,14 @@ body {
 .tab-link {
   flex-grow: 1;
   border-radius: 6px;
+  font-weight: normal !important;
+  font-size: 13px !important;
 }
 
 .settingSection {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   justify-items: center;
   padding: 10px;
   margin-top: 5px;
@@ -68,7 +95,6 @@ body {
 
 .turn-modes-containter {
   display: flex;
-  width: 200px;
   gap: 10px;
 }
 
@@ -178,4 +204,114 @@ body {
   margin-top: 20px;
   font-size: 14px;
   color: #555;
+}
+
+/* Captive Page */
+.form-container {
+  background-color: #e6f0ff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  padding: 20px;
+  gap: 10px;
+}
+
+.form-container .link {
+  width: 100%;
+  padding: 10px;
+  color: #000;
+  background-color: #e1d3c8;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.form-container .link:hover {
+  color: #000;
+  background-color: #e3af88;
+}
+
+form legend {
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 18px;
+}
+
+form input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+form input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+form input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  color: #000;
+  background-color: #89c1e7;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+form input[type="submit"]:hover {
+  background-color: #63b0e4;
+}
+
+.wifi-status-container {
+  background-color: #e6f0ff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  gap: 5px;
+}
+
+.status-message {
+  margin-top: 20px;
+  font-size: 1em;
+  color: red;
+}
+.ip-address {
+  display: none;
+  font-size: 1em;
+  margin-top: 10px;
+}
+.copy-button {
+  display: none;
+  width: 100%;
+  padding: 10px;
+  color: #000;
+  background-color: #e3af88;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.copy-button:hover {
+  background-color: #e1d3c8;
 }
