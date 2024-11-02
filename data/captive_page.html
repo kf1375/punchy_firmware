@@ -5,11 +5,11 @@
     <title>Wi-Fi Configuration</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="w3.css">
-    <link rel="stylesheet" href="captive_page.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <header id="masthead" class="header">
+    <!-- <header id="masthead" class="header">
         <div class="branding">
             <a href="#">
                 <img src="logo.png">
@@ -19,25 +19,29 @@
     <div class="title-container">
         <h1>DorsiDynamics Extension</h1>
 
-    </div>
-    <div class="form-container">
-        <form onsubmit="sendConfig(event)">
-            <legend>Wi-Fi Configuration</legend>
-            <input type="text" id="ssid" placeholder="SSID" name="ssid">
-            <input type="password" id="password" placeholder="Password" name="password">
-            <input type="submit" value="Connect">
-        </form>
-        <label class="label">Or</label>
-        <a href="http://192.168.4.1/" class="link">Continue in Access Point Mode</a>
-        <div id="status-message" class="status-message"></div>
-        
-    </div>
-    <div class="wifi-status-container">
-        <h5>Wi-Fi Status</h5>
-        <p id="cstatus">Loading...</p>
-        <p id="cssid"></p>
-        <p id="cip"></p>
-        <button id="copy-button" class="copy-button" onclick="copyIpAddress()">Copy IP Address</button>
+    </div> -->
+
+    <div class="container">
+        <div class="header">Wi-Fi Configuration</div>
+        <div class="form-container">
+            <form onsubmit="sendConfig(event)">
+                <!-- <legend>Connect to Wi-Fi</legend> -->
+                <input type="text" id="ssid" placeholder="SSID" name="ssid">
+                <input type="password" id="password" placeholder="Password" name="password">
+                <input type="submit" value="Connect">
+            </form>
+            <label class="label">Or</label>
+            <a href="http://192.168.4.1/" class="link">Continue in Access Point Mode</a>
+            <div id="status-message" class="status-message"></div>
+            
+        </div>
+        <div class="wifi-status-container">
+            <h5>Wi-Fi Status</h5>
+            <p id="cstatus">Loading...</p>
+            <p id="cssid"></p>
+            <p id="cip"></p>
+            <button id="copy-button" class="copy-button" onclick="copyIpAddress()">Copy IP Address</button>
+        </div>
     </div>
 </body>
 <script>
