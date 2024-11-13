@@ -8,8 +8,11 @@
 bool automatic_mode = false; // false = manual mode, true = automatic mode
 
 // Speed Variables
-unsigned int single_speed = 10; // Speed of the single turn in rmp default is 10
-unsigned int infinite_speed = 10; // Speed of the infinite turn in rmp
+unsigned int single_speed = 10;         // Speed of the single turn in rpm default is 10
+unsigned int max_single_speed = 100;    // Max Speed of the single turn in rpm default is 100
+
+unsigned int infinite_speed = 10;       // Speed of the infinite turn in rpm
+unsigned int max_infinite_speed = 100;  // Max Speed of the infinite turn in rpm default is 100
 
 unsigned int last_single_speed = 0;
 unsigned int last_infinite_speed = 0;

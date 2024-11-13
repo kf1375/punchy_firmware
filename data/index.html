@@ -18,18 +18,18 @@
 
         <button class="button button-single" onclick="toggleCheckbox('single_turn_start')">Start Single Turn</button>
         <div class="speed-label">Single Speed: <span id="single-speed-value">10</span></div>
-        <input type="range" id="single-speed" min="0" max="100" value="10" class="slider" oninput="updateSpeed('single')">
+        <input type="range" id="single-speed" min="0" max="100" value="0" class="slider" oninput="updateSpeed('single')">
 
         <button class="button button-infinite" onclick="toggleStart_Stop_infinite()">Start Infinite Turn</button>
         <div class="speed-label">Infinite Speed: <span id="infinite-speed-value">10</span></div>
-        <input type="range" id="infinite-speed" min="0" max="100" value="10" class="slider" oninput="updateSpeed('infinite')">
+        <input type="range" id="infinite-speed" min="0" max="100" value="0" class="slider" oninput="updateSpeed('infinite')">
 
         <div class="speed-info">
             <p>Current Motor Speeds:</p>
-            <p>Single Turn Speed: <span id="current-single-speed">10</span></p>
-            <p>Infinite Turn Speed: <span id="current-infinite-speed">10</span></p>
-            <p>Max Half Turn Speed: <span id="current-max-single-speed">100</span></p>
-            <p>Max Full Turn Speed: <span id="current-max-infinite-speed">100</span></p>
+            <p>Single Turn Speed: <span id="current-single-speed">0</span></p>
+            <p>Infinite Turn Speed: <span id="current-infinite-speed">0</span></p>
+            <p>Max Half Turn Speed: <span id="current-max-single-speed">0</span></p>
+            <p>Max Full Turn Speed: <span id="current-max-infinite-speed">0</span></p>
         </div>
     </div>
 
@@ -74,9 +74,9 @@
                     <div class="settingSection">
                         <h4>Max Speed Settings</h4>
                         <div class="speed-label">Max Half Turn Speed: <span id="max-single-speed-value">100</span></div>
-                        <input type="range" id="max-single-speed" min="0" max="1000" value="100" class="slider" oninput="updateMaxSpeed('single')">
+                        <input type="range" id="max-single-speed" min="0" max="1000" value="0" class="slider" oninput="updateMaxSpeed('single')">
                         <div class="speed-label">Max Full Turn Speed: <span id="max-infinite-speed-value">100</span></div>
-                        <input type="range" id="max-infinite-speed" min="0" max="1000" value="100" class="slider" oninput="updateMaxSpeed('infinite')">
+                        <input type="range" id="max-infinite-speed" min="0" max="1000" value="0" class="slider" oninput="updateMaxSpeed('infinite')">
                     </div>
                 </div>
             </div>

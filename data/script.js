@@ -2,8 +2,40 @@ let step_respo_mode = false;
 let step_respo_Start = false;
 let infinite_start = false;
 // let loggingEnabled = false;
-let singleSpeed = 0;
-let infiniteSpeed = 0;
+let singleSpeed, maxSingleSpeed;
+let infiniteSpeed, maxInfiniteSpeed;
+
+// Function to get the current speeds values
+function fetchSpeeds() {
+    fetch('/speeds')
+    .then(response => response.json())
+    .then(data => {
+        singleSpeed = data.single_speed;
+        document.getElementById(`single-speed`).value = singleSpeed;
+        document.getElementById(`single-speed-value`).textContent = singleSpeed;
+        document.getElementById(`current-single-speed`).textContent = singleSpeed;
+
+        maxSingleSpeed = data.max_single_speed;
+        document.getElementById(`max-single-speed`).value = maxSingleSpeed;
+        document.getElementById(`max-single-speed-value`).textContent = maxSingleSpeed;
+        document.getElementById(`current-max-single-speed`).textContent = maxSingleSpeed;
+
+        infiniteSpeed = data.infinite_speed;
+        document.getElementById(`infinite-speed`).value = infiniteSpeed;
+        document.getElementById(`infinite-speed-value`).textContent = infiniteSpeed;
+        document.getElementById(`current-infinite-speed`).textContent = singleSpeed;
+
+        maxInfiniteSpeed = data.max_infinite_speed;
+        document.getElementById(`max-infinite-speed`).value = maxInfiniteSpeed;
+        document.getElementById(`max-infinite-speed-value`).textContent = maxInfiniteSpeed;
+        document.getElementById(`current-max-infinite-speed`).textContent = maxInfiniteSpeed;
+    })
+    .catch(error => {
+    console.error('Error fetching speeds values', error);
+    });
+}
+
+fetchSpeeds();
 
 // Function to update speed values
 function updateSpeed(type) {

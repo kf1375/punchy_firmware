@@ -316,6 +316,15 @@ void handleWifiState(struct mg_connection *c, struct mg_http_message *hm) {
     mg_http_reply(c, 200, "Content-Type: application/json\r\n", response.c_str());
 }
 
+void handleSpeeds(struct mg_connection *c, struct mg_http_message *hm) {
+    String response = "{\"single_speed\":\"" + String(single_speed) + 
+                    "\",\"max_single_speed\":\"" + String(max_single_speed) + 
+                    "\",\"infinite_speed\":\"" + String(infinite_speed) + 
+                    "\",\"max_infinite_speed\":\"" + String(max_infinite_speed) + "\"}";
+                    
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", response.c_str());
+}
+
 // get the number of active connections
 static inline int numconns(struct mg_mgr *mgr) {
     int n = 0;
@@ -403,6 +412,8 @@ static void httpEventHandler(struct mg_connection *c, int ev, void *ev_data) {
             handleSendCofig(c, hm);
         } else if (mg_match(hm->uri, mg_str("/wifi-state"), NULL)) {
             handleWifiState(c, hm);
+        } else if (mg_match(hm->uri, mg_str("/speeds"), NULL)) {
+            handleSpeeds(c, hm);
         } else {
             // by default serve static files
             mg_http_serve_dir(c, hm, &s_http_serve_opts);
