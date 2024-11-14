@@ -1,7 +1,4 @@
-let step_respo_mode = false;
-let step_respo_Start = false;
 let infinite_start = false;
-// let loggingEnabled = false;
 let singleSpeed, maxSingleSpeed;
 let infiniteSpeed, maxInfiniteSpeed;
 
@@ -98,7 +95,7 @@ function openTab(evt, tabName) {
     for (i = 0; i < x.length; i++) {
         x[i].style.display = "none";
     }
-    tablinks = document.getElementsByClassName("tablink");
+    tablinks = document.getElementsByClassName("tab-link");
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" w3-white", "");
     }
@@ -136,38 +133,31 @@ function toggleCheckbox(x) {
 // function to enable the toggling of the start/stop button
 function toggleStart_Stop_infinite() {
     infinite_start = !infinite_start;
-
+    const infiniteTurnButton = document.getElementById('infiniteTurnButton')
     if (infinite_start) {
         toggleCheckbox("infinite_turn_start");
-        // document.getElementById(
-        //     "infinite_start_stop_button"
-        // ).style.backgroundColor = "#f14907";
-        // document.getElementById("infinite_start_stop_button").style.borderColor =
-        //     "#f14907";
+        infiniteTurnButton.style.backgroundColor = "#c1121f";
+        infiniteTurnButton.textContent = "Stop";
     } else {
         toggleCheckbox("infinite_turn_stop");
-        // document.getElementById(
-        //     "infinite_start_stop_button"
-        // ).style.backgroundColor = "#e3af88";
-        // document.getElementById("infinite_start_stop_button").style.borderColor =
-        //     "#e3af88";
+        infiniteTurnButton.style.backgroundColor = "#28A745";
+        infiniteTurnButton.textContent = "Start Infinite Turn";
     }
 }
 
 // function to toggle Half and Full Button
-function setActiveButton(selectedButtonId) {
-    if (selectedButtonId === "half") {
+function setActiveButton(mode) {
+    const halfButton = document.getElementById('halfButton');
+    const fullButton = document.getElementById('fullButton');
+    console.log(mode);
+    if (mode === "half") {
         toggleCheckbox("half");
-        // document.getElementById("half").style.backgroundColor = "#f14907";
-        // document.getElementById("half").style.borderColor = "#f14907";
-        // document.getElementById("full").style.backgroundColor = "#e3af88";
-        // document.getElementById("full").style.borderColor = "#e3af88";
+        halfButton.disabled = true;
+        fullButton.disabled = false;
     }
-    if (selectedButtonId === "full") {
+    if (mode === "full") {
         toggleCheckbox("full");
-        // document.getElementById("full").style.backgroundColor = "#f14907";
-        // document.getElementById("full").style.borderColor = "#f14907";
-        // document.getElementById("half").style.backgroundColor = "#e3af88";
-        // document.getElementById("half").style.borderColor = "#e3af88";
+        halfButton.disabled = false;
+        fullButton.disabled = true;
     }
 }

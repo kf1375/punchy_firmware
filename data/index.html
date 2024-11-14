@@ -12,24 +12,30 @@
         <div class="header">Stepper Control</div>
 
         <div class="top-buttons">
-            <button onclick="openSettingsDialog()">Settings</button>
-            <button onclick="openLoginDialog()">Login</button>
+            <button class="button-setting" onclick="openSettingsDialog()">Settings</button>
+            <button class="button-setting" onclick="openLoginDialog()">Login</button>
         </div>
 
-        <button class="button button-single" onclick="toggleCheckbox('single_turn_start')">Start Single Turn</button>
+        <button id="singleTurnButton" class="button button-single" onclick="toggleCheckbox('single_turn_start')">Start Single Turn</button>
         <div class="speed-label">Single Speed: <span id="single-speed-value">10</span></div>
         <input type="range" id="single-speed" min="0" max="100" value="0" class="slider" oninput="updateSpeed('single')">
 
-        <button class="button button-infinite" onclick="toggleStart_Stop_infinite()">Start Infinite Turn</button>
+        <button id="infiniteTurnButton" class="button button-infinite" onclick="toggleStart_Stop_infinite()">Start Infinite Turn</button>
         <div class="speed-label">Infinite Speed: <span id="infinite-speed-value">10</span></div>
         <input type="range" id="infinite-speed" min="0" max="100" value="0" class="slider" oninput="updateSpeed('infinite')">
 
         <div class="speed-info">
-            <p>Current Motor Speeds:</p>
-            <p>Single Turn Speed: <span id="current-single-speed">0</span></p>
-            <p>Infinite Turn Speed: <span id="current-infinite-speed">0</span></p>
-            <p>Max Half Turn Speed: <span id="current-max-single-speed">0</span></p>
-            <p>Max Full Turn Speed: <span id="current-max-infinite-speed">0</span></p>
+            <div class="speed-info-header">Current Motor Speeds</div>
+            <div class="speed-info-container">
+                <div class="current-speed-info">
+                    <p>Single Turn Speed: <span id="current-single-speed">0</span></p>
+                    <p>Infinite Turn Speed: <span id="current-infinite-speed">0</span></p>
+                </div>
+                <div class="max-speed-info">
+                    <p>Max Half Turn Speed: <span id="current-max-single-speed">0</span></p>
+                    <p>Max Full Turn Speed: <span id="current-max-infinite-speed">0</span></p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -53,19 +59,19 @@
                     <div class="settingSection">
                         <h4>Turn Setting</h4>
                         <div class="turn-modes-containter">
-                            <button class="button turn-modes-button" onclick="setActiveButton('half')">Half Turn</button>
-                            <button class="button turn-modes-button" onclick="setActiveButton('full')">Full Turn</button>
+                            <button id="halfButton" class="button turn-modes-button" onclick="setActiveButton('half')">Half Turn</button>
+                            <button id="fullButton" class="button turn-modes-button" onclick="setActiveButton('full')">Full Turn</button>
                         </div>
                     </div>
                     <div class="settingSection">
                         <h4>Position Control</h4>
                         <div class="turn-modes-containter">
-                            <button class="button position-button" onclick="toggleCheckbox('arrowUp')">▲ Up</button>
-                            <button class="button position-button" onclick="toggleCheckbox('arrowDown')">▼ Down</button>
+                            <button class="button button-position" onclick="toggleCheckbox('arrowUp')">▲ Up</button>
+                            <button class="button button-position" onclick="toggleCheckbox('arrowDown')">▼ Down</button>
                         </div>
                         <div class="turn-modes-containter">
-                            <button class="button position-button" onclick="toggleCheckbox('submitFrontPos')">Set Front</button>
-                            <button class="button position-button" onclick="toggleCheckbox('submitRearPos')">Set Rear</button>
+                            <button class="button button-position" onclick="toggleCheckbox('submitFrontPos')">Set Front</button>
+                            <button class="button button-position" onclick="toggleCheckbox('submitRearPos')">Set Rear</button>
                         </div>
                     </div>
                 </div>
