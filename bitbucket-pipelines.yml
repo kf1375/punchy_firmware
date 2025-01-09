@@ -17,9 +17,8 @@ pipelines:
             - echo "Current version = $VERSION"
 
             # Fetch the list of files in the Downloads section
-            - RESPONSE=$(curl -s -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" \ 
-              "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads")
-            
+            - RESPONSE=$(curl -s -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads")
+
             # Parse the latest file uploaded
             - LATEST_FILE=$(echo "$RESPONSE" | jq -r '.values | sort_by(.created_on) | last(.[]).name')
             - echo "Latest uploaded file = $LATEST_FILE"
