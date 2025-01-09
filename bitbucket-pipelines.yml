@@ -6,6 +6,9 @@ pipelines:
       - step:
           name: Build and Upload Binary
           script:
+            # install command-line JSON processor
+            - apt update && apt install -y jq
+
             # Fetch the version from version.txt
             - VERSION_FILE="version.txt"
             - if [ -f "$VERSION_FILE" ]; then
