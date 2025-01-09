@@ -4,15 +4,18 @@ pipelines:
   branches:
     main:
       - step:
-          - platformio run
-          - PLATFORMIO_BIN=$(find .pio -name "*.bin" | head -n 1)
-          - echo "Binary file generated: $PLATFORMIO_BIN"
-          - |
-            if [ -f "$PLATFORMIO_BIN" ]; then
-              curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" \
-                -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" \
-                -F "files=@$PLATFORMIO_BIN"
-            else
-              echo "Binary file not found!"
-              exit 1
-            fi
+          name: Build and Upload Binary
+          script:
+            - platformio run
+            - PLATFORMIO_BIN=$(find .pio -name "*.bin" | head -n 1)
+            - echo "Binary file generated:"
+            - echo $PLATFORMIO_BIN
+            - |
+              if [ -f "$PLATFORMIO_BIN" ]; then
+                curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" \
+                  -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" \
+                  -F "files=@$PLATFORMIO_BIN"
+              else
+                echo "Binary file not found!"
+                exit 1
+              fi
