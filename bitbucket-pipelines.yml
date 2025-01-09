@@ -39,10 +39,14 @@ pipelines:
             # Find the generated binary file
             - PLATFORMIO_BIN=$(find .pio -name "*.bin" | head -n 1)
             - echo "Binary file generated $PLATFORMIO_BIN"
-            - if [ -f "$PLATFORMIO_BIN" ]; then
+
+            # Upload the binary to Bitbucket Downloads section
+            - |
+              if [ -f "$PLATFORMIO_BIN" ]; then
+                echo "Uploading binary file: ${FILE_NAME}"
                 curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" \
                   -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" \
-                  -F "files=@$PLATFORMIO_BIN"
+                  -F "files=@$PLATFORMIO_BIN;filename=${FILE_NAME}"
               else
                 echo "Binary file not found!"
                 exit 1
