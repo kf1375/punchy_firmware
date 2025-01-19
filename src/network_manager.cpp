@@ -431,9 +431,9 @@ void NetworkManager::mqttHandleSettings(struct mg_connection *c, struct mg_str *
             return;
         }
         if (strcmp(turn_type, "Full Turn") == 0) {
-            cmd.value = TurnType::FullTurn;
+            cmd.value = (int32_t) TurnType::FULL_TURN;
         } else if (strcmp(turn_type, "Half Turn") == 0) {
-            cmd.value = TurnType::HalfTurn;
+            cmd.value = (int32_t) TurnType::HALF_TURN;
         }
         free(turn_type);
     } else if (mg_strcmp(*param, mg_str("set_front")) == 0) {

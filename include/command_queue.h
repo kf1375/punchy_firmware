@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "mongoose.h"
 
-enum CommandType {
+enum class CommandType {
     STOP = 0,
     START_SIGNLE,
     START_INFINITE,

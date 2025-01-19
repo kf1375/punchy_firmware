@@ -1,68 +1,209 @@
 #include "hardware_controller.h"
 
-HardwareController::HardwareController() {}
+HardwareController::HardwareController(uint8_t motorStepPin, uint8_t motorDirPin, uint8_t motorEnPin) : 
+    m_motorController(motorStepPin, motorDirPin), m_mode(Mode::STOP), m_motorState(MotorState::START),
+    m_turnFinished(false), m_frontPosDefined(false), m_rearPosDefined(false), m_frontPos(0), m_rearPos(0),
+    m_singleSpeed(100), m_infiniteSpeed(200), m_maxHalfSpeed(1000), m_maxFullSpeed(1000)
+{
 
-HardwareController::~HardwareController() {}
+}
 
-void HardwareController::init() {
-    // Initialize hardware components like motors and sensors
+HardwareController::~HardwareController() 
+{
+
+}
+
+void HardwareController::init() 
+{
+    Serial.println("Initializing hardware controller...");
+    m_motorController.begin();
+    m_motorController.setSpeed(1000);
+    m_motorController.setAcceleration(500);
     Serial.println("Hardware controller initialized.");
 }
 
-void HardwareController::poll() {
-    // Poll for commands and process them
+void HardwareController::poll() 
+{    
+    if (m_commandQueue) {
+        processCommand();
+    }
+    spin();
+}
+
+void HardwareController::processCommand() 
+{
     Command cmd;
     if (m_commandQueue->getNextCommand(cmd)) {
-        processCommand(cmd);
+        switch (cmd.type) {
+            case CommandType::STOP:
+                Serial.println("STOP command received.");
+                m_mode = Mode::STOP;
+                break;
+            case CommandType::START_SIGNLE:
+                Serial.println("START_SINGLE command received.");
+                if (m_frontPosDefined && m_rearPosDefined) {
+                    m_mode = Mode::SINGLE;
+                } else {
+                    Serial.println("Define positions first!");
+                    m_mode =  Mode::STOP;
+                }
+                break;
+            case CommandType::START_INFINITE:
+                Serial.println("START_INFINITE command received.");
+                if (m_frontPosDefined && m_rearPosDefined) {
+                    m_mode = Mode::INFINITE;
+                } else {
+                    Serial.println("Define positions first!");
+                    m_mode = Mode::STOP;
+                }
+                break;
+            case CommandType::SETTING_TURN_TYPE:
+                Serial.println("SETTING_TURN_TYPE command received.");
+                if ((TurnType) cmd.value == TurnType::FULL_TURN) {
+                    m_turnType = TurnType::FULL_TURN;
+                } else if ((TurnType) cmd.value == TurnType::HALF_TURN) {
+                    m_turnType = TurnType::HALF_TURN;
+                } else {
+                    Serial.println("Invalid Turn Type!");
+                }
+                break;
+            case CommandType::SETTING_SET_REAR:
+                Serial.println("SETTING_SET_REAR command received.");
+                m_rearPos = cmd.value;
+                break;
+            case CommandType::SETTING_SET_FRONT:
+                Serial.println("SETTING_SET_FRONT command received.");
+                m_frontPos = cmd.value;
+                break;
+            case CommandType::SETTING_MAX_HALF_SPEED:
+                Serial.println("SETTING_MAX_HALF_SPEED command received.");
+                m_maxHalfSpeed = cmd.value;
+                break;
+            case CommandType::SETTING_MAX_FULL_SPEED:
+                Serial.println("SETTING_MAX_FULL_SPEED command received.");
+                m_maxFullSpeed = cmd.value;
+                break;
+            case CommandType::COMMAND_UP:
+                Serial.println("COMMAND_UP command received.");
+                if (m_mode == Mode::STOP) {
+                    // Motor Should stop to perform manual command
+                }
+                break;
+            case CommandType::COMMAND_DOWN:
+                Serial.println("COMMAND_DOWN command received.");
+                if (m_mode == Mode::STOP) {
+                    // Motor Should stop to perform manual command
+                }
+                break;
+            default:
+                Serial.println("Unknown command type.");
+                break;
+        }
         m_commandQueue->removeCommand();
     }
 }
 
-void HardwareController::processCommand(const Command &cmd) {
-    // Process the command
-    switch (cmd.type) {
-        case STOP:
-            Serial.println("STOP command received.");
-            // Handle STOP command
+void HardwareController::spin()
+{
+    switch (m_mode) {
+    case Mode::SINGLE:
+        handleSingleMode();
+        break;
+    case Mode::INFINITE:
+        handleInfiniteMode();
+        break;
+    case Mode::STOP:
+        handleStopMode();
+        break;
+    default:
+        Serial.println("Unknown turn mode.");
+        break;
+    }
+}
+
+void HardwareController::handleSingleMode() 
+{
+    switch (m_motorState) {
+        case MotorState::START:
+            m_motorController.setSpeed(m_singleSpeed);
+            m_motorController.moveSteps(m_turnType == TurnType::HALF_TURN ? m_frontPos : 200);
+            m_motorState = MotorState::ROTATE_FORWARD;
+            Serial.println("Single mode started.");
             break;
-        case START_SIGNLE:
-            Serial.println("START_SINGLE command received.");
-            // Handle START_SINGLE command
+        case MotorState::ROTATE_FORWARD:
+            if (!m_motorController.isRunning()) {
+                m_motorState = MotorState::PAUSE_FORWARD;
+                m_startPauseForwardMillis = millis();
+            }
             break;
-        case START_INFINITE:
-            Serial.println("START_INFINITE command received.");
-            // Handle START_INFINITE command
+        case MotorState::PAUSE_FORWARD:
+            if ((millis() - m_startPauseForwardMillis) > (m_turnType == TurnType::HALF_TURN ? 1000 : 300)) {
+                m_motorState = MotorState::ROTATE_BACK;
+            }
             break;
-        case SETTING_TURN_TYPE:
-            Serial.println("SETTING_TURN_TYPE command received.");
-            // Handle SETTING_TURN_TYPE command
-            break;
-        case SETTING_SET_REAR:
-            Serial.println("SETTING_SET_REAR command received.");
-            // Handle SETTING_SET_REAR command
-            break;
-        case SETTING_SET_FRONT:
-            Serial.println("SETTING_SET_FRONT command received.");
-            // Handle SETTING_SET_FRONT command
-            break;
-        case SETTING_MAX_HALF_SPEED:
-            Serial.println("SETTING_MAX_HALF_SPEED command received.");
-            // Handle SETTING_MAX_HALF_SPEED command
-            break;
-        case SETTING_MAX_FULL_SPEED:
-            Serial.println("SETTING_MAX_FULL_SPEED command received.");
-            // Handle SETTING_MAX_FULL_SPEED command
-            break;
-        case COMMAND_UP:
-            Serial.println("COMMAND_UP command received.");
-            // Handle COMMAND_UP command
-            break;
-        case COMMAND_DOWN:
-            Serial.println("COMMAND_DOWN command received.");
-            // Handle COMMAND_DOWN command
+        case MotorState::ROTATE_BACK:
+            m_motorController.setSpeed(90);
+            m_motorController.moveSteps(m_turnType == TurnType::HALF_TURN ? m_rearPos : 0);
+
+            if (!m_motorController.isRunning()) {
+                m_motorState = MotorState::START;
+                m_mode = Mode::STOP;
+                m_turnFinished = true;
+            }
             break;
         default:
-            Serial.println("Unknown command type.");
+            Serial.println("Unknown motor state in SINGLE mode.");
             break;
     }
+
+}
+
+void HardwareController::handleInfiniteMode() 
+{
+    switch (m_motorState) {
+        case MotorState::START:
+            m_motorController.setSpeed(m_infiniteSpeed);
+            if (m_turnType == TurnType::HALF_TURN) {
+                m_motorController.moveSteps(m_frontPos);
+            } else if (m_turnType == TurnType::FULL_TURN) {
+                // m_motorController.rotate(1);
+            }
+            m_motorState = MotorState::ROTATE_FORWARD;
+            Serial.println("Infinite mode started.");
+            break;
+        case MotorState::ROTATE_FORWARD:
+            if (m_turnType == TurnType::HALF_TURN && !m_motorController.isRunning()) {
+                m_motorState = MotorState::PAUSE_FORWARD;
+                m_startPauseForwardMillis = millis();
+            }
+            break;
+        case MotorState::PAUSE_FORWARD:
+            if (millis() - m_startPauseForwardMillis >= 1000) {
+                m_motorState = MotorState::ROTATE_BACK;
+            }
+            break;
+        case MotorState::ROTATE_BACK:
+            m_motorController.setSpeed(90);
+            m_motorController.moveSteps(m_rearPos);
+
+            if (!m_motorController.isRunning()) {
+                m_motorState = MotorState::PAUSE_BACK;
+                m_startPauseBackMillis = millis();
+            }
+            break;
+        case MotorState::PAUSE_BACK:
+            if (millis() - m_startPauseBackMillis >= 1000) {
+                m_motorState = MotorState::START;
+                m_turnFinished = true;
+            }
+            break;
+        default:
+            Serial.println("Unknown motor state in INFINITE mode.");
+            break;
+    }
+}
+
+void HardwareController::handleStopMode()
+{
+
 }
