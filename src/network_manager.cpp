@@ -50,7 +50,7 @@ void NetworkManager::init()
         .fs = &m_fs,
     };
 
-    mg_log_set(MG_LL_DEBUG);
+    mg_log_set(MG_LL_INFO);
     mg_log_set_fn([](char ch, void *) { Serial.print(ch); }, NULL);
 
     mg_mgr_init(&m_mgr);
@@ -279,7 +279,6 @@ void NetworkManager::onMqttConnected(struct mg_connection *c, int code)
 void NetworkManager::onMqttMessageReceived(struct mg_connection *c, struct mg_str *topic, struct mg_str *data)
 {
     struct mg_str caps[3];
-    Util::printMgStr(*topic);
     
     if (mg_match(*topic, mg_str((m_deviceId + "/#/#").c_str()), caps)) {
         struct mg_str *second_level = &caps[1];
