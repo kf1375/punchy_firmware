@@ -75,7 +75,7 @@ void HardwareController::processCommand()
             case CommandType::SETTING_SET_FRONT:
                 Serial.println("SETTING_SET_FRONT command received.");
                 m_frontPos = cmd.value;
-                m_frontPos = true;
+                m_frontPosDefined = true;
                 break;
             case CommandType::SETTING_MAX_HALF_SPEED:
                 Serial.println("SETTING_MAX_HALF_SPEED command received.");
