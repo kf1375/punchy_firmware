@@ -3,7 +3,7 @@
 
 #define MG_ARCH MG_ARCH_ESP32
 
-#define MG_ENABLE_EPOLL 0
+#define MG_MAX_RECV_SIZE 16384
 #define MG_FATFS_ROOT "/"
 #define MG_HTTP_INDEX "index.html"
 #define MG_TLS MG_TLS_BUILTIN	// change to 'MG_TLS_MBED' to enable TLS
