@@ -7,7 +7,8 @@
 enum class Mode {
     STOP = 0,
     SINGLE,
-    INFINITE
+    INFINITE,
+    MANUAL,
 };
 
 enum class TurnType {
@@ -57,6 +58,7 @@ private:
 
     void handleSingleMode();
     void handleInfiniteMode();
+    void handleManualMode();
     void handleStopMode();
     void spin();
 };

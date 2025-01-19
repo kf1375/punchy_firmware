@@ -88,13 +88,13 @@ void HardwareController::processCommand()
             case CommandType::COMMAND_UP:
                 Serial.println("COMMAND_UP command received.");
                 if (m_mode == Mode::STOP) {
-                    // Motor Should stop to perform manual command
+                    m_mode = Mode::MANUAL;
                 }
                 break;
             case CommandType::COMMAND_DOWN:
                 Serial.println("COMMAND_DOWN command received.");
                 if (m_mode == Mode::STOP) {
-                    // Motor Should stop to perform manual command
+                    m_mode = Mode::MANUAL;
                 }
                 break;
             default:
@@ -113,6 +113,9 @@ void HardwareController::spin()
         break;
     case Mode::INFINITE:
         handleInfiniteMode();
+        break;
+    case Mode::MANUAL:
+        handleManualMode();
         break;
     case Mode::STOP:
         handleStopMode();
@@ -201,6 +204,21 @@ void HardwareController::handleInfiniteMode()
             break;
         default:
             Serial.println("Unknown motor state in INFINITE mode.");
+            break;
+    }
+}
+
+void HardwareController::handleManualMode()
+{
+    switch (m_motorState) {
+        case MotorState::START:
+            break;
+        case MotorState::ROTATE_FORWARD:
+            break;
+        case MotorState::PAUSE_BACK:
+            break;
+        default:
+            Serial.println("Unknown motor state in MANUAL mode.");
             break;
     }
 }
