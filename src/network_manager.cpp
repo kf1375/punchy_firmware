@@ -3,6 +3,7 @@
 #include <WiFi.h>
 
 #include "fs_interface.h"
+#include "hardware_controller.h"
 #include "util.h"
 
 NetworkManager::NetworkManager() 
@@ -311,6 +312,46 @@ void NetworkManager::onMqttMessageReceived(struct mg_connection *c, struct mg_st
 void NetworkManager::mqttHandlePair(struct mg_connection *c, struct mg_str *data)
 {
     Serial.println("Handle Pair");
+
+    if (data->buf == nullptr) {
+        Serial.println("Received null data");
+        return;
+    }
+
+    struct mg_str json = *data;
+    
+    char *type = NULL;
+    type = mg_json_get_str(json, "$.type");
+    if (!type) {
+        Serial.println("Error: 'type' field not found");
+        return;
+    }
+
+    if (strcmp(type, "request") == 0) {
+        char *name = mg_json_get_str(json, "$.name");
+        if (!name) {
+            Serial.println("Error: 'name' field not found");
+            free(type);
+            return;
+        }
+
+        Serial.printf("Pairing request received for device: %s\n", name);
+
+        struct mg_mqtt_opts opts;
+        memset(&opts, 0, sizeof(opts));
+        opts.qos = 0;
+        opts.topic = mg_str((m_deviceId + "/pair").c_str());
+        opts.message = mg_str("{\"type\":\"response\",\"status\":\"accepted\",\"message\":\"Device paired successfully\"}");
+        if (m_mqttConnection) {
+            mg_mqtt_pub(m_mqttConnection, &opts);
+        }
+        free(name);
+        Serial.println("Pairing response published successfully");
+    } else {
+        Serial.printf("Invalid type: %s\n", type);
+    }
+
+    free(type);
 }
 
 void NetworkManager::mqttHandleStatus(struct mg_connection *c, struct mg_str *data)
@@ -326,10 +367,31 @@ void NetworkManager::mqttHandleDisconnect(struct mg_connection *c, struct mg_str
 void NetworkManager::mqttHandleStart(struct mg_connection *c, struct mg_str *mode, struct mg_str *data)
 {
     Serial.println("Handle Start");
-    Command cmd;
-    cmd.type = CommandType::START_INFINITE;
-    cmd.value = 1000;
 
+    if (data->buf == nullptr) {
+        Serial.println("Received null data");
+        return;
+    }
+
+    struct mg_str json = *data;
+
+    int32_t speed = mg_json_get_long(json, "$.speed", -1);
+    if (speed == -1) {
+        Serial.println("Error: 'type' field to get speed");
+        return;
+    }
+
+    Command cmd;
+    cmd.value = speed;
+    if (mg_strcmp(*mode, mg_str("single")) == 0) {
+        cmd.type = CommandType::START_SIGNLE;
+    } else if (mg_strcmp(*mode, mg_str("infinite")) == 0) {
+        cmd.type = CommandType::START_INFINITE;
+    } else {
+        Serial.println("Invalid Start Command");
+        return;
+    }
+    
     if (!m_commandQueue->addCommand(cmd)) {
         Serial.println("Queue is full");
     }
@@ -337,22 +399,97 @@ void NetworkManager::mqttHandleStart(struct mg_connection *c, struct mg_str *mod
 
 void NetworkManager::mqttHandleStop(struct mg_connection *c, struct mg_str *data)
 {
+    (void) data;
     Serial.println("Handle Stop");
+
+    Command cmd;
+    cmd.type = CommandType::STOP;
+    cmd.value = 0;
+
+    if (!m_commandQueue->addCommand(cmd)) {
+        Serial.println("Queue is full");
+    }
 }
 
 void NetworkManager::mqttHandleSettings(struct mg_connection *c, struct mg_str *param, struct mg_str *data)
 {
     Serial.println("Handle Settings");
+
+    if (param->buf == nullptr || data->buf == nullptr) {
+        Serial.println("Received null data");
+        return;
+    }
+
+    struct mg_str json = *data;
+
+    Command cmd;
+    if (mg_strcmp(*param, mg_str("turn_type")) == 0) {
+        cmd.type = CommandType::SETTING_TURN_TYPE;
+        char *turn_type = NULL;
+        turn_type = mg_json_get_str(json, "$.value");
+        if (!turn_type) {
+            Serial.println("Error: 'value' field not found");
+            return;
+        }
+        if (strcmp(turn_type, "Full Turn") == 0) {
+            cmd.value = TurnType::FullTurn;
+        } else if (strcmp(turn_type, "Half Turn") == 0) {
+            cmd.value = TurnType::HalfTurn;
+        }
+        free(turn_type);
+    } else if (mg_strcmp(*param, mg_str("set_front")) == 0) {
+        cmd.type = CommandType::SETTING_SET_FRONT;
+        cmd.value = mg_json_get_long(json, "$.value", -1);
+    } else if (mg_strcmp(*param, mg_str("set_rear")) == 0) {
+        cmd.type = CommandType::SETTING_SET_REAR;
+        cmd.value = mg_json_get_long(json, "$.value", -1);
+    } else if (mg_strcmp(*param, mg_str("max_half_speed")) == 0) {
+        cmd.type = CommandType::SETTING_MAX_HALF_SPEED;
+        cmd.value = mg_json_get_long(json, "$.value", -1);
+    } else if (mg_strcmp(*param, mg_str("max_full_speed")) == 0) {
+        cmd.type = CommandType::SETTING_MAX_FULL_SPEED;
+        cmd.value = mg_json_get_long(json, "$.value", -1);
+    } else {
+        Serial.println("Invalid Setting");
+        return;
+    }
+
+    if (!m_commandQueue->addCommand(cmd)) {
+        Serial.println("Queue is full");
+    }
 }
 
 void NetworkManager::mqttHandleCommands(struct mg_connection *c, struct mg_str *command, struct mg_str *data)
 {
     Serial.println("Handle Commands");
+
+    if (command->buf == nullptr || data->buf == nullptr) {
+        Serial.println("Received null data");
+        return;
+    }
+
+    struct mg_str json = *data;
+
+    Command cmd;
+    if (mg_strcmp(*command, mg_str("up")) == 0) {
+        cmd.type = CommandType::COMMAND_UP;
+        cmd.value = mg_json_get_long(json, "$.value", -1);
+    } else if (mg_strcmp(*command, mg_str("down")) == 0) {
+        cmd.type = CommandType::COMMAND_DOWN;
+        cmd.value = mg_json_get_long(json, "$.value", -1);
+    } else {
+        Serial.println("Invalid Command");
+        return;
+    }
+
+    if (!m_commandQueue->addCommand(cmd)) {
+        Serial.println("Queue is full");
+    }
 }
 
 void NetworkManager::mqttHandleUnknown(struct mg_connection *c, struct mg_str *data)
 {
-
+    Serial.println("Unknown mqtt message received.");
 }
 
 void NetworkManager::poll() 
@@ -443,7 +580,6 @@ void NetworkManager::mqttEventHandler(struct mg_connection *c, int ev, void *ev_
         Serial.println("MQTT connect is successful.");
         networkManager->onMqttConnected(c, *(int *) ev_data);
     } else if (ev == MG_EV_MQTT_MSG) {
-        Serial.println("New message arrived.");
         struct mg_mqtt_message *mm = (struct mg_mqtt_message *) ev_data;
         networkManager->onMqttMessageReceived(c, &mm->topic, &mm->data);
     } else if (ev == MG_EV_CLOSE) {
