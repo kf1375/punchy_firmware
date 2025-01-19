@@ -1,4 +1,7 @@
 // VARIABLE DEFINITIONS
+#ifndef GLOBAL_VARIABLES_H
+#define GLOBAL_VARIABLES_H
+
 #include <WiFi.h>
 
 #define ACCESSPOINT_MODE // switch on to create Network with the ESP, switch
@@ -124,3 +127,5 @@ double video_1[20][2] = {{0, 30},  {3, 50},  {5, 40},   {7, 60},  {9, 70},
                          {11, 80}, {13, 90}, {15, 100}, {17, 90}, {19, 80},
                          {21, 70}, {23, 60}, {25, 50},  {27, 40}, {29, 30},
                          {31, 20}, {33, 10}, {35, 0},   {37, 0},  {39, 0}};
+
+#endif
