@@ -8,11 +8,13 @@ public:
     MotorController(uint8_t stepPin, uint8_t dirPin);
 
     void begin();
+    int32_t currentPosition();
     // Set speed (steps per second)
     void setSpeed(uint32_t speed);
     // Set acceleration (steps per second^2)
     void setAcceleration(uint32_t acceleration);
-    void moveSteps(int32_t steps);
+    void move(int32_t move);
+    void moveTo(int32_t position);
     void enableMotor();
     void disableMotor();
     bool isRunning();

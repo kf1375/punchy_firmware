@@ -24,6 +24,11 @@ enum class MotorState {
     PAUSE_BACK
 };
 
+enum class ManualCommand {
+    Forward = 0,
+    Backward
+};
+
 class HardwareController {
 public:
     HardwareController(uint8_t motorStepPin, uint8_t motorDirPin, uint8_t motorEnPin);
@@ -42,11 +47,12 @@ private:
     Mode m_mode;
     TurnType m_turnType;
     MotorState m_motorState;
+    ManualCommand m_manualCommand;
     bool m_turnFinished;
     bool m_frontPosDefined;
     bool m_rearPosDefined;
-    int m_frontPos;
-    int m_rearPos;
+    int32_t m_frontPos;
+    int32_t m_rearPos;
     int m_singleSpeed;
     int m_infiniteSpeed;
     
