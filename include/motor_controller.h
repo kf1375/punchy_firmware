@@ -5,7 +5,7 @@
 
 class MotorController {
 public:
-    MotorController(uint8_t stepPin, uint8_t dirPin);
+    MotorController(uint8_t stepPin, uint8_t dirPin, uint8_t enablePin);
 
     void begin();
     int32_t currentPosition();
@@ -20,10 +20,11 @@ public:
     bool isRunning();
     
 private:
-    FastAccelStepperEngine engine; 
-    FastAccelStepper *stepper;      // Stepper instance
-    uint8_t stepPin;
-    uint8_t dirPin;
+    FastAccelStepperEngine m_engine; 
+    FastAccelStepper *m_stepper;      // Stepper instance
+    uint8_t m_stepPin;
+    uint8_t m_dirPin;
+    uint8_t m_enablePin;
 };
 
 #endif // MOTOR_CONTROLLER_H

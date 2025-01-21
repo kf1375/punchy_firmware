@@ -12,8 +12,8 @@ enum class Mode {
 };
 
 enum class TurnType {
-    FULL_TURN = 0,
-    HALF_TURN
+    HALF_TURN = 0,
+    FULL_TURN
 };
 
 enum class MotorState {

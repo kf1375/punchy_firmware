@@ -1,79 +1,79 @@
 #include "motor_controller.h"
 
 // Constructor
-MotorController::MotorController(uint8_t stepPin, uint8_t dirPin)
-    : stepPin(stepPin), dirPin(dirPin), stepper(nullptr) {}
+MotorController::MotorController(uint8_t stepPin, uint8_t dirPin, uint8_t enablePin)
+    : m_stepPin(stepPin), m_dirPin(dirPin), m_enablePin(enablePin), m_stepper(nullptr) {}
 
 // Initialize the motor
 void MotorController::begin() 
 {
-    engine.init(); // Initialize the engine
+    m_engine.init(); // Initialize the engine
 
     // Connect stepper to the specified pin
-    stepper = engine.stepperConnectToPin(stepPin);
-    if (stepper) {
-        stepper->setDirectionPin(dirPin);
-        stepper->setEnablePin(-1); // No enable pin by default
-        stepper->setAutoEnable(false);
+    m_stepper = m_engine.stepperConnectToPin(m_stepPin);
+    if (m_stepper) {
+        m_stepper->setDirectionPin(m_dirPin);
+        m_stepper->setEnablePin(m_enablePin); // No enable pin by default
+        m_stepper->setAutoEnable(true);
     }
 }
 
 int32_t MotorController::currentPosition()
 {
-    return stepper->getCurrentPosition();
+    return m_stepper->getCurrentPosition();
 }
 
 // Set speed (steps per second)
 void MotorController::setSpeed(uint32_t speed) 
 {
-    if (stepper) {
-        stepper->setSpeedInHz(speed);
+    if (m_stepper) {
+        m_stepper->setSpeedInHz(speed);
     }
 }
 
 // Set acceleration (steps per second^2)
 void MotorController::setAcceleration(uint32_t acceleration) 
 {
-    if (stepper) {
-        stepper->setAcceleration(acceleration);
+    if (m_stepper) {
+        m_stepper->setAcceleration(acceleration);
     }
 }
 
 // Move a specific number of pulse
 void MotorController::move(int32_t move)
 {
-    if (stepper) {
-        stepper->move(move, true);
+    if (m_stepper) {
+        m_stepper->move(move, true);
     }
 }
 
 // Move to a specific position
 void MotorController::moveTo(int32_t position) 
 {
-    if (stepper) {
-        stepper->moveTo(position);
+    if (m_stepper) {
+        m_stepper->moveTo(position);
     }
 }
 
 // Enable the motor
 void MotorController::enableMotor() 
 {
-    if (stepper) {
-        stepper->setAutoEnable(true);
+    if (m_stepper) {
+        m_stepper->setAutoEnable(true);
     }
 }
 
 // Disable the motor
 void MotorController::disableMotor() 
 {
-    if (stepper) {
-        stepper->forceStop();
-        stepper->setAutoEnable(false);
+    if (m_stepper) {
+        m_stepper->forceStop();
+        m_stepper->setAutoEnable(false);
     }
 }
 
 // Check if the motor is running
 bool MotorController::isRunning() 
 {
-    return stepper && stepper->isRunning();
+    return m_stepper && m_stepper->isRunning();
 }
