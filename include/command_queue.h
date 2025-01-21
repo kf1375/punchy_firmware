@@ -33,7 +33,7 @@ public:
 
 private:
     struct mg_queue m_queue;
-    static const size_t MAX_QUEUE_SIZE = 100; // Adjust the queue size as needed
+    static const size_t MAX_QUEUE_SIZE = 256; // Adjust the queue size as needed
 };
 
 #endif // COMMAND_QUEUE_H
