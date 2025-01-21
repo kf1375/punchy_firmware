@@ -251,7 +251,7 @@ void NetworkManager::onMqttConnected(struct mg_connection *c, int code)
     mg_mqtt_sub(c, &opts);
     opts.topic = mg_str((m_deviceId + "/status").c_str());
     mg_mqtt_sub(c, &opts);
-    opts.topic = mg_str((m_deviceId + "/disconnect").c_str());
+    opts.topic = mg_str((m_deviceId + "/unpair").c_str());
     mg_mqtt_sub(c, &opts);
     opts.topic = mg_str((m_deviceId + "/start/single").c_str());
     mg_mqtt_sub(c, &opts);
@@ -296,8 +296,8 @@ void NetworkManager::onMqttMessageReceived(struct mg_connection *c, struct mg_st
             mqttHandlePair(c, data);
         } else if (mg_strcasecmp(caps[0], mg_str("status")) == 0) {
             mqttHandleStatus(c, data);
-        } else if (mg_strcasecmp(caps[0], mg_str("disconnect")) == 0) {
-            mqttHandleDisconnect(c, data);
+        } else if (mg_strcasecmp(caps[0], mg_str("unpair")) == 0) {
+            mqttHandleUnpair(c, data);
         } else if (mg_strcasecmp(caps[0], mg_str("stop")) == 0) {
             mqttHandleStop(c, data);
         } else {
@@ -346,8 +346,6 @@ void NetworkManager::mqttHandlePair(struct mg_connection *c, struct mg_str *data
         }
         free(name);
         Serial.println("Pairing response published successfully");
-    } else {
-        Serial.printf("Invalid type: %s\n", type);
     }
 
     free(type);
@@ -358,9 +356,9 @@ void NetworkManager::mqttHandleStatus(struct mg_connection *c, struct mg_str *da
     Serial.println("Handle Status");
 }
 
-void NetworkManager::mqttHandleDisconnect(struct mg_connection *c, struct mg_str *data)
+void NetworkManager::mqttHandleUnpair(struct mg_connection *c, struct mg_str *data)
 {
-    Serial.println("Handle Disconnect");
+    Serial.println("Handle Unpair");
 }
 
 void NetworkManager::mqttHandleStart(struct mg_connection *c, struct mg_str *mode, struct mg_str *data)

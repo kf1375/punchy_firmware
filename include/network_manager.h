@@ -65,7 +65,7 @@ public:
 
     void mqttHandlePair(struct mg_connection *c, struct mg_str *data);
     void mqttHandleStatus(struct mg_connection *c, struct mg_str *data);
-    void mqttHandleDisconnect(struct mg_connection *c, struct mg_str *data);
+    void mqttHandleUnpair(struct mg_connection *c, struct mg_str *data);
     void mqttHandleStart(struct mg_connection *c, struct mg_str *mode, struct mg_str *data);
     void mqttHandleStop(struct mg_connection *c, struct mg_str *data);
     void mqttHandleSettings(struct mg_connection *c, struct mg_str *param, struct mg_str *data);
