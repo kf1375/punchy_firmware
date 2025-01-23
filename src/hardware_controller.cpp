@@ -17,8 +17,7 @@ void HardwareController::init()
 {
     Serial.println("\nInitializing hardware controller...");
     m_motorController.begin();
-    m_motorController.setSpeed(1000);
-    m_motorController.setAcceleration(500);
+    m_motorController.setAcceleration(100000);
     Serial.println("\nHardware controller initialized.");
 }
 
@@ -138,7 +137,7 @@ void HardwareController::handleSingleMode()
 {
     switch (m_motorState) {
         case MotorState::START:
-            m_motorController.setSpeed(m_singleSpeed);
+            m_motorController.setSpeed(m_singleSpeed * 100);
             m_motorState = MotorState::ROTATE_FORWARD;
             Serial.println("Single mode started. Speed: " + String(m_singleSpeed));
             break;
@@ -151,7 +150,7 @@ void HardwareController::handleSingleMode()
             break;
         case MotorState::PAUSE_FORWARD:
             if ((millis() - m_startPauseForwardMillis) > (m_turnType == TurnType::HALF_TURN ? 1000 : 300)) {
-                m_motorController.setSpeed(25);
+                m_motorController.setSpeed(25 * 100);
                 m_motorState = MotorState::ROTATE_BACK;
             }
             break;
@@ -175,7 +174,7 @@ void HardwareController::handleInfiniteMode()
 {
     switch (m_motorState) {
         case MotorState::START:
-            m_motorController.setSpeed(m_infiniteSpeed);
+            m_motorController.setSpeed(m_infiniteSpeed * 100);
             m_motorState = MotorState::ROTATE_FORWARD;
             Serial.println("Infinite mode started. Speed: " + String(m_infiniteSpeed));
             break;
@@ -192,7 +191,7 @@ void HardwareController::handleInfiniteMode()
             break;
         case MotorState::PAUSE_FORWARD:
             if (millis() - m_startPauseForwardMillis >= 1000) {
-                m_motorController.setSpeed(25);
+                m_motorController.setSpeed(25 * 100);
                 m_motorState = MotorState::ROTATE_BACK;
             }
             break;
@@ -219,7 +218,7 @@ void HardwareController::handleManualMode()
 {
     switch (m_motorState) {
         case MotorState::START:
-            m_motorController.setSpeed(100);
+            m_motorController.setSpeed(100 * 100);
             if (m_manualCommand == ManualCommand::Forward) {
                 m_motorState = MotorState::ROTATE_FORWARD;
                 Serial.println("Manual move forward started. Speed: " + String(m_singleSpeed));

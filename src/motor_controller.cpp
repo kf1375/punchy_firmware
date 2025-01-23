@@ -15,7 +15,6 @@ void MotorController::begin()
         m_stepper->setDirectionPin(m_dirPin);
         m_stepper->setEnablePin(m_enablePin); // No enable pin by default
         m_stepper->setAutoEnable(true);
-        m_stepper->setAcceleration(1000);
     }
 }
 
