@@ -3,6 +3,8 @@
 
 #include <FastAccelStepper.h>
 
+#define STEPS_PER_REVOLUTION 400
+
 class MotorController {
 public:
     MotorController(uint8_t stepPin, uint8_t dirPin, uint8_t enablePin);

@@ -23,11 +23,12 @@ int32_t MotorController::currentPosition()
     return m_stepper->getCurrentPosition();
 }
 
-// Set speed (steps per second)
+// Set speed (rpm)
 void MotorController::setSpeed(uint32_t speed) 
 {
     if (m_stepper) {
-        m_stepper->setSpeedInHz(speed);
+        uint32_t speedInHz = (speed * STEPS_PER_REVOLUTION) / 60; // Convert rpm to Hz
+        m_stepper->setSpeedInHz(speedInHz);
     }
 }
 
