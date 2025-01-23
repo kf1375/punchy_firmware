@@ -15,6 +15,8 @@ public:
     void setAcceleration(uint32_t acceleration);
     void move(int32_t move);
     void moveTo(int32_t position);
+    void runForward();
+    void runBackward();
     void enableMotor();
     void disableMotor();
     bool isRunning();

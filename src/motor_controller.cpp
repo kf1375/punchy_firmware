@@ -15,6 +15,7 @@ void MotorController::begin()
         m_stepper->setDirectionPin(m_dirPin);
         m_stepper->setEnablePin(m_enablePin); // No enable pin by default
         m_stepper->setAutoEnable(true);
+        m_stepper->setAcceleration(1000);
     }
 }
 
@@ -55,12 +56,27 @@ void MotorController::moveTo(int32_t position)
     }
 }
 
+// run continuously in one direction
+void MotorController::runForward()
+{
+    if (m_stepper) {
+        m_stepper->runForward();
+    }
+}
+
+void MotorController::runBackward()
+{
+    if (m_stepper) {
+        m_stepper->runBackward();
+    }
+}
+
 // Enable the motor
 void MotorController::enableMotor() 
 {
-    if (m_stepper) {
-        m_stepper->setAutoEnable(true);
-    }
+    // if (m_stepper) {
+    //     m_stepper->setAutoEnable(true);
+    // }
 }
 
 // Disable the motor
@@ -68,7 +84,7 @@ void MotorController::disableMotor()
 {
     if (m_stepper) {
         m_stepper->forceStop();
-        m_stepper->setAutoEnable(false);
+        // m_stepper->setAutoEnable(false);
     }
 }
 
