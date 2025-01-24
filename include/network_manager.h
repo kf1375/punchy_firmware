@@ -7,8 +7,9 @@
 
 #include "command_queue.h"
 
-#define NETWORK_UPDATE_INTERVAL_MS 5000
+#define NETWORK_UPDATE_INTERVAL_MS 2000
 #define MQTT_MAX_RETRIES 3
+#define MQTT_PING_INTERVAL_MS 30 * 1000
 
 static uint8_t dns_answer[] = {
         0xc0, 0x0c,          // Point to the name in the DNS question
@@ -78,6 +79,8 @@ public:
     
     int mqttReconnectAttempts() { return m_mqttReconnectAttempts; };
     void setMqttReconnectAttempts(int cnt) { m_mqttReconnectAttempts = cnt; };
+    unsigned long lastMqttPingMillis() { return m_lastMqttPing_ms; };
+    void setLastMqttPingMillis(unsigned long ts) { m_lastMqttPing_ms = ts; };
 
     void poll();
 
@@ -116,6 +119,7 @@ private:
     String m_brokerUrl;
 
     unsigned long m_lastTimestamp_ms = 0;
+    unsigned long m_lastMqttPing_ms = 0;
 
     uint8_t m_mqttReconnectAttempts = 0;
 

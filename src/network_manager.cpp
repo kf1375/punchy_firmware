@@ -212,6 +212,7 @@ void NetworkManager::connectMqttBroker()
         struct mg_mqtt_opts opts;
         memset(&opts, 0, sizeof(opts));
         opts.clean = true;
+        opts.keepalive = 60;
         opts.client_id = mg_str(m_deviceId.c_str());
         m_brokerUrl = "mqtt://myremotedevice.com/mqtt:443";
         // m_brokerUrl = "mqtt://82.165.150.67:1883";
@@ -582,6 +583,11 @@ void NetworkManager::mqttEventHandler(struct mg_connection *c, int ev, void *ev_
     } else if (ev == MG_EV_CLOSE) {
         Serial.println("MQTT closed.");
         networkManager->disconnectMqtt();
+    } else if (ev == MG_EV_POLL) {
+        if(millis() - networkManager->lastMqttPingMillis() >= MQTT_PING_INTERVAL_MS) { 
+            mg_mqtt_ping(c); 
+            networkManager->setLastMqttPingMillis(millis()); 
+        }
     }
 }
 
