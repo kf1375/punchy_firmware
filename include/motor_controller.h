@@ -11,7 +11,11 @@ public:
 
     void begin();
     int32_t currentPosition();
-    // Set speed (steps per second)
+    // Get Speed (RPM)
+    uint32_t speed();
+
+    void setCurrentPosition(int32_t position);
+    // Set speed (RPM)
     void setSpeed(uint32_t speed);
     // Set acceleration (steps per second^2)
     void setAcceleration(uint32_t acceleration);
