@@ -44,7 +44,8 @@ private:
     CommandQueue *m_commandQueue;
     MotorController m_motorController;
 
-    Mode m_mode;
+    Mode m_currentMode;
+    Mode m_nextMode;
     TurnType m_turnType;
     MotorState m_motorState;
     ManualCommand m_manualCommand;

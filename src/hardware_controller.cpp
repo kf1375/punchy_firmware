@@ -1,7 +1,7 @@
 #include "hardware_controller.h"
 
 HardwareController::HardwareController(uint8_t motorStepPin, uint8_t motorDirPin, uint8_t motorEnPin) : 
-    m_motorController(motorStepPin, motorDirPin, motorEnPin), m_mode(Mode::STOP), m_motorState(MotorState::START),
+    m_motorController(motorStepPin, motorDirPin, motorEnPin), m_currentMode(Mode::STOP), m_nextMode(Mode::STOP), m_motorState(MotorState::START),
     m_turnFinished(false), m_frontPosDefined(false), m_rearPosDefined(false), m_frontPos(0), m_rearPos(0),
     m_singleSpeed(100), m_infiniteSpeed(200), m_maxHalfSpeed(1000), m_maxFullSpeed(1000)
 {
@@ -36,26 +36,26 @@ void HardwareController::processCommand()
         switch (cmd.type) {
             case CommandType::STOP:
                 Serial.println("STOP command received.");
-                m_mode = Mode::STOP;
+                m_nextMode = Mode::STOP;
                 break;
             case CommandType::START_SIGNLE:
                 Serial.println("START_SINGLE command received.");
                 if (m_frontPosDefined && m_rearPosDefined) {
                     m_singleSpeed = cmd.value;
-                    m_mode = Mode::SINGLE;
+                    m_nextMode = Mode::SINGLE;
                 } else {
                     Serial.println("Define positions first!");
-                    m_mode =  Mode::STOP;
+                    m_nextMode =  Mode::STOP;
                 }
                 break;
             case CommandType::START_INFINITE:
                 Serial.println("START_INFINITE command received.");
                 if (m_frontPosDefined && m_rearPosDefined) {
                     m_infiniteSpeed = cmd.value;
-                    m_mode = Mode::INFINITE;
+                    m_nextMode = Mode::INFINITE;
                 } else {
                     Serial.println("Define positions first!");
-                    m_mode = Mode::STOP;
+                    m_nextMode = Mode::STOP;
                 }
                 break;
             case CommandType::SETTING_TURN_TYPE:
@@ -92,15 +92,15 @@ void HardwareController::processCommand()
                 break;
             case CommandType::COMMAND_UP:
                 Serial.println("COMMAND_UP command received.");
-                if (m_mode == Mode::STOP) {
-                    m_mode = Mode::MANUAL;
+                if (m_currentMode == Mode::STOP) {
+                    m_nextMode = Mode::MANUAL;
                     m_manualCommand = ManualCommand::Forward;
                 }
                 break;
             case CommandType::COMMAND_DOWN:
                 Serial.println("COMMAND_DOWN command received.");
-                if (m_mode == Mode::STOP) {
-                    m_mode = Mode::MANUAL;
+                if (m_currentMode == Mode::STOP) {
+                    m_nextMode = Mode::MANUAL;
                     m_manualCommand = ManualCommand::Backward;
                 }
                 break;
@@ -114,7 +114,12 @@ void HardwareController::processCommand()
 
 void HardwareController::spin()
 {
-    switch (m_mode) {
+    if (m_nextMode != m_currentMode) {
+        if (m_turnFinished) {
+            m_currentMode = m_nextMode;
+        }
+    }
+    switch (m_currentMode) {
     case Mode::SINGLE:
         handleSingleMode();
         break;
@@ -135,6 +140,7 @@ void HardwareController::spin()
 
 void HardwareController::handleSingleMode() 
 {
+    m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
             m_motorState = MotorState::ROTATE_FORWARD;
@@ -158,7 +164,7 @@ void HardwareController::handleSingleMode()
             m_motorController.moveTo(m_turnType == TurnType::HALF_TURN ? m_rearPos : 0);
             if (!m_motorController.isRunning()) {
                 m_motorState = MotorState::START;
-                m_mode = Mode::STOP;
+                m_nextMode = Mode::STOP;
                 m_turnFinished = true;
                 Serial.println("Single mode finished.");
             }
@@ -172,6 +178,7 @@ void HardwareController::handleSingleMode()
 
 void HardwareController::handleInfiniteMode() 
 {
+    m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
             m_motorState = MotorState::ROTATE_FORWARD;
@@ -189,6 +196,7 @@ void HardwareController::handleInfiniteMode()
                 m_motorController.runForward();
                 if (m_motorController.currentPosition() >= STEPS_PER_REVOLUTION) {
                     m_motorController.setCurrentPosition(0);
+                    m_turnFinished = true;
                 }
             }
             break;
@@ -219,6 +227,7 @@ void HardwareController::handleInfiniteMode()
 
 void HardwareController::handleManualMode()
 {
+    m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
             m_motorController.setSpeed(30);
@@ -237,7 +246,7 @@ void HardwareController::handleManualMode()
                 Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
                 m_motorState = MotorState::START;
-                m_mode = Mode::STOP;
+                m_nextMode = Mode::STOP;
                 m_turnFinished = true;
             }
             break;
@@ -248,7 +257,7 @@ void HardwareController::handleManualMode()
                 Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
                 m_motorState = MotorState::START;
-                m_mode = Mode::STOP;
+                m_nextMode = Mode::STOP;
                 m_turnFinished = true;
             }
             break;
@@ -263,7 +272,5 @@ void HardwareController::handleStopMode()
     if (m_motorController.isRunning()) {
         m_motorController.disableMotor();
         m_motorState = MotorState::START;
-        m_mode = Mode::STOP;
-        m_turnFinished = true;
     }
 }
