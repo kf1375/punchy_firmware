@@ -203,7 +203,6 @@ void HardwareController::handleInfiniteMode()
                 }
             } else if (m_turnType == TurnType::FULL_TURN) {
                 m_motorController.runForward();
-                Serial.println(m_motorController.currentPosition());
                 if (m_motorController.currentPosition() >= STEPS_PER_REVOLUTION) {
                     m_motorController.setCurrentPosition(0);
                     m_turnFinished = true;
@@ -232,6 +231,7 @@ void HardwareController::handleInfiniteMode()
             if (millis() - m_startPauseBackMillis >= 1000) {
                 m_motorState = MotorState::START;
                 m_turnFinished = true;
+                Serial.println("Infinite mode HALF_TURN finished.");
             }
             break;
         default:
