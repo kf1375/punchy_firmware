@@ -3,7 +3,7 @@
 
 #include <FastAccelStepper.h>
 
-#define STEPS_PER_REVOLUTION 400
+#define STEPS_PER_REVOLUTION 200
 
 class MotorController {
 public:
