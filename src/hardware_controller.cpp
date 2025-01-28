@@ -203,12 +203,12 @@ void HardwareController::handleInfiniteMode()
                 }
             } else if (m_turnType == TurnType::FULL_TURN) {
                 m_motorController.runForward();
-                if (m_motorController.currentPosition() == STEPS_PER_REVOLUTION) {
+                Serial.println(m_motorController.currentPosition());
+                if (m_motorController.currentPosition() >= STEPS_PER_REVOLUTION) {
+                    m_motorController.setCurrentPosition(0);
                     m_turnFinished = true;
                 }
                 if (m_turnFinished && m_nextMode == Mode::STOP) {
-                    m_motorController.disableMotor();
-                    m_motorController.setCurrentPosition(0);
                     m_motorState = MotorState::START;
                     m_currentMode = Mode::STOP;
                     Serial.println("Infinite mode FULL_TURN finished.");

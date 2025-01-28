@@ -39,7 +39,7 @@ void MotorController::setCurrentPosition(int32_t position)
         return;
     }
 
-    m_stepper->setCurrentPosition(position);
+    m_stepper->setPositionAfterCommandsCompleted(position);
 }
 
 // Set speed (rpm)
