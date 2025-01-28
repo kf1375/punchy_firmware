@@ -9,7 +9,7 @@
 #define DIR_PIN 5
 #define ENA_PIN 22
 
-const char *ssid = "MyEden";
-const char *password = "Kazem1375";
+const char *ssid = "DorsiWifi";
+const char *password = "Dorsi2024";
 
 #endif
