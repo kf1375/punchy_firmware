@@ -161,13 +161,22 @@ void HardwareController::handleSingleMode()
             }
             break;
         case MotorState::ROTATE_BACK:
-            m_motorController.moveTo(m_turnType == TurnType::HALF_TURN ? m_rearPos : 0);
-            if (!m_motorController.isRunning()) {
+            if (m_turnType == TurnType::HALF_TURN) {
+                m_motorController.moveTo(m_rearPos);
+                if (!m_motorController.isRunning()) {
+                    m_motorState = MotorState::START;
+                    m_nextMode = Mode::STOP;
+                    m_turnFinished = true;
+                    Serial.println("Single mode HALF_TURN finished.");
+                }
+            } else if (m_turnType == TurnType::FULL_TURN) {
+                m_motorController.setCurrentPosition(0);
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
-                Serial.println("Single mode finished.");
+                Serial.println("Single mode FULL_TURN finished.");
             }
+            
             break;
         default:
             Serial.println("Unknown motor state in SINGLE mode.");
@@ -194,9 +203,14 @@ void HardwareController::handleInfiniteMode()
                 }
             } else if (m_turnType == TurnType::FULL_TURN) {
                 m_motorController.runForward();
-                if (m_motorController.currentPosition() >= STEPS_PER_REVOLUTION) {
+                if (m_motorController.currentPosition() == STEPS_PER_REVOLUTION) {
                     m_motorController.setCurrentPosition(0);
                     m_turnFinished = true;
+                }
+                if (m_turnFinished && m_nextMode == Mode::STOP) {
+                    m_motorState = MotorState::START;
+                    m_currentMode = Mode::STOP;
+                    Serial.println("Infinite mode FULL_TURN finished.");
                 }
             }
             break;
