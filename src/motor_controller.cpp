@@ -82,7 +82,7 @@ void MotorController::moveTo(int32_t position)
 void MotorController::runForward()
 {
     if (m_stepper) {
-        m_stepper->forwardStep();
+        m_stepper->runForward();
     }
 }
 
