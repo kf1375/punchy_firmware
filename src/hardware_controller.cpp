@@ -17,7 +17,7 @@ void HardwareController::init()
 {
     Serial.println("\nInitializing hardware controller...");
     m_motorController.begin();
-    m_motorController.setAcceleration(100000);
+    m_motorController.setRampLen(0);
     Serial.println("\nHardware controller initialized.");
 }
 
@@ -156,7 +156,8 @@ void HardwareController::handleSingleMode()
             break;
         case MotorState::PAUSE_FORWARD:
             if ((millis() - m_startPauseForwardMillis) > (m_turnType == TurnType::HALF_TURN ? 1000 : 300)) {
-                m_motorController.setSpeed(30);
+                m_motorController.setRampLen(10);
+                m_motorController.setSpeed(90);
                 m_motorState = MotorState::ROTATE_BACK;
             }
             break;
@@ -167,16 +168,17 @@ void HardwareController::handleSingleMode()
                     m_motorState = MotorState::START;
                     m_nextMode = Mode::STOP;
                     m_turnFinished = true;
+                    m_motorController.setRampLen(0);
                     Serial.println("Single mode HALF_TURN finished.");
                 }
             } else if (m_turnType == TurnType::FULL_TURN) {
-                m_motorController.setCurrentPosition(0);
+                m_motorController.setZero();
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
+                m_motorController.setRampLen(0);
                 Serial.println("Single mode FULL_TURN finished.");
-            }
-            
+            }      
             break;
         default:
             Serial.println("Unknown motor state in SINGLE mode.");
@@ -204,7 +206,7 @@ void HardwareController::handleInfiniteMode()
             } else if (m_turnType == TurnType::FULL_TURN) {
                 m_motorController.runForward();
                 if (m_motorController.currentPosition() >= STEPS_PER_REVOLUTION) {
-                    m_motorController.setCurrentPosition(0);
+                    m_motorController.setZero();
                     m_turnFinished = true;
                 }
                 if (m_turnFinished && m_nextMode == Mode::STOP) {
@@ -216,7 +218,8 @@ void HardwareController::handleInfiniteMode()
             break;
         case MotorState::PAUSE_FORWARD:
             if (millis() - m_startPauseForwardMillis >= 1000) {
-                m_motorController.setSpeed(30);
+                m_motorController.setRampLen(10);
+                m_motorController.setSpeed(90);
                 m_motorState = MotorState::ROTATE_BACK;
             }
             break;
@@ -231,6 +234,7 @@ void HardwareController::handleInfiniteMode()
             if (millis() - m_startPauseBackMillis >= 1000) {
                 m_motorState = MotorState::START;
                 m_turnFinished = true;
+                m_motorController.setRampLen(0);
                 Serial.println("Infinite mode HALF_TURN finished.");
             }
             break;
@@ -245,6 +249,7 @@ void HardwareController::handleManualMode()
     m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
+            m_motorController.setRampLen(3);
             m_motorController.setSpeed(30);
             if (m_manualCommand == ManualCommand::Forward) {
                 m_motorState = MotorState::ROTATE_FORWARD;
@@ -263,6 +268,7 @@ void HardwareController::handleManualMode()
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
+                m_motorController.setRampLen(0);
             }
             break;
         case MotorState::ROTATE_BACK:
@@ -274,6 +280,7 @@ void HardwareController::handleManualMode()
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
+                m_motorController.setRampLen(0);
             }
             break;
         default:

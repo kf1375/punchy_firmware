@@ -7,20 +7,14 @@ MotorController::MotorController(uint8_t stepPin, uint8_t dirPin, uint8_t enable
 // Initialize the motor
 void MotorController::begin() 
 {
-    m_engine.init(); // Initialize the engine
-
-    // Connect stepper to the specified pin
-    m_stepper = m_engine.stepperConnectToPin(m_stepPin);
-    if (m_stepper) {
-        m_stepper->setDirectionPin(m_dirPin);
-        m_stepper->setEnablePin(m_enablePin); // No enable pin by default
-        m_stepper->setAutoEnable(true);
-    }
+    m_stepper = new MoToStepper(STEPS_PER_REVOLUTION, STEPDIR);
+    m_stepper->attach(m_stepPin, m_dirPin);
+    m_stepper->setMaxSpeed(MAX_SPEED_IN_RPM * 10);
 }
 
 int32_t MotorController::currentPosition()
 {
-    return m_stepper->getCurrentPosition();
+    return m_stepper->currentPosition();
 }
 
 // Get speed (rpm)
@@ -30,16 +24,16 @@ uint32_t MotorController::speed()
         return 0;
     }
 
-    return (m_stepper->getMaxSpeedInHz() * 60) / STEPS_PER_REVOLUTION;
+    return ((m_stepper->getSpeedSteps() * 6.0) / STEPS_PER_REVOLUTION);
 }
 
-void MotorController::setCurrentPosition(int32_t position)
+void MotorController::setZero()
 {
     if (!m_stepper) {
         return;
     }
 
-    m_stepper->setPositionAfterCommandsCompleted(position);
+    m_stepper->setZero();
 }
 
 // Set speed (rpm)
@@ -49,16 +43,15 @@ void MotorController::setSpeed(uint32_t speed)
         if (speed == this->speed()) {
             return;
         }
-        uint32_t speedInHz = (speed * STEPS_PER_REVOLUTION) / 60; // Convert rpm to Hz
-        m_stepper->setSpeedInHz(speedInHz);
+        m_stepper->setSpeed(speed * 10);
     }
 }
 
-// Set acceleration (steps per second^2)
-void MotorController::setAcceleration(uint32_t acceleration) 
+// steps
+void MotorController::setRampLen(uint32_t ramp_len) 
 {
     if (m_stepper) {
-        m_stepper->setAcceleration(acceleration);
+        m_stepper->setRampLen(ramp_len);
     }
 }
 
@@ -66,7 +59,7 @@ void MotorController::setAcceleration(uint32_t acceleration)
 void MotorController::move(int32_t move)
 {
     if (m_stepper) {
-        m_stepper->move(move, true);
+        m_stepper->move(move);
     }
 }
 
@@ -82,14 +75,14 @@ void MotorController::moveTo(int32_t position)
 void MotorController::runForward()
 {
     if (m_stepper) {
-        m_stepper->runForward();
+        m_stepper->rotate(1);
     }
 }
 
 void MotorController::runBackward()
 {
     if (m_stepper) {
-        m_stepper->runBackward();
+        m_stepper->rotate(-1);
     }
 }
 
@@ -105,7 +98,7 @@ void MotorController::enableMotor()
 void MotorController::disableMotor() 
 {
     if (m_stepper) {
-        m_stepper->forceStop();
+        m_stepper->stop();
         // m_stepper->setAutoEnable(false);
     }
 }
@@ -113,5 +106,5 @@ void MotorController::disableMotor()
 // Check if the motor is running
 bool MotorController::isRunning() 
 {
-    return m_stepper && m_stepper->isRunning();
+    return m_stepper && m_stepper->moving();
 }

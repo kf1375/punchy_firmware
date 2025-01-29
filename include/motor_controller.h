@@ -1,9 +1,10 @@
 #ifndef MOTOR_CONTROLLER_H
 #define MOTOR_CONTROLLER_H
 
-#include <FastAccelStepper.h>
+#include <MobaTools.h>
 
 #define STEPS_PER_REVOLUTION 200
+#define MAX_SPEED_IN_RPM 500
 
 class MotorController {
 public:
@@ -14,11 +15,10 @@ public:
     // Get Speed (RPM)
     uint32_t speed();
 
-    void setCurrentPosition(int32_t position);
+    void setZero();
     // Set speed (RPM)
     void setSpeed(uint32_t speed);
-    // Set acceleration (steps per second^2)
-    void setAcceleration(uint32_t acceleration);
+    void setRampLen(uint32_t ramp_len);
     void move(int32_t move);
     void moveTo(int32_t position);
     void runForward();
@@ -28,8 +28,7 @@ public:
     bool isRunning();
     
 private:
-    FastAccelStepperEngine m_engine; 
-    FastAccelStepper *m_stepper;      // Stepper instance
+    MoToStepper *m_stepper;      // Stepper instance
     uint8_t m_stepPin;
     uint8_t m_dirPin;
     uint8_t m_enablePin;
