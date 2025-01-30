@@ -292,8 +292,6 @@ void HardwareController::handleManualMode()
 
 void HardwareController::handleStopMode()
 {
-    if (m_motorController.isRunning()) {
-        m_motorController.disableMotor();
-        m_motorState = MotorState::START;
-    }
+    m_motorController.disableMotor();
+    m_motorState = MotorState::START;
 }
