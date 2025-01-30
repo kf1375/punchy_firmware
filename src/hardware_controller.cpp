@@ -134,7 +134,6 @@ void HardwareController::spin()
         break;
     default:
         Serial.println("Unknown turn mode.");
-        break;
     }
 }
 
@@ -182,7 +181,6 @@ void HardwareController::handleSingleMode()
             break;
         default:
             Serial.println("Unknown motor state in SINGLE mode.");
-            break;
     }
 
 }
@@ -286,7 +284,6 @@ void HardwareController::handleManualMode()
             break;
         default:
             Serial.println("Unknown motor state in MANUAL mode.");
-            break;
     }
 }
 

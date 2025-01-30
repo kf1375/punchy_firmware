@@ -60,7 +60,7 @@ void MotorController::setRampLen(uint32_t ramp_len)
 void MotorController::move(int32_t move)
 {
     if (m_stepper) {
-        m_stepper->move(move);
+        m_stepper->doSteps(move);
     }
 }
 
