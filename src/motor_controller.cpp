@@ -10,6 +10,7 @@ void MotorController::begin()
     m_stepper = new MoToStepper(STEPS_PER_REVOLUTION, STEPDIR);
     m_stepper->attach(m_stepPin, m_dirPin);
     m_stepper->setMaxSpeed(MAX_SPEED_IN_RPM * 10);
+    setZero();
 }
 
 int32_t MotorController::currentPosition()
