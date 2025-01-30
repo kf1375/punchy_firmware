@@ -140,9 +140,9 @@ void HardwareController::spin()
 
 void HardwareController::handleSingleMode() 
 {
-    m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
+            m_turnFinished = false;
             m_motorController.setSpeed(m_singleSpeed);
             m_motorController.moveTo(m_turnType == TurnType::HALF_TURN ? m_frontPos : STEPS_PER_REVOLUTION);
             m_motorState = MotorState::ROTATE_FORWARD;
@@ -189,9 +189,9 @@ void HardwareController::handleSingleMode()
 
 void HardwareController::handleInfiniteMode() 
 {
-    m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
+            m_turnFinished = false;
             m_motorController.setSpeed(m_infiniteSpeed);
             if (m_turnType == TurnType::HALF_TURN) {
                 m_motorController.moveTo(m_frontPos);
@@ -206,6 +206,7 @@ void HardwareController::handleInfiniteMode()
                     m_startPauseForwardMillis = millis();
                 }
             } else if (m_turnType == TurnType::FULL_TURN) {
+                m_turnFinished = false;
                 m_motorController.runForward();
                 if (m_motorController.currentPosition() >= STEPS_PER_REVOLUTION) {
                     m_motorController.setZero();
@@ -248,25 +249,24 @@ void HardwareController::handleInfiniteMode()
 
 void HardwareController::handleManualMode()
 {
-    m_turnFinished = false;
     switch (m_motorState) {
         case MotorState::START:
+            m_turnFinished = false;
             m_motorController.setRampLen(3);
             m_motorController.setSpeed(30);
             if (m_manualCommand == ManualCommand::Forward) {
                 m_motorController.move(15);
                 m_motorState = MotorState::ROTATE_FORWARD;
-                Serial.println("Manual move forward started. Speed: " + String(m_singleSpeed));
-            } else {
+                Serial.println("Manual move forward started. Speed: 30");
+            } else if (m_manualCommand == ManualCommand::Backward) {
                 m_motorController.move(-15);
                 m_motorState = MotorState::ROTATE_BACK;
-                Serial.println("Manual move backward started. Speed: " + String(m_singleSpeed));
+                Serial.println("Manual move backward started. Speed: 30");
             }
             break;
         case MotorState::ROTATE_FORWARD:
             if (!m_motorController.isRunning()) {
                 Serial.print("Manual move forward finished. Current Position: ");
-                Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
@@ -277,7 +277,6 @@ void HardwareController::handleManualMode()
         case MotorState::ROTATE_BACK:
             if (!m_motorController.isRunning()) {
                 Serial.print("Manual move back finished. Current Position: ");
-                Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
