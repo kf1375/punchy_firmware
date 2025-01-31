@@ -18,7 +18,7 @@ void HardwareController::init()
     Serial.println("\nInitializing hardware controller...");
     m_motorController.begin();
     m_motorController.setRampLen(0);
-    m_motorController.move(0);
+    m_motorController.move(15);
     Serial.println("\nHardware controller initialized.");
 }
 
