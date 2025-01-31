@@ -125,19 +125,15 @@ void HardwareController::spin()
     }
     switch (m_currentMode) {
     case Mode::SINGLE:
-        Serial.print("SINGLE");
         handleSingleMode();
         break;
     case Mode::INFINITE:
-        Serial.print("INFINITE");
         handleInfiniteMode();
         break;
     case Mode::MANUAL:
-        Serial.print("MANUAL");
         handleManualMode();
         break;
     case Mode::STOP:
-        Serial.print("STOP");
         handleStopMode();
         break;
     default:
@@ -264,18 +260,18 @@ void HardwareController::handleManualMode()
             m_turnFinished = false;
             m_motorController.setRampLen(3);
             m_motorController.setSpeed(30);
-            if (m_manualCommand == ManualCommand::Forward) {
-                m_motorController.move(15);
-                m_motorState = MotorState::ROTATE_FORWARD;
-                Serial.println("Manual move forward started. Speed: 30");
-            } else if (m_manualCommand == ManualCommand::Backward) {
-                m_motorController.move(-15);
-                m_motorState = MotorState::ROTATE_BACK;
-                Serial.println("Manual move backward started. Speed: 30");
-            }
+            m_motorController.move(15);
+            // if (m_manualCommand == ManualCommand::Forward) {
+            //     m_motorController.move(15);
+            //     m_motorState = MotorState::ROTATE_FORWARD;
+            //     Serial.println("Manual move forward started. Speed: 30");
+            // } else if (m_manualCommand == ManualCommand::Backward) {
+            //     m_motorController.move(-15);
+            //     m_motorState = MotorState::ROTATE_BACK;
+            //     Serial.println("Manual move backward started. Speed: 30");
+            // }
             break;
         case MotorState::ROTATE_FORWARD:
-            Serial.println("Current Position: " + String(m_motorController.currentPosition()));
             if (!m_motorController.isRunning()) {
                 Serial.print("Manual move forward finished. Current Position: ");
                 Serial.println(m_motorController.currentPosition());
