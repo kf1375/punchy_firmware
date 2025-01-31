@@ -68,8 +68,6 @@ void HardwareController::processCommand()
                 break;
             case CommandType::SETTING_SET_REAR:
                 Serial.println("SETTING_SET_REAR command received.");
-                Serial.print("Current Position: ");
-                Serial.println(m_motorController.currentPosition());
                 m_motorController.setZero();
                 m_rearPosDefined = true;
                 break;
