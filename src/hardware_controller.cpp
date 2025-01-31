@@ -70,15 +70,14 @@ void HardwareController::processCommand()
                 Serial.println("SETTING_SET_REAR command received.");
                 Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
-                if (m_motorController.currentPosition() < 0) {
-                    m_frontPos = m_frontPos + std::abs(m_motorController.currentPosition());
-                } else {
-                    m_frontPos = m_frontPos - m_motorController.currentPosition();
-                }
                 m_motorController.setZero();
                 m_rearPosDefined = true;
                 break;
             case CommandType::SETTING_SET_FRONT:
+                if (!m_rearPosDefined) {
+                    Serial.println("You should define rear pose first!");
+                    break;
+                }
                 Serial.println("SETTING_SET_FRONT command received.");
                 Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
@@ -153,7 +152,7 @@ void HardwareController::handleSingleMode()
             if (m_turnType == TurnType::HALF_TURN) {
                 m_motorController.moveTo(m_frontPos);
             } else if (m_turnType == TurnType::FULL_TURN) {
-                m_motorController.move(STEPS_PER_REVOLUTION);
+                m_motorController.moveTo(STEPS_PER_REVOLUTION);
             }
             m_motorState = MotorState::ROTATE_FORWARD;
             Serial.println("Single mode started. Speed: " + String(m_singleSpeed));
