@@ -18,6 +18,7 @@ void HardwareController::init()
     Serial.println("\nInitializing hardware controller...");
     m_motorController.begin();
     m_motorController.setRampLen(0);
+    m_motorController.move(0);
     Serial.println("\nHardware controller initialized.");
 }
 
@@ -260,16 +261,15 @@ void HardwareController::handleManualMode()
             m_turnFinished = false;
             m_motorController.setRampLen(3);
             m_motorController.setSpeed(30);
-            m_motorController.move(15);
-            // if (m_manualCommand == ManualCommand::Forward) {
-            //     m_motorController.move(15);
-            //     m_motorState = MotorState::ROTATE_FORWARD;
-            //     Serial.println("Manual move forward started. Speed: 30");
-            // } else if (m_manualCommand == ManualCommand::Backward) {
-            //     m_motorController.move(-15);
-            //     m_motorState = MotorState::ROTATE_BACK;
-            //     Serial.println("Manual move backward started. Speed: 30");
-            // }
+            if (m_manualCommand == ManualCommand::Forward) {
+                m_motorController.move(15);
+                m_motorState = MotorState::ROTATE_FORWARD;
+                Serial.println("Manual move forward started. Speed: 30");
+            } else if (m_manualCommand == ManualCommand::Backward) {
+                m_motorController.move(-15);
+                m_motorState = MotorState::ROTATE_BACK;
+                Serial.println("Manual move backward started. Speed: 30");
+            }
             break;
         case MotorState::ROTATE_FORWARD:
             if (!m_motorController.isRunning()) {
