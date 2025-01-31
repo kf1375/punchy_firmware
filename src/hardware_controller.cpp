@@ -2,7 +2,7 @@
 
 HardwareController::HardwareController(uint8_t motorStepPin, uint8_t motorDirPin, uint8_t motorEnPin) : 
     m_motorController(motorStepPin, motorDirPin, motorEnPin), m_currentMode(Mode::STOP), m_nextMode(Mode::STOP), m_motorState(MotorState::START),
-    m_turnFinished(true), m_frontPosDefined(false), m_rearPosDefined(false), m_frontPos(0),
+    m_turnFinished(true), m_frontPosDefined(false), m_rearPosDefined(false), m_frontPos(0), m_turnType(TurnType::HALF_TURN)
     m_singleSpeed(100), m_infiniteSpeed(200), m_maxHalfSpeed(1000), m_maxFullSpeed(1000)
 {
 
