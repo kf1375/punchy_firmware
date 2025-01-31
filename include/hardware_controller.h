@@ -53,7 +53,7 @@ private:
     bool m_frontPosDefined;
     bool m_rearPosDefined;
     int32_t m_frontPos;
-    int32_t m_rearPos;
+    // int32_t m_rearPos;
     int m_singleSpeed;
     int m_infiniteSpeed;
     

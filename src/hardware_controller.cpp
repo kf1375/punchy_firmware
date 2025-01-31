@@ -2,7 +2,7 @@
 
 HardwareController::HardwareController(uint8_t motorStepPin, uint8_t motorDirPin, uint8_t motorEnPin) : 
     m_motorController(motorStepPin, motorDirPin, motorEnPin), m_currentMode(Mode::STOP), m_nextMode(Mode::STOP), m_motorState(MotorState::START),
-    m_turnFinished(true), m_frontPosDefined(false), m_rearPosDefined(false), m_frontPos(0), m_rearPos(0),
+    m_turnFinished(true), m_frontPosDefined(false), m_rearPosDefined(false), m_frontPos(0),
     m_singleSpeed(100), m_infiniteSpeed(200), m_maxHalfSpeed(1000), m_maxFullSpeed(1000)
 {
 
@@ -45,7 +45,6 @@ void HardwareController::processCommand()
                     m_nextMode = Mode::SINGLE;
                 } else {
                     Serial.println("Define positions first!");
-                    m_nextMode =  Mode::STOP;
                 }
                 break;
             case CommandType::START_INFINITE:
@@ -55,7 +54,6 @@ void HardwareController::processCommand()
                     m_nextMode = Mode::INFINITE;
                 } else {
                     Serial.println("Define positions first!");
-                    m_nextMode = Mode::STOP;
                 }
                 break;
             case CommandType::SETTING_TURN_TYPE:
@@ -70,16 +68,25 @@ void HardwareController::processCommand()
                 break;
             case CommandType::SETTING_SET_REAR:
                 Serial.println("SETTING_SET_REAR command received.");
-                m_rearPos = m_motorController.currentPosition();
-                Serial.print("Rear Position: ");
-                Serial.println(m_rearPos);
+                Serial.print("Current Position: ");
+                Serial.println(m_motorController.currentPosition());
+                if (m_motorController.currentPosition() < 0) {
+                    m_frontPos = m_frontPos + std::abs(m_motorController.currentPosition());
+                } else {
+                    m_frontPos = m_frontPos - m_motorController.currentPosition();
+                }
+                m_motorController.setZero();
                 m_rearPosDefined = true;
                 break;
             case CommandType::SETTING_SET_FRONT:
                 Serial.println("SETTING_SET_FRONT command received.");
+                Serial.print("Current Position: ");
+                Serial.println(m_motorController.currentPosition());
+                if (m_motorController.currentPosition() < 0) {
+                    Serial.print("Front pose should not be negative.");
+                    break;
+                }
                 m_frontPos = m_motorController.currentPosition();
-                Serial.print("Front Position: ");
-                Serial.println(m_frontPos);
                 m_frontPosDefined = true;
                 break;
             case CommandType::SETTING_MAX_HALF_SPEED:
@@ -143,7 +150,11 @@ void HardwareController::handleSingleMode()
         case MotorState::START:
             m_turnFinished = false;
             m_motorController.setSpeed(m_singleSpeed);
-            m_motorController.moveTo(m_turnType == TurnType::HALF_TURN ? m_frontPos : STEPS_PER_REVOLUTION);
+            if (m_turnType == TurnType::HALF_TURN) {
+                m_motorController.moveTo(m_frontPos);
+            } else if (m_turnType == TurnType::FULL_TURN) {
+                m_motorController.move(STEPS_PER_REVOLUTION);
+            }
             m_motorState = MotorState::ROTATE_FORWARD;
             Serial.println("Single mode started. Speed: " + String(m_singleSpeed));
             break;
@@ -158,7 +169,7 @@ void HardwareController::handleSingleMode()
                 m_motorController.setRampLen(10);
                 m_motorController.setSpeed(90);
                 if (m_turnType == TurnType::HALF_TURN) {
-                    m_motorController.moveTo(m_rearPos);
+                    m_motorController.moveTo(0);
                     m_motorState = MotorState::ROTATE_BACK;
                 } else if (m_turnType == TurnType::FULL_TURN) {
                     m_motorController.setZero();
@@ -221,7 +232,7 @@ void HardwareController::handleInfiniteMode()
             if (millis() - m_startPauseForwardMillis >= 1000) {
                 m_motorController.setRampLen(10);
                 m_motorController.setSpeed(90);
-                m_motorController.moveTo(m_rearPos);
+                m_motorController.moveTo(0);
                 m_motorState = MotorState::ROTATE_BACK;
             }
             break;
