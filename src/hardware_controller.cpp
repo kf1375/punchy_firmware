@@ -125,15 +125,19 @@ void HardwareController::spin()
     }
     switch (m_currentMode) {
     case Mode::SINGLE:
+        Serial.print("SINGLE");
         handleSingleMode();
         break;
     case Mode::INFINITE:
+        Serial.print("INFINITE");
         handleInfiniteMode();
         break;
     case Mode::MANUAL:
+        Serial.print("MANUAL");
         handleManualMode();
         break;
     case Mode::STOP:
+        Serial.print("STOP");
         handleStopMode();
         break;
     default:
