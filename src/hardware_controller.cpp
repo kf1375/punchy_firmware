@@ -69,21 +69,16 @@ void HardwareController::processCommand()
                 break;
             case CommandType::SETTING_SET_REAR:
                 Serial.println("SETTING_SET_REAR command received.");
+                if (m_frontPosDefined) {
+                    m_frontPos = m_frontPos - m_motorController.currentPosition();
+                }
                 m_motorController.setZero();
                 m_rearPosDefined = true;
                 break;
             case CommandType::SETTING_SET_FRONT:
-                if (!m_rearPosDefined) {
-                    Serial.println("You should define rear pose first!");
-                    break;
-                }
                 Serial.println("SETTING_SET_FRONT command received.");
                 Serial.print("Current Position: ");
                 Serial.println(m_motorController.currentPosition());
-                if (m_motorController.currentPosition() < 0) {
-                    Serial.print("Front pose should not be negative.");
-                    break;
-                }
                 m_frontPos = m_motorController.currentPosition();
                 m_frontPosDefined = true;
                 break;
