@@ -231,6 +231,14 @@ void NetworkManager::disconnectMqtt()
         m_mqttConnection = nullptr;
         m_mqttReconnectAttempts++;
     }
+
+    Command cmd;
+    cmd.type = CommandType::STOP;
+    cmd.value = 0;
+
+    if (!m_commandQueue->addCommand(cmd)) {
+        Serial.println("Queue is full");
+    }
 }
 
 void NetworkManager::mqttTlsInit(struct mg_connection *c)
