@@ -8,7 +8,7 @@
 #include "global_variables.h"
 #include "network_manager.h"
 #include "hardware_controller.h"
-
+#include "logging.h"
 #include <FS.h>
 #include <LittleFS.h>
 
@@ -43,7 +43,7 @@ void setup() {
 
     // Setting up littlefs File System, required for HTML and dataloggin
     if (!LittleFS.begin()) { // Mounts the littlefs file system and handle littlefs
-        Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "An Error has occurred while mounting SPIFFS");
+        LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "An Error has occurred while mounting SPIFFS");
         return;
     }
 
@@ -51,8 +51,7 @@ void setup() {
     File root = LittleFS.open("/");
     File file = root.openNextFile();
     while (file) {
-        Serial.print("FILE: ");
-        Serial.println(file.name());
+        LOG_INFO(file.name());
         file = root.openNextFile();
     }
 

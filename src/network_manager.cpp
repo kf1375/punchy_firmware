@@ -1,7 +1,7 @@
 #include "network_manager.h"
 
 #include <WiFi.h>
-
+#include "logging.h"
 #include "fs_interface.h"
 #include "hardware_controller.h"
 #include "util.h"
@@ -11,7 +11,7 @@ NetworkManager::NetworkManager()
       m_wifiConnected(false), m_hotspotEnabled(false), m_mqttConnected(false) 
 {
     m_deviceId = Util::getMacAddress();
-    Serial.println("Device ID: " + m_deviceId);
+    LOG_INFO("Device ID: " + m_deviceId);
 }
 
 NetworkManager::~NetworkManager()
@@ -24,7 +24,7 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::init()
 {
-    Serial.println("Initialize Network Manager");
+    LOG_INFO("Initialize Network Manager");
 
     WiFi.mode(WIFI_MODE_STA);
     
@@ -55,7 +55,7 @@ void NetworkManager::init()
 
     mg_mgr_init(&m_mgr);
 
-    Serial.println("Initialize Network Done!");
+    LOG_INFO("Initialize Network Done!");
 }
 
 void NetworkManager::connectWifi(const String &ssid, const String &password) 
@@ -63,13 +63,13 @@ void NetworkManager::connectWifi(const String &ssid, const String &password)
     //     String ssid, password;
     // if (readCredentials(ssid, password)) {
     // search for ssid
-    Serial.println("Scanning for WiFi networks...");
+    LOG_INFO("Scanning for WiFi networks...");
     WiFi.disconnect(true);
     int n = WiFi.scanNetworks();
-    Serial.println("Scan done.");
+    LOG_INFO("Scan done.");
     bool ssidFound = false;
     if (n == 0) {
-        Serial.println("No networks found");
+        LOG_INFO("No networks found");
     } else {
         for (int i = 0; i < n; ++i) {
             if (WiFi.SSID(i) == ssid) {
@@ -82,7 +82,7 @@ void NetworkManager::connectWifi(const String &ssid, const String &password)
     // Attempt to connect to the stored SSID
     if (ssidFound) {
         WiFi.begin(ssid.c_str(), password.c_str());
-        Serial.println("Connecting to WiFi");
+        LOG_INFO("Connecting to WiFi");
         int counter = 0;
         while (WiFi.status() != WL_CONNECTED && counter < 20) {
             delay(500);
@@ -92,18 +92,18 @@ void NetworkManager::connectWifi(const String &ssid, const String &password)
         Serial.print("\n");
         if (WiFi.status() == WL_CONNECTED) {
             m_wifiConnected = true;
-            Serial.println("Connected to: " + ssid);
+            LOG_INFO("Connected to: " + ssid);
             Serial.print("IP Address: ");
-            Serial.println(WiFi.localIP());
+            LOG_INFO(WiFi.localIP());
 
             // starting http server
             // String httpUrl = "http://" + WiFi.localIP().toString() + ":" + String(HTTP_PORT);
-            // Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
+            // LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
             // mg_http_listen(&m_mgr, httpUrl.c_str(), httpEventHandler, NULL);
 
             // starting https server
             // String httpsUrl = "https://" + WiFi.localIP().toString() + ":" + String(HTTPS_PORT);
-            // Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
+            // LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " +
             //                "Starting HTTPS listener on " + httpsUrl);
             // mg_http_listen(&mgr, httpsUrl.c_str(), httpEventHandler, NULL);
 
@@ -115,16 +115,16 @@ void NetworkManager::connectWifi(const String &ssid, const String &password)
             // String secureSockteUrl = "https://" + WiFi.localIP().toString() + ":" + String(WSS_PORT);
             // mg_http_listen(&mgr, secureSockteUrl.c_str(), WebSocket::event_handler, NULL);
 
-            // Serial.println(String(__FILE__) + ":" + String(__LINE__) +
+            // LOG_INFO(String(__FILE__) + ":" + String(__LINE__) +
             //                ": Starting WS listener on " + socketUrl);
         } else {
-            Serial.println("Failed to connect to WiFi");
+            LOG_INFO("Failed to connect to WiFi");
         }
     } else {
-        Serial.println("Target SSID not found");
+        LOG_INFO("Target SSID not found");
     }
     // } else {
-    //     Serial.println("No stored WiFi credentials found");
+    //     LOG_INFO("No stored WiFi credentials found");
     // }
 }
 
@@ -137,7 +137,7 @@ void NetworkManager::enableHotspot(const String &ssid, const String &password)
 {
     WiFi.softAP(ssid.c_str(), password.isEmpty() ? nullptr : password.c_str());
     m_hotspotEnabled = true;
-    Serial.println("Hotspot enabled. SSID: " + ssid + " IP: " + WiFi.softAPIP());
+    LOG_INFO("Hotspot enabled. SSID: " + ssid + " IP: " + WiFi.softAPIP());
 }
 
 void NetworkManager::disableHotspot() 
@@ -145,23 +145,23 @@ void NetworkManager::disableHotspot()
     if (m_hotspotEnabled) {
         WiFi.softAPdisconnect(true);
         m_hotspotEnabled = false;
-        Serial.println("Hotspot disabled.");
+        LOG_INFO("Hotspot disabled.");
     }
 }
 
 void NetworkManager::startDnsServer()
 {
     if (!m_hotspotEnabled) {
-        Serial.println("Hotspot is not enabled. Cannot start DNS server.");
+        LOG_INFO("Hotspot is not enabled. Cannot start DNS server.");
         return;
     }
 
     m_dnsUrl = "udp://" + WiFi.softAPIP().toString() + ":" + String(53);
-    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting DNS listener on " + m_dnsUrl);
+    LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting DNS listener on " + m_dnsUrl);
     m_dnsConnection = mg_listen(&m_mgr, m_dnsUrl.c_str(), dnsEventHandler, this);
 
     if (m_httpConnection == nullptr) {
-        Serial.println("Failed to start DNS server on " + m_httpUrl);;
+        LOG_INFO("Failed to start DNS server on " + m_httpUrl);;
     }
 }
 
@@ -175,16 +175,16 @@ void NetworkManager::stopDnsServer()
 void NetworkManager::startHttpServer() 
 {
     if (!m_hotspotEnabled) {
-        Serial.println("Hotspot is not enabled. Cannot start HTTP server.");
+        LOG_INFO("Hotspot is not enabled. Cannot start HTTP server.");
         return;
     }
 
     m_httpUrl = "http://" + WiFi.softAPIP().toString() + ":" + String(80);
-    Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + m_httpUrl);
+    LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + m_httpUrl);
     m_httpConnection = mg_http_listen(&m_mgr, m_httpUrl.c_str(), httpEventHandler, this);
 
     if (m_httpConnection == nullptr) {
-        Serial.println("Failed to start HTTP server on " + m_httpUrl);;
+        LOG_INFO("Failed to start HTTP server on " + m_httpUrl);;
     }
 }
 
@@ -200,7 +200,7 @@ void NetworkManager::connectMqttBroker()
     if (m_mqttConnection == nullptr) {
         if (!m_wifiConnected) {
             m_mqttReconnectAttempts++;
-            Serial.println("Wifi is not enabled. Cann not connect to the MQTT broker.");
+            LOG_INFO("Wifi is not enabled. Cann not connect to the MQTT broker.");
             return;
         }
 
@@ -216,11 +216,11 @@ void NetworkManager::connectMqttBroker()
         opts.client_id = mg_str(m_deviceId.c_str());
         m_brokerUrl = "mqtt://myremotedevice.com/mqtt:443";
         // m_brokerUrl = "mqtt://82.165.150.67:1883";
-        Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Connecting to: " + m_brokerUrl);
+        LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "Connecting to: " + m_brokerUrl);
         m_mqttConnection = mg_mqtt_connect(&m_mgr, m_brokerUrl.c_str(), &opts, mqttEventHandler, this);
 
         if (m_mqttConnection == nullptr) {
-            Serial.println("Failed to connect MQTT broker: " + m_brokerUrl);
+            LOG_INFO("Failed to connect MQTT broker: " + m_brokerUrl);
         }
     }
 }
@@ -237,7 +237,7 @@ void NetworkManager::disconnectMqtt()
     cmd.value = 0;
 
     if (!m_commandQueue->addCommand(cmd)) {
-        Serial.println("Queue is full");
+        LOG_INFO("Queue is full");
     }
 }
 
@@ -246,7 +246,7 @@ void NetworkManager::mqttTlsInit(struct mg_connection *c)
     if (mg_url_is_ssl(m_brokerUrl.c_str())) {
         // struct mg_tls_opts opts = {.ca = "ca.pem"};
         // mg_tls_init(c, &opts);
-        Serial.println("Target URL is SSL/TLS, command client connection to use TLS.");
+        LOG_INFO("Target URL is SSL/TLS, command client connection to use TLS.");
     }
 }
 
@@ -282,7 +282,7 @@ void NetworkManager::onMqttConnected(struct mg_connection *c, int code)
     mg_mqtt_sub(c, &opts);
     opts.topic = mg_str((m_deviceId + "/commands/down").c_str());
     mg_mqtt_sub(c, &opts);
-    Serial.println("Subscribing to " + m_deviceId + "/#");
+    LOG_INFO("Subscribing to " + m_deviceId + "/#");
 }
 
 void NetworkManager::onMqttMessageReceived(struct mg_connection *c, struct mg_str *topic, struct mg_str *data)
@@ -319,10 +319,10 @@ void NetworkManager::onMqttMessageReceived(struct mg_connection *c, struct mg_st
 
 void NetworkManager::mqttHandlePair(struct mg_connection *c, struct mg_str *data)
 {
-    Serial.println("Handle Pair");
+    LOG_INFO("Handle Pair");
 
     if (data->buf == nullptr) {
-        Serial.println("Received null data");
+        LOG_INFO("Received null data");
         return;
     }
 
@@ -331,14 +331,14 @@ void NetworkManager::mqttHandlePair(struct mg_connection *c, struct mg_str *data
     char *type = NULL;
     type = mg_json_get_str(json, "$.type");
     if (!type) {
-        Serial.println("Error: 'type' field not found");
+        LOG_INFO("Error: 'type' field not found");
         return;
     }
 
     if (strcmp(type, "request") == 0) {
         char *name = mg_json_get_str(json, "$.name");
         if (!name) {
-            Serial.println("Error: 'name' field not found");
+            LOG_INFO("Error: 'name' field not found");
             free(type);
             return;
         }
@@ -354,7 +354,7 @@ void NetworkManager::mqttHandlePair(struct mg_connection *c, struct mg_str *data
             mg_mqtt_pub(m_mqttConnection, &opts);
         }
         free(name);
-        Serial.println("Pairing response published successfully");
+        LOG_INFO("Pairing response published successfully");
     }
 
     free(type);
@@ -362,20 +362,20 @@ void NetworkManager::mqttHandlePair(struct mg_connection *c, struct mg_str *data
 
 void NetworkManager::mqttHandleStatus(struct mg_connection *c, struct mg_str *data)
 {
-    Serial.println("Handle Status");
+    LOG_INFO("Handle Status");
 }
 
 void NetworkManager::mqttHandleUnpair(struct mg_connection *c, struct mg_str *data)
 {
-    Serial.println("Handle Unpair");
+    LOG_INFO("Handle Unpair");
 }
 
 void NetworkManager::mqttHandleStart(struct mg_connection *c, struct mg_str *mode, struct mg_str *data)
 {
-    Serial.println("Handle Start");
+    LOG_INFO("Handle Start");
 
     if (data->buf == nullptr) {
-        Serial.println("Received null data");
+        LOG_INFO("Received null data");
         return;
     }
 
@@ -383,7 +383,7 @@ void NetworkManager::mqttHandleStart(struct mg_connection *c, struct mg_str *mod
 
     int32_t speed = mg_json_get_long(json, "$.speed", -1);
     if (speed == -1) {
-        Serial.println("Error: 'type' field to get speed");
+        LOG_INFO("Error: 'type' field to get speed");
         return;
     }
 
@@ -394,35 +394,35 @@ void NetworkManager::mqttHandleStart(struct mg_connection *c, struct mg_str *mod
     } else if (mg_strcmp(*mode, mg_str("infinite")) == 0) {
         cmd.type = CommandType::START_INFINITE;
     } else {
-        Serial.println("Invalid Start Command");
+        LOG_INFO("Invalid Start Command");
         return;
     }
     
     if (!m_commandQueue->addCommand(cmd)) {
-        Serial.println("Queue is full");
+        LOG_INFO("Queue is full");
     }
 }
 
 void NetworkManager::mqttHandleStop(struct mg_connection *c, struct mg_str *data)
 {
     (void) data;
-    Serial.println("Handle Stop");
+    LOG_INFO("Handle Stop");
 
     Command cmd;
     cmd.type = CommandType::STOP;
     cmd.value = 0;
 
     if (!m_commandQueue->addCommand(cmd)) {
-        Serial.println("Queue is full");
+        LOG_INFO("Queue is full");
     }
 }
 
 void NetworkManager::mqttHandleSettings(struct mg_connection *c, struct mg_str *param, struct mg_str *data)
 {
-    Serial.println("Handle Settings");
+    LOG_INFO("Handle Settings");
 
     if (param->buf == nullptr || data->buf == nullptr) {
-        Serial.println("Received null data");
+        LOG_INFO("Received null data");
         return;
     }
 
@@ -434,7 +434,7 @@ void NetworkManager::mqttHandleSettings(struct mg_connection *c, struct mg_str *
         char *turn_type = NULL;
         turn_type = mg_json_get_str(json, "$.value");
         if (!turn_type) {
-            Serial.println("Error: 'value' field not found");
+            LOG_INFO("Error: 'value' field not found");
             return;
         }
         if (strcmp(turn_type, "Full Turn") == 0) {
@@ -456,21 +456,21 @@ void NetworkManager::mqttHandleSettings(struct mg_connection *c, struct mg_str *
         cmd.type = CommandType::SETTING_MAX_FULL_SPEED;
         cmd.value = mg_json_get_long(json, "$.value", -1);
     } else {
-        Serial.println("Invalid Setting");
+        LOG_INFO("Invalid Setting");
         return;
     }
 
     if (!m_commandQueue->addCommand(cmd)) {
-        Serial.println("Queue is full");
+        LOG_INFO("Queue is full");
     }
 }
 
 void NetworkManager::mqttHandleCommands(struct mg_connection *c, struct mg_str *command, struct mg_str *data)
 {
-    Serial.println("Handle Commands");
+    LOG_INFO("Handle Commands");
 
     if (command->buf == nullptr || data->buf == nullptr) {
-        Serial.println("Received null data");
+        LOG_INFO("Received null data");
         return;
     }
 
@@ -484,18 +484,18 @@ void NetworkManager::mqttHandleCommands(struct mg_connection *c, struct mg_str *
         cmd.type = CommandType::COMMAND_DOWN;
         cmd.value = mg_json_get_long(json, "$.value", -1);
     } else {
-        Serial.println("Invalid Command");
+        LOG_INFO("Invalid Command");
         return;
     }
 
     if (!m_commandQueue->addCommand(cmd)) {
-        Serial.println("Queue is full");
+        LOG_INFO("Queue is full");
     }
 }
 
 void NetworkManager::mqttHandleUnknown(struct mg_connection *c, struct mg_str *data)
 {
-    Serial.println("Unknown mqtt message received.");
+    LOG_INFO("Unknown mqtt message received.");
 }
 
 void NetworkManager::poll() 
@@ -561,7 +561,7 @@ void NetworkManager::httpEventHandler(struct mg_connection *c, int ev, void *ev_
         // }
         // if (sizeof(c->mgr->conns) > LIMIT) {
         if (numberOfConnections(c->mgr) > 20) {
-            Serial.println("Too many connections");
+            LOG_INFO("Too many connections");
             c->is_closing = 1;
         }
     } else if (ev == MG_EV_ERROR) {
@@ -576,20 +576,20 @@ void NetworkManager::mqttEventHandler(struct mg_connection *c, int ev, void *ev_
 {
     auto networkManager = static_cast<NetworkManager *>(c->fn_data);
     if (ev == MG_EV_OPEN) {
-        Serial.println("New connection created: " + c->id);
+        LOG_INFO("New connection created: " + c->id);
     } else if (ev == MG_EV_ERROR) {
-        Serial.println("Error: " + c->id + String((char *) ev_data));
+        LOG_INFO("Error: " + c->id + String((char *) ev_data));
     } else if (ev == MG_EV_CONNECT) {
         // If target URL is SSL/TLS, command client connection to use TLS
         networkManager->mqttTlsInit(c);
     } else if (ev == MG_EV_MQTT_OPEN) {
-        Serial.println("MQTT connect is successful.");
+        LOG_INFO("MQTT connect is successful.");
         networkManager->onMqttConnected(c, *(int *) ev_data);
     } else if (ev == MG_EV_MQTT_MSG) {
         struct mg_mqtt_message *mm = (struct mg_mqtt_message *) ev_data;
         networkManager->onMqttMessageReceived(c, &mm->topic, &mm->data);
     } else if (ev == MG_EV_CLOSE) {
-        Serial.println("MQTT closed.");
+        LOG_INFO("MQTT closed.");
         networkManager->disconnectMqtt();
     } else if (ev == MG_EV_POLL) {
         if(millis() - networkManager->lastMqttPingMillis() >= MQTT_PING_INTERVAL_MS) { 
@@ -615,32 +615,32 @@ void NetworkManager::httpHandleSetWifiConfig(struct mg_connection *c, struct mg_
     // char nssid[128];
     // char npassword[128];
     // if (mg_http_get_var(&hm->body, "ssid", param, sizeof(param)) <= 0) {
-    //     Serial.println("Missing 'ssid' parameter");
+    //     LOG_INFO("Missing 'ssid' parameter");
     //     mg_http_reply(c, 400, "Content-Type: text/plain\r\n", "Missing 'ssid' parameter");
     //     return;
     // }
     // strcpy(nssid, param);
     // if (mg_http_get_var(&hm->body, "password", param, sizeof(param)) <= 0) {
-    //     Serial.println("Missing 'password' parameter");
+    //     LOG_INFO("Missing 'password' parameter");
     //     mg_http_reply(c, 400, "Content-Type: text/plain\r\n", "Missing 'password' parameter");
     //     return;
     // }
     // strcpy(npassword, param);
 
-    // Serial.println(nssid);
-    // Serial.println(npassword);
+    // LOG_INFO(nssid);
+    // LOG_INFO(npassword);
 
     // // Connect to the new Wi-Fi network
     // // search for ssid
-    // Serial.println("Scanning for WiFi networks...");
+    // LOG_INFO("Scanning for WiFi networks...");
     // int n = WiFi.scanNetworks();
-    // Serial.println("Scan done.");
+    // LOG_INFO("Scan done.");
     // bool ssidFound = false;
     // if (n == 0) {
-    //     Serial.println("No networks found");
+    //     LOG_INFO("No networks found");
     // } else {
     //     for (int i = 0; i < n; ++i) {
-    //         Serial.println("New SSID found: " + String(WiFi.SSID(i)));
+    //         LOG_INFO("New SSID found: " + String(WiFi.SSID(i)));
     //         if (WiFi.SSID(i) == String(nssid)) {
     //             ssidFound = true;
     //             break;
@@ -657,31 +657,31 @@ void NetworkManager::httpHandleSetWifiConfig(struct mg_connection *c, struct mg_
     //     const unsigned long timeout = 10000; // 10 seconds timeout
     //     while (WiFi.status() != WL_CONNECTED) {
     //         if (millis() - startTime >= timeout) {
-    //             Serial.println("Failed to connect to WiFi: Timeout");
+    //             LOG_INFO("Failed to connect to WiFi: Timeout");
     //             mg_http_reply(c, 500, "Content-Type: text/plain\r\n", "Failed to connect to WiFi: Timeout");
     //             return;
     //         }
     //         delay(1000);
-    //         Serial.println("Connecting to WiFi...");
+    //         LOG_INFO("Connecting to WiFi...");
     //     }
-    //     Serial.println("Connected to WiFi");
+    //     LOG_INFO("Connected to WiFi");
 
     //     // Save the new WiFi credentials to the wifi.txt file
     //     if (saveCredentials(String(nssid), String(npassword))) {
-    //         Serial.println("WiFi credentials saved");
+    //         LOG_INFO("WiFi credentials saved");
     //     } else {
-    //         Serial.println("Failed to save WiFi credentials");
+    //         LOG_INFO("Failed to save WiFi credentials");
     //     }
 
     //     //************* Re-Init Web Server *******************
     //     // starting http server
     //     String httpUrl = "http://" + WiFi.localIP().toString() + ":" + String(HTTP_PORT);
-    //     Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
+    //     LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "Starting HTTP listener on " + httpUrl);
     //     mg_http_listen(&mgr, httpUrl.c_str(), httpEventHandler, NULL);
 
         // starting https server
         // String httpsUrl = "https://" + WiFi.localIP().toString() + ":" + String(HTTPS_PORT);
-        // Serial.println(String(__FILE__) + ":" + String(__LINE__) + ": " +
+        // LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " +
         //                "Starting HTTPS listener on " + httpsUrl);
         // mg_http_listen(&mgr, httpsUrl.c_str(), httpEventHandler, NULL);
 
@@ -693,14 +693,14 @@ void NetworkManager::httpHandleSetWifiConfig(struct mg_connection *c, struct mg_
         // String secureSockteUrl = "https://" + WiFi.localIP().toString() + ":" + String(WSS_PORT);
         // mg_http_listen(&mgr, secureSockteUrl.c_str(), WebSocket::event_handler, NULL);
 
-        // Serial.println(String(__FILE__) + ":" + String(__LINE__) +
+        // LOG_INFO(String(__FILE__) + ":" + String(__LINE__) +
         //                ": Starting WS listener on " + socketUrl);
 
         // Respond to the client with the IP address
     //     String ipAddress = WiFi.localIP().toString();
     //     mg_http_reply(c, 200, "Content-Type: text/plain\r\n", ipAddress.c_str());
     // } else {
-    //     Serial.println("Target SSID not found");
+    //     LOG_INFO("Target SSID not found");
     //     mg_http_reply(c, 500, "Content-Type: text/plain\r\n", "Failed to connect to WiFi: Target SSID not found");
     // }
 }

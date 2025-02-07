@@ -1,4 +1,5 @@
 #include "hardware_controller.h"
+#include "logging.h"
 
 HardwareController::HardwareController(uint8_t motorStepPin, uint8_t motorDirPin, uint8_t motorEnPin) : 
     m_motorController(motorStepPin, motorDirPin, motorEnPin), m_currentMode(Mode::STOP), m_nextMode(Mode::STOP), m_motorState(MotorState::START),
@@ -15,11 +16,11 @@ HardwareController::~HardwareController()
 
 void HardwareController::init() 
 {
-    Serial.println("\nInitializing hardware controller...");
+    LOG_INFO("Initializing hardware controller.");
     m_motorController.begin();
     m_motorController.setRampLen(0);
     m_motorController.move(15);
-    Serial.println("\nHardware controller initialized.");
+    LOG_INFO("Hardware controller initialized.");
 }
 
 void HardwareController::poll() 
@@ -36,39 +37,39 @@ void HardwareController::processCommand()
     if (m_commandQueue->getNextCommand(cmd)) {
         switch (cmd.type) {
             case CommandType::STOP:
-                Serial.println("STOP command received.");
+                LOG_INFO("STOP command received.");
                 m_nextMode = Mode::STOP;
                 break;
             case CommandType::START_SIGNLE:
-                Serial.println("START_SINGLE command received.");
+                LOG_INFO("START_SINGLE command received.");
                 if (m_frontPosDefined && m_rearPosDefined) {
                     m_singleSpeed = cmd.value;
                     m_nextMode = Mode::SINGLE;
                 } else {
-                    Serial.println("Define positions first!");
+                    LOG_INFO("Define positions first!");
                 }
                 break;
             case CommandType::START_INFINITE:
-                Serial.println("START_INFINITE command received.");
+                LOG_INFO("START_INFINITE command received.");
                 if (m_frontPosDefined && m_rearPosDefined) {
                     m_infiniteSpeed = cmd.value;
                     m_nextMode = Mode::INFINITE;
                 } else {
-                    Serial.println("Define positions first!");
+                    LOG_INFO("Define positions first!");
                 }
                 break;
             case CommandType::SETTING_TURN_TYPE:
-                Serial.println("SETTING_TURN_TYPE command received.");
+                LOG_INFO("SETTING_TURN_TYPE command received.");
                 if ((TurnType) cmd.value == TurnType::FULL_TURN) {
                     m_turnType = TurnType::FULL_TURN;
                 } else if ((TurnType) cmd.value == TurnType::HALF_TURN) {
                     m_turnType = TurnType::HALF_TURN;
                 } else {
-                    Serial.println("Invalid Turn Type!");
+                    LOG_INFO("Invalid Turn Type!");
                 }
                 break;
             case CommandType::SETTING_SET_REAR:
-                Serial.println("SETTING_SET_REAR command received.");
+                LOG_INFO("SETTING_SET_REAR command received.");
                 if (m_frontPosDefined) {
                     m_frontPos = m_frontPos - m_motorController.currentPosition();
                 }
@@ -76,36 +77,36 @@ void HardwareController::processCommand()
                 m_rearPosDefined = true;
                 break;
             case CommandType::SETTING_SET_FRONT:
-                Serial.println("SETTING_SET_FRONT command received.");
+                LOG_INFO("SETTING_SET_FRONT command received.");
                 Serial.print("Current Position: ");
-                Serial.println(m_motorController.currentPosition());
+                LOG_INFO(m_motorController.currentPosition());
                 m_frontPos = m_motorController.currentPosition();
                 m_frontPosDefined = true;
                 break;
             case CommandType::SETTING_MAX_HALF_SPEED:
-                Serial.println("SETTING_MAX_HALF_SPEED command received.");
+                LOG_INFO("SETTING_MAX_HALF_SPEED command received.");
                 m_maxHalfSpeed = cmd.value;
                 break;
             case CommandType::SETTING_MAX_FULL_SPEED:
-                Serial.println("SETTING_MAX_FULL_SPEED command received.");
+                LOG_INFO("SETTING_MAX_FULL_SPEED command received.");
                 m_maxFullSpeed = cmd.value;
                 break;
             case CommandType::COMMAND_UP:
-                Serial.println("COMMAND_UP command received.");
+                LOG_INFO("COMMAND_UP command received.");
                 if (m_currentMode == Mode::STOP) {
                     m_nextMode = Mode::MANUAL;
                     m_manualCommand = ManualCommand::Forward;
                 }
                 break;
             case CommandType::COMMAND_DOWN:
-                Serial.println("COMMAND_DOWN command received.");
+                LOG_INFO("COMMAND_DOWN command received.");
                 if (m_currentMode == Mode::STOP) {
                     m_nextMode = Mode::MANUAL;
                     m_manualCommand = ManualCommand::Backward;
                 }
                 break;
             default:
-                Serial.println("Unknown command type.");
+                LOG_INFO("Unknown command type.");
                 break;
         }
         m_commandQueue->removeCommand();
@@ -133,7 +134,7 @@ void HardwareController::spin()
         handleStopMode();
         break;
     default:
-        Serial.println("Unknown turn mode.");
+        LOG_INFO("Unknown turn mode.");
     }
 }
 
@@ -149,7 +150,7 @@ void HardwareController::handleSingleMode()
                 m_motorController.moveTo(STEPS_PER_REVOLUTION);
             }
             m_motorState = MotorState::ROTATE_FORWARD;
-            Serial.println("Single mode started. Speed: " + String(m_singleSpeed));
+            LOG_INFO("Single mode started. Speed: " + String(m_singleSpeed));
             break;
         case MotorState::ROTATE_FORWARD:
             if (!m_motorController.isRunning()) {
@@ -170,7 +171,7 @@ void HardwareController::handleSingleMode()
                     m_nextMode = Mode::STOP;
                     m_turnFinished = true;
                     m_motorController.setRampLen(0);
-                    Serial.println("Single mode FULL_TURN finished.");
+                    LOG_INFO("Single mode FULL_TURN finished.");
                 }
             }
             break;
@@ -180,11 +181,11 @@ void HardwareController::handleSingleMode()
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
                 m_motorController.setRampLen(0);
-                Serial.println("Single mode HALF_TURN finished.");
+                LOG_INFO("Single mode HALF_TURN finished.");
             }      
             break;
         default:
-            Serial.println("Unknown motor state in SINGLE mode.");
+            LOG_INFO("Unknown motor state in SINGLE mode.");
     }
 
 }
@@ -199,7 +200,7 @@ void HardwareController::handleInfiniteMode()
                 m_motorController.moveTo(m_frontPos);
             }
             m_motorState = MotorState::ROTATE_FORWARD;
-            Serial.println("Infinite mode started. Speed: " + String(m_infiniteSpeed));
+            LOG_INFO("Infinite mode started. Speed: " + String(m_infiniteSpeed));
             break;
         case MotorState::ROTATE_FORWARD:
             if (m_turnType == TurnType::HALF_TURN) {
@@ -217,7 +218,7 @@ void HardwareController::handleInfiniteMode()
                 if (m_turnFinished && m_nextMode == Mode::STOP) {
                     m_motorState = MotorState::START;
                     m_currentMode = Mode::STOP;
-                    Serial.println("Infinite mode FULL_TURN finished.");
+                    LOG_INFO("Infinite mode FULL_TURN finished.");
                 }
             }
             break;
@@ -240,11 +241,11 @@ void HardwareController::handleInfiniteMode()
                 m_motorState = MotorState::START;
                 m_turnFinished = true;
                 m_motorController.setRampLen(0);
-                Serial.println("Infinite mode HALF_TURN finished.");
+                LOG_INFO("Infinite mode HALF_TURN finished.");
             }
             break;
         default:
-            Serial.println("Unknown motor state in INFINITE mode.");
+            LOG_INFO("Unknown motor state in INFINITE mode.");
             break;
     }
 }
@@ -259,17 +260,17 @@ void HardwareController::handleManualMode()
             if (m_manualCommand == ManualCommand::Forward) {
                 m_motorController.move(15);
                 m_motorState = MotorState::ROTATE_FORWARD;
-                Serial.println("Manual move forward started. Speed: 30");
+                LOG_INFO("Manual move forward started. Speed: 30");
             } else if (m_manualCommand == ManualCommand::Backward) {
                 m_motorController.move(-15);
                 m_motorState = MotorState::ROTATE_BACK;
-                Serial.println("Manual move backward started. Speed: 30");
+                LOG_INFO("Manual move backward started. Speed: 30");
             }
             break;
         case MotorState::ROTATE_FORWARD:
             if (!m_motorController.isRunning()) {
                 Serial.print("Manual move forward finished. Current Position: ");
-                Serial.println(m_motorController.currentPosition());
+                LOG_INFO(m_motorController.currentPosition());
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
@@ -279,7 +280,7 @@ void HardwareController::handleManualMode()
         case MotorState::ROTATE_BACK:
             if (!m_motorController.isRunning()) {
                 Serial.print("Manual move back finished. Current Position: ");
-                Serial.println(m_motorController.currentPosition());
+                LOG_INFO(m_motorController.currentPosition());
                 m_motorState = MotorState::START;
                 m_nextMode = Mode::STOP;
                 m_turnFinished = true;
@@ -287,7 +288,7 @@ void HardwareController::handleManualMode()
             }
             break;
         default:
-            Serial.println("Unknown motor state in MANUAL mode.");
+            LOG_INFO("Unknown motor state in MANUAL mode.");
     }
 }
 
