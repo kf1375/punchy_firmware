@@ -3,12 +3,10 @@
 BasedOnStyle: LLVM
 
 # Indentation settings
-IndentWidth: 4            # Number of spaces to use for each indentation level
-TabWidth: 4               # Width of a tab character (in spaces)
 UseTab: Never             # Use spaces instead of tabs (Options: Always, Never, ForIndentation)
 
 # Brace placement
-BreakBeforeBraces: Attach  # Places braces on a new line (Options: Attach, Linux, Stroustrup, Allman, GNU)
+BreakBeforeBraces: Linux  # Places braces on a new line (Options: Attach, Linux, Stroustrup, Allman, GNU)
 
 # Column width for wrapping code
 ColumnLimit: 150           # Maximum number of columns per line
