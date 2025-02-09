@@ -1,0 +1,20 @@
+{
+    "wifi": {
+        "ssid": "KF’s iPhone",
+        "pass": "Kazem1375"
+    },
+    "mqtt": {
+        "address": "mqtt://myremotedevice.com/mqtt:443",
+        "username": "null",
+        "password": "null",
+        "enabled": true
+    },
+    "hardware": {
+        "turn_type": "HALF_TURN",
+        "front_position": 0,
+        "single_speed": 100,
+        "infinite_speed": 200,
+        "max_half_speed": 100,
+        "max_full_speed": 100
+    }
+}

@@ -1,63 +1,34 @@
-// #include "custom_functions.h"
-// #include "driver.h"
-// #include "fs_interface.h"
-// #include "global_variables.h"
-// #include "io.h"
 #include <Arduino.h>
 
-#include "global_variables.h"
-#include "network_manager.h"
+#include "configuration.h"
 #include "hardware_controller.h"
 #include "logging.h"
-#include <FS.h>
-#include <LittleFS.h>
+#include "network_manager.h"
 
-CommandQueue commandQueue;
+Configuration config;
+HardwareController hardwareController(config);
+NetworkManager networkManager(config, hardwareController);
 
-void networkTask(void *pvParameters) 
+void networkTask(void *pvParameters)
 {
-    NetworkManager networkManager;
-    networkManager.init();
-    networkManager.setCommandQueue(&commandQueue);
-    networkManager.connectWifi(ssid, password);
-    networkManager.connectMqttBroker();
-
-    while (true) {
-        networkManager.poll();
-    }
+  networkManager.setup();
+  while (true) {
+    networkManager.loop();
+  }
 }
 
-void hardwareTask() {
-    HardwareController hardwareController(STEP_PIN, DIR_PIN, ENA_PIN);
-    hardwareController.init();
-    hardwareController.setCommandQueue(&commandQueue);
+void setup()
+{
+  Serial.begin(115200);
 
-    while (true) {
-        hardwareController.poll();
-    }
-    
+  config.begin();
+  hardwareController.begin();
+
+  xTaskCreatePinnedToCore(networkTask, "networkTask", 50000, NULL, 0, NULL, 0);
 }
 
-void setup() {
-    Serial.begin(115200);
-
-    // Setting up littlefs File System, required for HTML and dataloggin
-    if (!LittleFS.begin()) { // Mounts the littlefs file system and handle littlefs
-        LOG_INFO(String(__FILE__) + ":" + String(__LINE__) + ": " + "An Error has occurred while mounting SPIFFS");
-        return;
-    }
-
-    // List all files in littlefs (for debugging purposes)
-    File root = LittleFS.open("/");
-    File file = root.openNextFile();
-    while (file) {
-        LOG_INFO(file.name());
-        file = root.openNextFile();
-    }
-
-    xTaskCreatePinnedToCore(networkTask, "networkTask", 50000, NULL, 0, NULL, 0);
-}
-
-void loop() {
-    hardwareTask();
+void loop()
+{
+  config.loop();
+  hardwareController.loop();
 }
