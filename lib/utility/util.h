@@ -4,16 +4,14 @@
 #include <Arduino.h>
 #include <mongoose.h>
 
-class Util {
-
+class Util
+{
 public:
-    static String getMacAddress();
-    static void printMgStr(const mg_str &str);
+  static String getMacAddress();
+  // Function to get number of mongoose connections
+  static int getNumberOfConnections(struct mg_mgr *mgr);
 
-    // Function to save WiFi credentials
-    static bool saveCredentials(const String& ssid, const String& password);
-    // Function to read WiFi credentials
-    static bool readCredentials(String& ssid, String& password);
+  static bool timeElapsed(float seconds, long startT);
 };
 
 #endif // UTIL_H

@@ -5,51 +5,31 @@
 
 String Util::getMacAddress()
 {
-    uint8_t device_mac_address[6];
-    esp_efuse_mac_get_default(device_mac_address);
+  uint8_t device_mac_address[6];
+  esp_efuse_mac_get_default(device_mac_address);
 
-    String device_id = "";
-    for (uint8_t i = 0; i < 6; i++) {
-        device_id += String(device_mac_address[i], HEX);
-    }
-    device_id.toUpperCase();
-    return device_id;
-}
-
-void Util::printMgStr(const mg_str &str)
-{
-    for (size_t i = 0; i < str.len; i++) {
-        Serial.print(str.buf[i]);
-    }
-    Serial.print("\n");
-}
-
-// Function to save WiFi credentials
-bool Util::saveCredentials(const String& ssid, const String& password)
-{
-  File file = LittleFS.open("/wifi.txt", "w");
-  if (!file) {
-    Serial.println("Failed to open file for writing");
-    return false;
+  String device_id = "";
+  for (uint8_t i = 0; i < 6; i++) {
+    device_id += String(device_mac_address[i], HEX);
   }
-  file.println(ssid);
-  file.println(password);
-  file.close();
-  return true;
+  device_id.toUpperCase();
+  return device_id;
 }
 
-// Function to read WiFi credentials
-bool Util::readCredentials(String& ssid, String& password)
+int Util::getNumberOfConnections(struct mg_mgr *mgr)
 {
-  File file = LittleFS.open("/wifi.txt", "r");
-  if (!file) {
-    Serial.println("Failed to open file for reading");
-    return false;
-  }
-  ssid = file.readStringUntil('\n');
-  ssid.trim(); // Remove any whitespace
-  password = file.readStringUntil('\n');
-  password.trim(); // Remove any whitespace
-  file.close();
-  return true;
+  int n = 0;
+  for (struct mg_connection *t = mgr->conns; t != NULL; t = t->next)
+    n++;
+  return n;
+}
+
+bool Util::timeElapsed(float seconds, long startT)
+{
+  float elapsedSeconds = (millis() - startT) / 1000.0;
+
+  if (elapsedSeconds > seconds)
+    return true;
+
+  return false;
 }

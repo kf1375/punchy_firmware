@@ -2,12 +2,6 @@
 #define MONGOOSE_CONFIG_H
 
 #define MG_ARCH MG_ARCH_ESP32
-
-#define MG_MAX_RECV_SIZE 16384
-#define MG_FATFS_ROOT "/"
-#define MG_HTTP_INDEX "index.html"
-#define MG_TLS MG_TLS_BUILTIN	// change to 'MG_TLS_MBED' to enable TLS
-#define MG_OTA MG_OTA_CUSTOM
-#define MG_DEVICE MG_DEVICE_CUSTOM
+#define MG_ENABLE_POSIX_FS 1
 
 #endif

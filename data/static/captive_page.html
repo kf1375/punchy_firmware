@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <title>Wi-Fi Configuration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="w3.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- <header id="masthead" class="header">
+        <div class="branding">
+            <a href="#">
+                <img src="logo.png">
+            </a>
+        </div>
+    </header>
+    <div class="title-container">
+        <h1>DorsiDynamics Extension</h1>
+
+    </div> -->
+
+    <div class="container">
+        <div class="header">Wi-Fi Configuration</div>
+        <div class="form-container">
+            <form onsubmit="sendConfig(event)">
+                <!-- <legend>Connect to Wi-Fi</legend> -->
+                <input type="text" id="ssid" placeholder="SSID" name="ssid">
+                <input type="password" id="password" placeholder="Password" name="password">
+                <input type="submit" value="Connect">
+            </form>
+            <label class="label">Or</label>
+            <a href="http://172.217.28.1/" class="link">Continue in Access Point Mode</a>
+            <div id="status-message" class="status-message"></div>
+
+        </div>
+        <div class="wifi-status-container">
+            <h5>Wi-Fi Status</h5>
+            <p id="cstatus">Loading...</p>
+            <p id="cssid"></p>
+            <p id="cip"></p>
+            <button id="copy-button" class="copy-button" onclick="copyIpAddress()">Copy IP Address</button>
+        </div>
+    </div>
+</body>
+<script>
+    async function sendConfig(event) {
+        event.preventDefault();
+        const ssid = document.getElementById('ssid').value;
+        const password = document.getElementById('password').value;
+        const statusMessage = document.getElementById('status-message');
+
+        const response = await fetch('/api/wifi/set', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ssid, password })
+        });
+
+        if (response.ok) {
+            const result = await response.text();
+            statusMessage.style.color = 'green';
+            statusMessage.innerHTML = "Connected successfully!";
+        } else {
+            const error = await response.text();
+            statusMessage.style.color = 'red';
+            statusMessage.innerHTML = error;
+        }
+    }
+
+    function fetchWiFiStatus() {
+        fetch('/api/wifi/get')
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.getElementById('cstatus');
+                const ssidElement = document.getElementById('cssid');
+                const ipElement = document.getElementById('cip');
+                const copyButton = document.getElementById('copy-button');
+
+                if (data.status == 0) {
+                    statusElement.style.color = 'green';
+                    statusElement.textContent = 'Connected';
+                    // ssidElement.textContent = 'SSID: ' + data.ssid;
+                    // ipElement.textContent = data.ip;
+                    // copyButton.style.display = 'block';
+                } else {
+                    statusElement.style.color = 'red';
+                    statusElement.textContent = 'Disconnected';
+                    // ssidElement.textContent = '';
+                    // ipElement.textContent = '';
+                    // copyButton.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching WiFi status:', error);
+            });
+    }
+
+    window.onload = function () {
+        fetchWiFiStatus();
+        setInterval(fetchWiFiStatus, 5000); // Refresh every 5 seconds
+    }
+
+    function copyIpAddress() {
+        const ipElement = document.getElementById('cip').innerHTML;
+        if (navigator.clipboard) { // If normal copy method available, use it
+            navigator.clipboard.writeText(ipElement);
+        } else { // Otherwise fallback to the above function
+            unsecuredCopyToClipboard(ipElement);
+        }
+    }
+
+    function unsecuredCopyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err);
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
+
+</html>
