@@ -33,18 +33,9 @@ void MqttClient::setup()
   opts.client_id = mg_str((m_mqttPrefix + "_client").c_str());
   opts.topic = mg_str((m_mqttPrefix + "/will").c_str());
   opts.message = mg_str("bye");
-  opts.qos = 1, opts.version = 4;
+  opts.qos = 1;
+  opts.version = 4;
   opts.clean = true;
-  // struct mg_mqtt_opts opts = {
-  //     // .user = mg_str(userString.c_str()),
-  //     // .pass = mg_str(passString.c_str()),
-  //     .client_id = mg_str((m_mqttPrefix + "_client").c_str()),
-  //     .topic = mg_str((m_mqttPrefix + "/will").c_str()),
-  //     .message = mg_str("bye"),
-  //     .qos = 1,
-  //     .version = 4,
-  //     .clean = true,
-  // };
 
   // Establish MQTT connection
   String brokerUrl = "mqtt://myremotedevice.com/mqtt:443";
@@ -106,7 +97,6 @@ void MqttClient::run()
 void MqttClient::subscribe()
 {
   LOG_INFO("Subscribing to MQTT topics with prefix " + m_mqttPrefix);
-  struct mg_str topic;
   struct mg_mqtt_opts sub_opts;
   memset(&sub_opts, 0, sizeof(sub_opts));
 
@@ -143,8 +133,8 @@ void MqttClient::close()
 
   // Reconnect if the fail count is within limits
   if (m_failCount < 5 && !m_stopped) {
-    LOG_INFO("Reconnecting in 2 seconds");
-    mg_timer_add(&m_mgr, 2000, 0, [](void *arg) { static_cast<MqttClient *>(arg)->restart(); }, this);
+    LOG_INFO("Reconnecting in 5 seconds");
+    mg_timer_add(&m_mgr, 5000, 0, [](void *arg) { static_cast<MqttClient *>(arg)->restart(); }, this);
   }
 }
 
@@ -156,12 +146,14 @@ void MqttClient::close()
  */
 void MqttClient::publishData(String topic, String data, bool retain)
 {
+  if (!m_mqttConn)
+    return;
+
   struct mg_mqtt_opts pub_opts;
   memset(&pub_opts, 0, sizeof(pub_opts));
-  struct mg_str pubt = mg_str(topic.c_str());
-  struct mg_str mg_data = mg_str(data.c_str());
-  pub_opts.topic = pubt;
-  pub_opts.message = mg_data;
+  pub_opts.qos = 0;
+  pub_opts.topic = mg_str(topic.c_str());
+  pub_opts.message = mg_str(data.c_str());
   pub_opts.retain = retain;
 
   // Send the MQTT message
@@ -225,19 +217,11 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
     LOG_INFO("Failed to parse JSON");
     return;
   }
-  JsonObject dataJson = doc.as<JsonObject>();
-  if (!dataJson.containsKey("type")) {
-    LOG_INFO("Error: 'type' field not found");
-    return;
-  }
 
-  if (!dataJson.containsKey("type")) {
-    LOG_INFO("Error: 'name' field not found");
-    return;
+  if (doc["type"].as<String>() == "request") {
+    publishData("/pair", "{\"type\":\"response\",\"status\":\"accepted\",\"message\":\"Device paired successfully\"}");
+    LOG_INFO("Pairing response published successfully");
   }
-
-  publishData("/pair", "{\"type\":\"response\",\"status\":\"accepted\",\"message\":\"Device paired successfully\"}");
-  LOG_INFO("Pairing response published successfully");
 }
 
 void MqttClient::handleStatus(struct mg_connection *c, const String &data)
@@ -253,51 +237,124 @@ void MqttClient::handleUnpair(struct mg_connection *c, const String &data)
 void MqttClient::handleStartSingle(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Start Single");
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, data);
+  if (error) {
+    LOG_INFO("Failed to parse JSON");
+    return;
+  }
+
+  int singleSpeed = doc["speed"].as<int>();
+  m_config.hardware.setSingleSpeed(singleSpeed);
+
+  m_hwController.setNextState(HardwareController::State::SingleTurn);
 }
 
 void MqttClient::handleStartInfinite(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Start Infinite");
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, data);
+  if (error) {
+    LOG_INFO("Failed to parse JSON");
+    return;
+  }
+
+  int singleSpeed = doc["speed"].as<int>();
+  m_config.hardware.setSingleSpeed(singleSpeed);
+
+  m_hwController.setNextState(HardwareController::State::InfiniteTurn);
 }
 
 void MqttClient::handleStop(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Start Stop");
+  m_hwController.setNextState(HardwareController::State::Stop);
 }
 
 void MqttClient::handleSettingTurnType(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Turn Type");
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, data);
+  if (error) {
+    LOG_INFO("Failed to parse JSON");
+    return;
+  }
+
+  HardwareConfig::TurnType turnType;
+  String turnTypeStr = doc["value"].as<String>();
+  if (turnTypeStr == "Half Turn")
+    turnType = HardwareConfig::TurnType::HalfTurn;
+  else if (turnTypeStr == "Full Turn")
+    turnType = HardwareConfig::TurnType::HalfTurn;
+  else
+    turnType = HardwareConfig::TurnType::HalfTurn;
+
+  m_config.hardware.setTurnType(turnType);
 }
 
 void MqttClient::handleSettingFrontPos(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Front Pos");
+
+  m_hwController.setFrontPos();
 }
 
 void MqttClient::handleSettingRearPos(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Rear Pos");
+
+  m_hwController.setRearPos();
 }
 
 void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Max Half Speed");
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, data);
+  if (error) {
+    LOG_INFO("Failed to parse JSON");
+    return;
+  }
+
+  int maxHalfSpeed = doc["value"].as<int>();
+  m_config.hardware.setMaxHalfSpeed(maxHalfSpeed);
 }
 
 void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Max Full Speed");
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, data);
+  if (error) {
+    LOG_INFO("Failed to parse JSON");
+    return;
+  }
+
+  int maxFullSpeed = doc["value"].as<int>();
+  m_config.hardware.setMaxFullSpeed(maxFullSpeed);
 }
 
 void MqttClient::handleCommandUp(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Up");
+
+  m_hwController.setManualCommand(HardwareController::ManualCommand::Forward);
+  m_hwController.setNextState(HardwareController::State::ManualTurn);
 }
 
 void MqttClient::handleCommandDown(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Down");
+
+  m_hwController.setManualCommand(HardwareController::ManualCommand::Backward);
+  m_hwController.setNextState(HardwareController::State::ManualTurn);
 }
 
 /**

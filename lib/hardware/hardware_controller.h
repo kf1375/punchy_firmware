@@ -24,6 +24,9 @@ public:
   void loop();
 
   void setNextState(HardwareController::State state);
+  void setFrontPos() {};
+  void setRearPos() {};
+  void setManualCommand(ManualCommand command) { m_manualCommand = command; };
 
 private:
   Configuration &m_config;

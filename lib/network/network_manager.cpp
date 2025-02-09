@@ -198,9 +198,6 @@ void NetworkManager::printDecisionFlags()
     LOG_INFO("WiFi Stored: " + String(m_config.wifi.stored()));
   if (!m_mqttClient.isClientConnected())
     LOG_INFO("MQTT Connected: " + String(m_mqttClient.isClientConnected()));
-  if (m_config.time.valid()) {
-    LOG_INFO("Time Synced: " + String(m_config.time.valid()));
-  }
   if (!m_config.mqtt.credentialsStored()) {
     LOG_INFO("MQTT Credentials Stored: " + String(m_config.mqtt.credentialsStored()));
   }
