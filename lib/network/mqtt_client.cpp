@@ -219,7 +219,7 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
   }
 
   if (doc["type"].as<String>() == "request") {
-    publishData("/pair", "{\"type\":\"response\",\"status\":\"accepted\",\"message\":\"Device paired successfully\"}");
+    publishData(m_mqttPrefix + "/pair", "{\"type\":\"response\",\"status\":\"accepted\",\"message\":\"Device paired successfully\"}");
     LOG_INFO("Pairing response published successfully");
   }
 }
