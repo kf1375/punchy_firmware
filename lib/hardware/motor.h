@@ -3,9 +3,6 @@
 
 #include <MobaTools.h>
 
-#define STEPS_PER_REVOLUTION 200
-#define MAX_SPEED_IN_RPM 500
-
 class Motor
 {
 public:
@@ -16,6 +13,9 @@ public:
     RotateBack,
     PauseBack
   };
+
+  static const int StepsPerRevolution = 200;
+  static const int MaxSpeedInRPM = 500;
 
   Motor();
 
@@ -40,7 +40,7 @@ public:
   Motor::State state() { return m_state; };
 
 private:
-  MoToStepper *m_stepper; // Stepper instance
+  MoToStepper m_stepper; // Stepper instance
   State m_state;
 
   const uint8_t m_stepPin = 4;

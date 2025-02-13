@@ -1,6 +1,7 @@
 #ifndef HARDWARE_CONTROLLER_H
 #define HARDWARE_CONTROLLER_H
 
+#include "MobaTools.h"
 #include "configuration.h"
 #include "motor.h"
 
@@ -24,8 +25,18 @@ public:
   void loop();
 
   void setNextState(HardwareController::State state);
-  void setFrontPos() {};
-  void setRearPos() {};
+  void setFrontPos()
+  {
+    if (m_state == State::Idle) {
+      m_config.hardware.setFrontPosition(m_motor.currentPosition());
+    }
+  };
+  void setRearPos()
+  {
+    if (m_state == State::Idle) {
+      m_motor.setZero();
+    }
+  };
   void setManualCommand(ManualCommand command) { m_manualCommand = command; };
 
 private:

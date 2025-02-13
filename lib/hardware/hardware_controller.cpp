@@ -43,91 +43,6 @@ void HardwareController::setNextState(HardwareController::State state)
   m_nextState = state;
 }
 
-// void HardwareController::processCommand()
-// {
-//     Command cmd;
-//     if (m_commandQueue->getNextCommand(cmd)) {
-//         switch (cmd.type) {
-//             case CommandType::STOP:
-//                 LOG_INFO("STOP command received.");
-//                 m_nextMode = Mode::STOP;
-//                 break;
-//             case CommandType::START_SIGNLE:
-//                 LOG_INFO("START_SINGLE command received.");
-//                 if (m_frontPosDefined && m_rearPosDefined) {
-//                     m_singleSpeed = cmd.value;
-//                     m_nextMode = Mode::SINGLE;
-//                 } else {
-//                     LOG_INFO("Define positions first!");
-//                 }
-//                 break;
-//             case CommandType::START_INFINITE:
-//                 LOG_INFO("START_INFINITE command received.");
-//                 if (m_frontPosDefined && m_rearPosDefined) {
-//                     m_infiniteSpeed = cmd.value;
-//                     m_nextMode = Mode::INFINITE;
-//                 } else {
-//                     LOG_INFO("Define positions first!");
-//                 }
-//                 break;
-//             case CommandType::SETTING_TURN_TYPE:
-//                 LOG_INFO("SETTING_TURN_TYPE command received.");
-//                 if ((TurnType) cmd.value ==
-//                 HardwareConfig::TurnType::FULL_TURN) {
-//                     m_turnType = HardwareConfig::TurnType::FULL_TURN;
-//                 } else if ((TurnType) cmd.value ==
-//                 HardwareConfig::TurnType::HALF_TURN) {
-//                     m_turnType = HardwareConfig::TurnType::HALF_TURN;
-//                 } else {
-//                     LOG_INFO("Invalid Turn Type!");
-//                 }
-//                 break;
-//             case CommandType::SETTING_SET_REAR:
-//                 LOG_INFO("SETTING_SET_REAR command received.");
-//                 if (m_frontPosDefined) {
-//                     m_frontPos = m_frontPos -
-//                     m_motorController.currentPosition();
-//                 }
-//                 m_motorController.setZero();
-//                 m_rearPosDefined = true;
-//                 break;
-//             case CommandType::SETTING_SET_FRONT:
-//                 LOG_INFO("SETTING_SET_FRONT command received.");
-//                 Serial.print("Current Position: ");
-//                 LOG_INFO(m_motorController.currentPosition());
-//                 m_frontPos = m_motorController.currentPosition();
-//                 m_frontPosDefined = true;
-//                 break;
-//             case CommandType::SETTING_MAX_HALF_SPEED:
-//                 LOG_INFO("SETTING_MAX_HALF_SPEED command received.");
-//                 m_maxHalfSpeed = cmd.value;
-//                 break;
-//             case CommandType::SETTING_MAX_FULL_SPEED:
-//                 LOG_INFO("SETTING_MAX_FULL_SPEED command received.");
-//                 m_maxFullSpeed = cmd.value;
-//                 break;
-//             case CommandType::COMMAND_UP:
-//                 LOG_INFO("COMMAND_UP command received.");
-//                 if (m_currentMode == Mode::STOP) {
-//                     m_nextMode = Mode::MANUAL;
-//                     m_manualCommand = ManualCommand::Forward;
-//                 }
-//                 break;
-//             case CommandType::COMMAND_DOWN:
-//                 LOG_INFO("COMMAND_DOWN command received.");
-//                 if (m_currentMode == Mode::STOP) {
-//                     m_nextMode = Mode::MANUAL;
-//                     m_manualCommand = ManualCommand::Backward;
-//                 }
-//                 break;
-//             default:
-//                 LOG_INFO("Unknown command type.");
-//                 break;
-//         }
-//         m_commandQueue->removeCommand();
-//     }
-// }
-
 /**
  * @brief Loop function for the hardware controller
  *
@@ -174,7 +89,7 @@ void HardwareController::handleSingleTurnState()
       m_motor.moveTo(m_config.hardware.frontPosition());
     } else if (m_config.hardware.turnType() ==
                HardwareConfig::TurnType::FullTurn) {
-      m_motor.moveTo(STEPS_PER_REVOLUTION);
+      m_motor.moveTo(Motor::StepsPerRevolution);
     }
     m_motor.setState(Motor::State::RotateForward);
     LOG_INFO("Single mode started. Speed: " +
@@ -244,7 +159,7 @@ void HardwareController::handleInfiniteTurnState()
                HardwareConfig::TurnType::FullTurn) {
       m_turnFinished = false;
       m_motor.runForward();
-      if (m_motor.currentPosition() >= STEPS_PER_REVOLUTION) {
+      if (m_motor.currentPosition() >= Motor::StepsPerRevolution) {
         m_motor.setZero();
         m_turnFinished = true;
       }
@@ -301,10 +216,9 @@ void HardwareController::handleManualTurnState()
     }
     break;
   case Motor::State::RotateForward:
-    LOG_INFO("Jinx");
     if (!m_motor.isRunning()) {
-      LOG_INFO("Manual move forward finished. Current Position: ");
-      LOG_INFO(m_motor.currentPosition());
+      LOG_INFO("Manual move forward finished. Current Position: " +
+               m_motor.currentPosition());
       m_motor.setState(Motor::State::Start);
       m_nextState = State::Stop;
       m_turnFinished = true;
@@ -313,8 +227,8 @@ void HardwareController::handleManualTurnState()
     break;
   case Motor::State::RotateBack:
     if (!m_motor.isRunning()) {
-      LOG_INFO("Manual move back finished. Current Position: ");
-      LOG_INFO(m_motor.currentPosition());
+      LOG_INFO("Manual move back finished. Current Position: " +
+               m_motor.currentPosition());
       m_motor.setState(Motor::State::Start);
       m_nextState = State::Stop;
       m_turnFinished = true;
