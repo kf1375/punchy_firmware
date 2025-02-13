@@ -32,7 +32,7 @@ public:
   void asJson(JsonObject &json);
 
 private:
-  String m_address = "mqtt://mq.dorsi-dynamics.com:1883";
+  String m_address;
   String m_username;
   String m_password;
 };

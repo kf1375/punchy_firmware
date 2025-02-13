@@ -97,13 +97,13 @@ void NetworkManager::startAP()
   ap_started = true;
   // For Access Point Mode:
   // https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/soft-access-point-class.html
-  const char *ap_ssid = "Dorsi Traktion";
+  String ap_ssid = "Testiwhisk_" + Util::getMacAddress();
   // Use this IP range to for more reliability on samsung devices
   IPAddress ap_ip(172, 217, 28, 1);
   IPAddress ap_mask(255, 255, 255, 0);
   IPAddress ap_leaseStart(172, 217, 28, 2);
 
-  WiFi.softAP(ap_ssid, "12345678");
+  WiFi.softAP(ap_ssid.c_str(), "12345678");
   WiFi.setMinSecurity(WIFI_AUTH_WPA2_PSK);
   delay(100); // you have to wait until event SYSTEM_EVENT_AP_START fireed
   // define AP-DHCP Settings for more reliable AP connection on samsung devices
@@ -204,10 +204,6 @@ void NetworkManager::printDecisionFlags()
     LOG_INFO("WiFi Stored: " + String(m_config.wifi.stored()));
   if (!m_mqttClient.isClientConnected())
     LOG_INFO("MQTT Connected: " + String(m_mqttClient.isClientConnected()));
-  if (!m_config.mqtt.credentialsStored()) {
-    LOG_INFO("MQTT Credentials Stored: " +
-             String(m_config.mqtt.credentialsStored()));
-  }
   if (m_config.wifi.failed())
     LOG_INFO("Connection Failed: " + String(m_config.wifi.failed()));
   LOG_INFO("-------------------------------------------------------------------"
@@ -217,8 +213,6 @@ void NetworkManager::printDecisionFlags()
 void NetworkManager::clearWifiConnection()
 {
   WiFi.disconnect(true);
-  // WiFi.mode(WIFI_OFF);
-  //  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
 }
 
 void NetworkManager::setupMqtt()

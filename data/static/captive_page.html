@@ -9,18 +9,6 @@
 </head>
 
 <body>
-    <!-- <header id="masthead" class="header">
-        <div class="branding">
-            <a href="#">
-                <img src="logo.png">
-            </a>
-        </div>
-    </header>
-    <div class="title-container">
-        <h1>DorsiDynamics Extension</h1>
-
-    </div> -->
-
     <div class="container">
         <div class="header">Wi-Fi Configuration</div>
         <div class="form-container">
@@ -30,9 +18,9 @@
                 <input type="password" id="password" placeholder="Password" name="password">
                 <input type="submit" value="Connect">
             </form>
-            <label class="label">Or</label>
+            <!-- <label class="label">Or</label>
             <a href="http://172.217.28.1/" class="link">Continue in Access Point Mode</a>
-            <div id="status-message" class="status-message"></div>
+            <div id="status-message" class="status-message"></div> -->
 
         </div>
         <div class="wifi-status-container">
@@ -40,7 +28,7 @@
             <p id="cstatus">Loading...</p>
             <p id="cssid"></p>
             <p id="cip"></p>
-            <button id="copy-button" class="copy-button" onclick="copyIpAddress()">Copy IP Address</button>
+            <!-- <button id="copy-button" class="copy-button" onclick="copyIpAddress()">Copy IP Address</button> -->
         </div>
     </div>
 </body>
@@ -103,28 +91,28 @@
         setInterval(fetchWiFiStatus, 5000); // Refresh every 5 seconds
     }
 
-    function copyIpAddress() {
-        const ipElement = document.getElementById('cip').innerHTML;
-        if (navigator.clipboard) { // If normal copy method available, use it
-            navigator.clipboard.writeText(ipElement);
-        } else { // Otherwise fallback to the above function
-            unsecuredCopyToClipboard(ipElement);
-        }
-    }
+    // function copyIpAddress() {
+    //     const ipElement = document.getElementById('cip').innerHTML;
+    //     if (navigator.clipboard) { // If normal copy method available, use it
+    //         navigator.clipboard.writeText(ipElement);
+    //     } else { // Otherwise fallback to the above function
+    //         unsecuredCopyToClipboard(ipElement);
+    //     }
+    // }
 
-    function unsecuredCopyToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-        } catch (err) {
-            console.error('Unable to copy to clipboard', err);
-        }
-        document.body.removeChild(textArea);
-    }
+    // function unsecuredCopyToClipboard(text) {
+    //     const textArea = document.createElement("textarea");
+    //     textArea.value = text;
+    //     document.body.appendChild(textArea);
+    //     textArea.focus();
+    //     textArea.select();
+    //     try {
+    //         document.execCommand('copy');
+    //     } catch (err) {
+    //         console.error('Unable to copy to clipboard', err);
+    //     }
+    //     document.body.removeChild(textArea);
+    // }
 </script>
 
 </html>

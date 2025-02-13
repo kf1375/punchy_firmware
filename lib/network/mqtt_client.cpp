@@ -45,19 +45,8 @@ void MqttClient::setup()
       .clean = true,
   };
 
-  // struct mg_mqtt_opts opts;
-  // memset(&opts, 0, sizeof(opts));
-  // opts.clean = true;
-  // opts.keepalive = 60;
-  // opts.client_id = mg_str((m_mqttPrefix + "_client").c_str());
-  // opts.topic = mg_str((m_mqttPrefix + "/will").c_str());
-  // opts.message = mg_str("bye");
-  // opts.qos = 1;
-  // opts.version = 4;
-  // opts.clean = true;
-
   // Establish MQTT connection
-  String brokerUrl = "mqtt://myremotedevice.com/mqtt:443";
+  String brokerUrl = m_config.mqtt.getAddress();
   m_mqttConn = mg_mqtt_connect(
       &m_mgr, brokerUrl.c_str(), &opts,
       [](mg_connection *c, int ev, void *ev_data) {
@@ -241,6 +230,12 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
   }
 }
 
+/**
+ * @brief Handle the incoming message on /pair topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handlePair(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Pair");
@@ -260,16 +255,34 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
   }
 }
 
+/**
+ * @brief Handle the incoming messages on /status topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleStatus(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Status");
 }
 
+/**
+ * @brief Handle the incoming message on /unpair topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleUnpair(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Unpair");
 }
 
+/**
+ * @brief Handle the incoming message on /start/single topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload { speed: (value) }
+ */
 void MqttClient::handleStartSingle(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Start Single");
@@ -287,6 +300,12 @@ void MqttClient::handleStartSingle(struct mg_connection *c, const String &data)
   m_hwController.setNextState(HardwareController::State::SingleTurn);
 }
 
+/**
+ * @brief Handle the incoming message on /start/infinite topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload { speed: (value) }
+ */
 void MqttClient::handleStartInfinite(struct mg_connection *c,
                                      const String &data)
 {
@@ -299,18 +318,30 @@ void MqttClient::handleStartInfinite(struct mg_connection *c,
     return;
   }
 
-  int singleSpeed = doc["speed"].as<int>();
-  m_config.hardware.setSingleSpeed(singleSpeed);
+  int infiniteSpeed = doc["speed"].as<int>();
+  m_config.hardware.setInfiniteSpeed(infiniteSpeed);
 
   m_hwController.setNextState(HardwareController::State::InfiniteTurn);
 }
 
+/**
+ * @brief Handle the incoming message on /stop topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleStop(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Start Stop");
   m_hwController.setNextState(HardwareController::State::Stop);
 }
 
+/**
+ * @brief Handle the incoming message on /settings/turn_type topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload { value: (turn_type) }
+ */
 void MqttClient::handleSettingTurnType(struct mg_connection *c,
                                        const String &data)
 {
@@ -328,13 +359,19 @@ void MqttClient::handleSettingTurnType(struct mg_connection *c,
   if (turnTypeStr == "Half Turn")
     turnType = HardwareConfig::TurnType::HalfTurn;
   else if (turnTypeStr == "Full Turn")
-    turnType = HardwareConfig::TurnType::HalfTurn;
+    turnType = HardwareConfig::TurnType::FullTurn;
   else
     turnType = HardwareConfig::TurnType::HalfTurn;
 
   m_config.hardware.setTurnType(turnType);
 }
 
+/**
+ * @brief Handle the incoming message on /settings/set_front topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleSettingFrontPos(struct mg_connection *c,
                                        const String &data)
 {
@@ -343,6 +380,12 @@ void MqttClient::handleSettingFrontPos(struct mg_connection *c,
   m_hwController.setFrontPos();
 }
 
+/**
+ * @brief Handle the incoming message on /settings/set_rear topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleSettingRearPos(struct mg_connection *c,
                                       const String &data)
 {
@@ -351,6 +394,12 @@ void MqttClient::handleSettingRearPos(struct mg_connection *c,
   m_hwController.setRearPos();
 }
 
+/**
+ * @brief Handle the incoming message on /settings/max_half_speed topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload { value: (speed [RPM]) }
+ */
 void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c,
                                            const String &data)
 {
@@ -367,6 +416,12 @@ void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c,
   m_config.hardware.setMaxHalfSpeed(maxHalfSpeed);
 }
 
+/**
+ * @brief Handle the incoming message on /settings/max_full_speed topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload { value: (speed [RPM]) }
+ */
 void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c,
                                            const String &data)
 {
@@ -383,6 +438,12 @@ void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c,
   m_config.hardware.setMaxFullSpeed(maxFullSpeed);
 }
 
+/**
+ * @brief Handle the incoming message on /commands/up topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleCommandUp(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Up");
@@ -391,6 +452,12 @@ void MqttClient::handleCommandUp(struct mg_connection *c, const String &data)
   m_hwController.setNextState(HardwareController::State::ManualTurn);
 }
 
+/**
+ * @brief Handle the incoming message on /commands/down topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
 void MqttClient::handleCommandDown(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Down");

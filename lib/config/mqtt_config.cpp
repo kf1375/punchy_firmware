@@ -13,6 +13,7 @@ MqttConfig::MqttConfig(JsonObject json)
 {
   m_username = json["username"].as<String>();
   m_password = json["password"].as<String>();
+  m_address = json["address"].as<String>();
 
   LOG_INFO("MQTT configuration loaded.");
 }
@@ -27,4 +28,5 @@ void MqttConfig::asJson(JsonObject &json)
 {
   json["username"] = m_username;
   json["password"] = m_password;
+  json["address"] = m_address;
 }

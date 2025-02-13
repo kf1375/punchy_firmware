@@ -21,11 +21,11 @@ public:
 private:
   Configuration &m_config;
 
-  const String m_deviceName = "dorsi-dynamics-traction-nodemcu-32s";
+  const String m_deviceName = "testiwhisk-nodemcu-32s";
   String m_deviceVersion;
   esp32FOTA *m_esp32FOTA;
   void updateFinishedCallback(int partition, bool restart_after);
 
-  const char *m_manifestUrl = "http://updates.dorsi-dynamics.com/index.json";
+  const char *m_manifestUrl = "http://updates.myremotedevice.com/index.json";
 };
 #endif // WEB_UPDATER_H

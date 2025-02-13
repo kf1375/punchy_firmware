@@ -136,6 +136,10 @@ void HardwareController::handleSingleTurnState()
   }
 }
 
+/**
+ * @brief Handle the infinite turn state
+ *
+ */
 void HardwareController::handleInfiniteTurnState()
 {
   switch (m_motor.state()) {
@@ -198,6 +202,10 @@ void HardwareController::handleInfiniteTurnState()
   }
 }
 
+/**
+ * @brief Handle the manual turn state
+ *
+ */
 void HardwareController::handleManualTurnState()
 {
   switch (m_motor.state()) {
@@ -240,6 +248,10 @@ void HardwareController::handleManualTurnState()
   }
 }
 
+/**
+ * @brief Handle the stop turn state
+ *
+ */
 void HardwareController::handleStopState()
 {
   m_motor.disableMotor();
