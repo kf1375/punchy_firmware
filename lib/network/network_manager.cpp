@@ -18,7 +18,8 @@ void NetworkManager::WiFiEvent(WiFiEvent_t event)
     m_config.wifi.setFailed(false);
     break;
   case SYSTEM_EVENT_STA_GOT_IP:
-    LOG_INFO("Connected to " + m_config.wifi.getSSID() + " and got IP: " + WiFi.localIP().toString());
+    LOG_INFO("Connected to " + m_config.wifi.getSSID() +
+             " and got IP: " + WiFi.localIP().toString());
     break;
   default:
     LOG_INFO("Wi-Fi event: " + String(event));
@@ -26,7 +27,8 @@ void NetworkManager::WiFiEvent(WiFiEvent_t event)
   }
 }
 
-NetworkManager::NetworkManager(Configuration &config, HardwareController &hwController)
+NetworkManager::NetworkManager(Configuration &config,
+                               HardwareController &hwController)
     : m_config(config),
       m_hwController(hwController),
       m_dnsServer(m_mgr),
@@ -50,7 +52,9 @@ void NetworkManager::setup()
 
   WiFi.mode(WIFI_AP_STA);
   WiFi.setSleep(WIFI_PS_NONE);
-  WiFi.onEvent([this](arduino_event_id_t event, arduino_event_info_t info) { this->WiFiEvent(event); });
+  WiFi.onEvent([this](arduino_event_id_t event, arduino_event_info_t info) {
+    this->WiFiEvent(event);
+  });
 
   mg_mgr_init(&m_mgr);
 }
@@ -60,7 +64,8 @@ void NetworkManager::setup()
  *
  * Work on mongoose events as well as event loops of subtasks
  * Whenever wifi connection is lost, attempt a reconnection every 5 Minutes, if
- * credentials are stored. Make sure that AP is running if no credentials are stored
+ * credentials are stored. Make sure that AP is running if no credentials are
+ * stored
  */
 void NetworkManager::loop()
 {
@@ -192,18 +197,21 @@ void NetworkManager::printCurrentState()
 
 void NetworkManager::printDecisionFlags()
 {
-  LOG_INFO("-----------------------------------------------------------------------");
+  LOG_INFO("-------------------------------------------------------------------"
+           "----");
   LOG_INFO("WiFi Connected: " + String(WiFi.status() == WL_CONNECTED));
   if (m_config.wifi.stored())
     LOG_INFO("WiFi Stored: " + String(m_config.wifi.stored()));
   if (!m_mqttClient.isClientConnected())
     LOG_INFO("MQTT Connected: " + String(m_mqttClient.isClientConnected()));
   if (!m_config.mqtt.credentialsStored()) {
-    LOG_INFO("MQTT Credentials Stored: " + String(m_config.mqtt.credentialsStored()));
+    LOG_INFO("MQTT Credentials Stored: " +
+             String(m_config.mqtt.credentialsStored()));
   }
   if (m_config.wifi.failed())
     LOG_INFO("Connection Failed: " + String(m_config.wifi.failed()));
-  LOG_INFO("-----------------------------------------------------------------------");
+  LOG_INFO("-------------------------------------------------------------------"
+           "----");
 }
 
 void NetworkManager::clearWifiConnection()
@@ -259,7 +267,8 @@ void NetworkManager::changeStateConnectionOngoing()
   } else if (m_config.wifi.failed()) {
     WiFi.disconnect();
     LOG_INFO("Clearing WiFi Credentials and starting AP");
-    LOG_INFO("failed: " + String(m_config.wifi.failed()) + " status: " + String(status));
+    LOG_INFO("failed: " + String(m_config.wifi.failed()) +
+             " status: " + String(status));
     startAP();
     m_config.wifi.reset();
     changeState(AP_MODE);

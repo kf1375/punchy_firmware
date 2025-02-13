@@ -13,7 +13,8 @@
 class WebServer
 {
 public:
-  WebServer(mg_mgr &mgr, Configuration &config, HardwareController &hwController);
+  WebServer(mg_mgr &mgr, Configuration &config,
+            HardwareController &hwController);
 
   void setup();
   void loop();

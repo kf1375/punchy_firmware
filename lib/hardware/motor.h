@@ -9,7 +9,13 @@
 class Motor
 {
 public:
-  enum class State { Start, RotateForward, PauseForward, RotateBack, PauseBack };
+  enum class State {
+    Start,
+    RotateForward,
+    PauseForward,
+    RotateBack,
+    PauseBack
+  };
 
   Motor();
 

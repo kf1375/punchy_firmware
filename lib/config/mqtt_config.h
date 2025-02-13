@@ -24,7 +24,10 @@ public:
   void setPass(String password) { changeStringConfig(m_password, password); }
   void setAddress(String address) { changeStringConfig(m_address, address); }
 
-  bool credentialsStored() { return (m_username != "" && m_username != "null"); }
+  bool credentialsStored()
+  {
+    return (m_username != "" && m_username != "null");
+  }
 
   void asJson(JsonObject &json);
 

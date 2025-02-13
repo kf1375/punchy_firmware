@@ -23,7 +23,8 @@ HardwareConfig::HardwareConfig(JsonObject json)
 /**
  * @brief Fill a given JSON object with the SpeedConfig data.
  *
- * This method serializes the safety configuration parameters into the provided JSON object.
+ * This method serializes the safety configuration parameters into the provided
+ * JSON object.
  *
  * @param json JSON object to populate with the safety configuration parameters.
  */
@@ -46,7 +47,8 @@ void HardwareConfig::asJson(JsonObject &json)
  * @param turnTypeStr String representation of the TurnType.
  * @return HardwareController::TurnType The TurnType enum.
  */
-HardwareConfig::TurnType HardwareConfig::turnTypeFromString(const String &turnTypeStr)
+HardwareConfig::TurnType
+HardwareConfig::turnTypeFromString(const String &turnTypeStr)
 {
   if (turnTypeStr == "HALF_TURN") {
     return TurnType::HalfTurn;

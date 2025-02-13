@@ -6,8 +6,8 @@
 #include <esp32FOTA.hpp>
 
 //************************************************************************************************
-// Class for Firmware updates. Will check for new firmware when internet connection is available
-// Will start update if triggered updateStart in UI
+// Class for Firmware updates. Will check for new firmware when internet
+// connection is available Will start update if triggered updateStart in UI
 // ***********************************************************************************************
 
 class WebUpdater

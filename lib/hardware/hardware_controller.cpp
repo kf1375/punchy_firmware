@@ -7,7 +7,10 @@
  *
  * @param config
  */
-HardwareController::HardwareController(Configuration &config) : m_config(config), m_motor(), m_state(State::Idle), m_turnFinished(true) {}
+HardwareController::HardwareController(Configuration &config)
+    : m_config(config), m_motor(), m_state(State::Idle), m_turnFinished(true)
+{
+}
 
 /**
  * @brief Destroy the Hardware Controller:: Hardware Controller object
@@ -69,9 +72,11 @@ void HardwareController::setNextState(HardwareController::State state)
 //                 break;
 //             case CommandType::SETTING_TURN_TYPE:
 //                 LOG_INFO("SETTING_TURN_TYPE command received.");
-//                 if ((TurnType) cmd.value == HardwareConfig::TurnType::FULL_TURN) {
+//                 if ((TurnType) cmd.value ==
+//                 HardwareConfig::TurnType::FULL_TURN) {
 //                     m_turnType = HardwareConfig::TurnType::FULL_TURN;
-//                 } else if ((TurnType) cmd.value == HardwareConfig::TurnType::HALF_TURN) {
+//                 } else if ((TurnType) cmd.value ==
+//                 HardwareConfig::TurnType::HALF_TURN) {
 //                     m_turnType = HardwareConfig::TurnType::HALF_TURN;
 //                 } else {
 //                     LOG_INFO("Invalid Turn Type!");
@@ -80,7 +85,8 @@ void HardwareController::setNextState(HardwareController::State state)
 //             case CommandType::SETTING_SET_REAR:
 //                 LOG_INFO("SETTING_SET_REAR command received.");
 //                 if (m_frontPosDefined) {
-//                     m_frontPos = m_frontPos - m_motorController.currentPosition();
+//                     m_frontPos = m_frontPos -
+//                     m_motorController.currentPosition();
 //                 }
 //                 m_motorController.setZero();
 //                 m_rearPosDefined = true;
@@ -166,11 +172,13 @@ void HardwareController::handleSingleTurnState()
     m_motor.setSpeed(m_config.hardware.singleSpeed());
     if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
       m_motor.moveTo(m_config.hardware.frontPosition());
-    } else if (m_config.hardware.turnType() == HardwareConfig::TurnType::FullTurn) {
+    } else if (m_config.hardware.turnType() ==
+               HardwareConfig::TurnType::FullTurn) {
       m_motor.moveTo(STEPS_PER_REVOLUTION);
     }
     m_motor.setState(Motor::State::RotateForward);
-    LOG_INFO("Single mode started. Speed: " + String(m_config.hardware.singleSpeed()));
+    LOG_INFO("Single mode started. Speed: " +
+             String(m_config.hardware.singleSpeed()));
     break;
   case Motor::State::RotateForward:
     if (!m_motor.isRunning()) {
@@ -179,13 +187,17 @@ void HardwareController::handleSingleTurnState()
     }
     break;
   case Motor::State::PauseForward:
-    if ((millis() - m_startPauseForwardMillis) > (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn ? 1000 : 300)) {
+    if ((millis() - m_startPauseForwardMillis) >
+        (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn
+             ? 1000
+             : 300)) {
       m_motor.setRampLen(10);
       m_motor.setSpeed(90);
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
         m_motor.moveTo(0);
         m_motor.setState(Motor::State::RotateBack);
-      } else if (m_config.hardware.turnType() == HardwareConfig::TurnType::FullTurn) {
+      } else if (m_config.hardware.turnType() ==
+                 HardwareConfig::TurnType::FullTurn) {
         m_motor.setZero();
         m_motor.setState(Motor::State::Start);
         m_nextState = State::Stop;
@@ -219,7 +231,8 @@ void HardwareController::handleInfiniteTurnState()
       m_motor.moveTo(m_config.hardware.frontPosition());
     }
     m_motor.setState(Motor::State::RotateForward);
-    LOG_INFO("Infinite mode started. Speed: " + String(m_config.hardware.infiniteSpeed()));
+    LOG_INFO("Infinite mode started. Speed: " +
+             String(m_config.hardware.infiniteSpeed()));
     break;
   case Motor::State::RotateForward:
     if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
@@ -227,7 +240,8 @@ void HardwareController::handleInfiniteTurnState()
         m_motor.setState(Motor::State::PauseForward);
         m_startPauseForwardMillis = millis();
       }
-    } else if (m_config.hardware.turnType() == HardwareConfig::TurnType::FullTurn) {
+    } else if (m_config.hardware.turnType() ==
+               HardwareConfig::TurnType::FullTurn) {
       m_turnFinished = false;
       m_motor.runForward();
       if (m_motor.currentPosition() >= STEPS_PER_REVOLUTION) {
@@ -287,8 +301,9 @@ void HardwareController::handleManualTurnState()
     }
     break;
   case Motor::State::RotateForward:
+    LOG_INFO("Jinx");
     if (!m_motor.isRunning()) {
-      Serial.print("Manual move forward finished. Current Position: ");
+      LOG_INFO("Manual move forward finished. Current Position: ");
       LOG_INFO(m_motor.currentPosition());
       m_motor.setState(Motor::State::Start);
       m_nextState = State::Stop;
@@ -298,7 +313,7 @@ void HardwareController::handleManualTurnState()
     break;
   case Motor::State::RotateBack:
     if (!m_motor.isRunning()) {
-      Serial.print("Manual move back finished. Current Position: ");
+      LOG_INFO("Manual move back finished. Current Position: ");
       LOG_INFO(m_motor.currentPosition());
       m_motor.setState(Motor::State::Start);
       m_nextState = State::Stop;

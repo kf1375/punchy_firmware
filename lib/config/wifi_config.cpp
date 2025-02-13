@@ -5,6 +5,7 @@ WifiConfig::WifiConfig(JsonObject json)
 {
   m_ssid = json["ssid"].as<String>();
   m_pass = json["pass"].as<String>();
+  LOG_INFO(m_ssid);
   LOG_INFO(m_pass);
   if (m_ssid.length() > 0) {
     m_stored = true;
@@ -28,8 +29,8 @@ void WifiConfig::setSSID(String ssid)
 /**
  * @brief Sets the password for the WiFi configuration.
  *
- * This function updates the password value and marks the configuration as changed.
- * It also sets the stored flag to true.
+ * This function updates the password value and marks the configuration as
+ * changed. It also sets the stored flag to true.
  *
  * @param password The new password
  */
@@ -72,12 +73,14 @@ void WifiConfig::asJson(JsonObject &wifi_json)
 /**
  * Reset the current wifi connection information
  *
- * @param restart if true, the device will clear flash and restart after the reset
+ * @param restart if true, the device will clear flash and restart after the
+ * reset
  */
 void WifiConfig::reset(bool restart)
 {
   m_stored = false;
-  // Do not write this change to flash, to avoid loosing credentials on single wifi outage. (restart will try again)
+  // Do not write this change to flash, to avoid loosing credentials on single
+  // wifi outage. (restart will try again)
   if (restart) {
     setSSID("");
     setPassword("");

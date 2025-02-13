@@ -3,34 +3,34 @@
 BasedOnStyle: LLVM
 
 # Indentation settings
-UseTab: Never             # Use spaces instead of tabs (Options: Always, Never, ForIndentation)
+UseTab: Never # Use spaces instead of tabs (Options: Always, Never, ForIndentation)
 
 # Brace placement
-BreakBeforeBraces: Linux  # Places braces on a new line (Options: Attach, Linux, Stroustrup, Allman, GNU)
-
-# Column width for wrapping code
-ColumnLimit: 150           # Maximum number of columns per line
+BreakBeforeBraces: Linux # Places braces on a new line (Options: Attach, Linux, Stroustrup, Allman, GNU)
 
 # Formatting options for functions
-AllowShortFunctionsOnASingleLine: Inline  # Allow empty functions to be on a single line
+AllowShortFunctionsOnASingleLine: Inline # Allow empty functions to be on a single line
 
 # Namespace indentation settings
-NamespaceIndentation: All  # Indent inside namespaces (Options: None, Inner, All)
+NamespaceIndentation: All # Indent inside namespaces (Options: None, Inner, All)
 
 # Pointer and reference alignment
-PointerAlignment: Right     # Align pointers to the type (Options: Left, Right, Middle)
+PointerAlignment: Right # Align pointers to the type (Options: Left, Right, Middle)
 
 # Spaces in control statements
 SpaceBeforeParens: ControlStatements # Add a space before parentheses in control statements (if, for, while)
 
 # Trailing commas in container literals
-Cpp11BracedListStyle: true  # Format braced lists consistently in C++11 mode
+Cpp11BracedListStyle: true # Format braced lists consistently in C++11 mode
 
 # Reflow comments
-ReflowComments: true       # Reflow long comments to fit within the column limit
+ReflowComments: true # Reflow long comments to fit within the column limit
 
 # Include sorting
-SortIncludes: true         # Sort #include directives alphabetically
+SortIncludes: true # Sort #include directives alphabetically
 
 # Constructor initializer lists formatting
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+# Space after cast
+SpaceAfterCStyleCast: true

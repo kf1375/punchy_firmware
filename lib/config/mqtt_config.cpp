@@ -4,7 +4,8 @@
 /**
  * @brief Construct a new MqttConfig object from a JSON object.
  *
- * This constructor initializes the MqttConfig object using data from the provided JSON object.
+ * This constructor initializes the MqttConfig object using data from the
+ * provided JSON object.
  *
  * @param json JSON object containing the MQTT configuration parameters.
  */

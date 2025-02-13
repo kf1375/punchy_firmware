@@ -27,7 +27,10 @@ public:
   MqttConfig mqtt;
   HardwareConfig hardware;
 
-  void scheduleRestart(int seconds) { m_restart_at = millis() + seconds * 1000; };
+  void scheduleRestart(int seconds)
+  {
+    m_restart_at = millis() + seconds * 1000;
+  };
   void serializeConfig();
 
 private:

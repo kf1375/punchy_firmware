@@ -8,10 +8,13 @@
 #include "configuration.h"
 #include "hardware_controller.h"
 
+#define MQTT_PING_INTERVAL_MS 30 * 1000
+
 class MqttClient
 {
 public:
-  MqttClient(mg_mgr &mgr, Configuration &config, HardwareController &hwController);
+  MqttClient(mg_mgr &mgr, Configuration &config,
+             HardwareController &hwController);
 
   void setup();
   void run();
@@ -34,12 +37,15 @@ private:
   bool m_stopped = false;
   bool m_connected = false;
 
+  unsigned long m_lastMqttPing_ms = 0;
+
   void subscribe();
   void restart();
   void close();
   void publishData(String topic, String data, bool retain = false);
 
-  void onMessageReceived(struct mg_connection *c, const String &topic, const String &data);
+  void onMessageReceived(struct mg_connection *c, const String &topic,
+                         const String &data);
   void handlePair(struct mg_connection *c, const String &data);
   void handleStatus(struct mg_connection *c, const String &data);
   void handleUnpair(struct mg_connection *c, const String &data);

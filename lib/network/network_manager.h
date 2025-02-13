@@ -14,10 +14,11 @@
 #include "hardware_controller.h"
 //************************************************************************************************
 // Network Manager Class
-// This class combines all network-related operations in the system. It handles WiFi connectivity,
-// DNS services, MQTT communication, time synchronization, web server operations, and firmware
-// updates. The `NetworkManager` orchestrates these components, ensuring a seamless connection
-// to the cloud and efficient local network management.
+// This class combines all network-related operations in the system. It handles
+// WiFi connectivity, DNS services, MQTT communication, time synchronization,
+// web server operations, and firmware updates. The `NetworkManager`
+// orchestrates these components, ensuring a seamless connection to the cloud
+// and efficient local network management.
 //************************************************************************************************
 
 class NetworkManager

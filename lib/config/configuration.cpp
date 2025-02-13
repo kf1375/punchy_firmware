@@ -7,13 +7,15 @@
 /**
  * @brief Flash storage setuo
  *
- * Initializes the flash file system, log all present files and read config to RAM
+ * Initializes the flash file system, log all present files and read config to
+ * RAM
  */
 void Configuration::begin()
 {
   LOG_INFO("Setting up config from filesystem...");
   // Setting up littlefs File System, required for HTML and dataloggin
-  if (!LittleFS.begin()) { // Mounts the littlefs file system and handle littlefs
+  if (!LittleFS
+           .begin()) { // Mounts the littlefs file system and handle littlefs
     // Errors:
     LOG_INFO("An Error has occurred while mounting SPIFFS");
     return;

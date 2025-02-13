@@ -107,5 +107,5 @@ void Motor::disableMotor()
 // Check if the motor is running
 bool Motor::isRunning()
 {
-  return (bool)m_stepper->moving();
+  return (bool) m_stepper->moving();
 }

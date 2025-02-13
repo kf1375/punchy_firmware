@@ -22,9 +22,18 @@ public:
   String getVersion() { return version; }
   bool getUpdateAvailable() { return update_available; }
   bool getStartUpdate() { return start_update; }
-  void setVersion(String new_version) { changeStringConfig(version, new_version); }
-  void setUpdateAvailable(bool new_update_available) { update_available = new_update_available; }
-  void setStartUpdate(bool new_start_update) { start_update = new_start_update; }
+  void setVersion(String new_version)
+  {
+    changeStringConfig(version, new_version);
+  }
+  void setUpdateAvailable(bool new_update_available)
+  {
+    update_available = new_update_available;
+  }
+  void setStartUpdate(bool new_start_update)
+  {
+    start_update = new_start_update;
+  }
 
   void asJson(JsonObject &json)
   {

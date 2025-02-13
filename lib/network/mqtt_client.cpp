@@ -10,14 +10,15 @@
  *
  * @param mgr Mongoose event manager
  */
-MqttClient::MqttClient(mg_mgr &mgr, Configuration &config, HardwareController &hwController)
+MqttClient::MqttClient(mg_mgr &mgr, Configuration &config,
+                       HardwareController &hwController)
     : m_mgr(mgr), m_config(config), m_hwController(hwController)
 {
 }
 
 /**
- * @brief Initializes the MQTT client by setting connection options, credentials,
- *        and starting an MQTT listener.
+ * @brief Initializes the MQTT client by setting connection options,
+ * credentials, and starting an MQTT listener.
  */
 void MqttClient::setup()
 {
@@ -25,23 +26,44 @@ void MqttClient::setup()
   m_mqttPrefix = Util::getMacAddress();
   LOG_INFO("Setting up new MqttClient instance with prefix " + m_mqttPrefix);
 
+  // Copy credentials locally
+  String userString = m_config.mqtt.getUser();
+  String passString = m_config.mqtt.getPass();
+  String willString = m_mqttPrefix + "/will";
+  String clientIDString = m_mqttPrefix + "_client";
+
   // MQTT connection options
-  struct mg_mqtt_opts opts;
-  memset(&opts, 0, sizeof(opts));
-  opts.clean = true;
-  opts.keepalive = 60;
-  opts.client_id = mg_str((m_mqttPrefix + "_client").c_str());
-  opts.topic = mg_str((m_mqttPrefix + "/will").c_str());
-  opts.message = mg_str("bye");
-  opts.qos = 1;
-  opts.version = 4;
-  opts.clean = true;
+  struct mg_mqtt_opts opts = {
+      .user = mg_str(userString.c_str()),
+      .pass = mg_str(passString.c_str()),
+      .client_id = mg_str(clientIDString.c_str()),
+      .topic = mg_str(willString.c_str()),
+      .message = mg_str("bye"),
+      .qos = 1,
+      .version = 4,
+      .keepalive = 60,
+      .clean = true,
+  };
+
+  // struct mg_mqtt_opts opts;
+  // memset(&opts, 0, sizeof(opts));
+  // opts.clean = true;
+  // opts.keepalive = 60;
+  // opts.client_id = mg_str((m_mqttPrefix + "_client").c_str());
+  // opts.topic = mg_str((m_mqttPrefix + "/will").c_str());
+  // opts.message = mg_str("bye");
+  // opts.qos = 1;
+  // opts.version = 4;
+  // opts.clean = true;
 
   // Establish MQTT connection
   String brokerUrl = "mqtt://myremotedevice.com/mqtt:443";
   m_mqttConn = mg_mqtt_connect(
       &m_mgr, brokerUrl.c_str(), &opts,
-      [](mg_connection *c, int ev, void *ev_data) { static_cast<MqttClient *>(c->fn_data)->eventHandler(c, ev, ev_data); }, this);
+      [](mg_connection *c, int ev, void *ev_data) {
+        static_cast<MqttClient *>(c->fn_data)->eventHandler(c, ev, ev_data);
+      },
+      this);
   LOG_INFO("Starting MQTT listener on " + brokerUrl);
 }
 
@@ -69,8 +91,8 @@ void MqttClient::restart()
 }
 
 /**
- * @brief Handles the main loop for the MQTT client, including discovery, subscription,
- *        and publishing messages.
+ * @brief Handles the main loop for the MQTT client, including discovery,
+ * subscription, and publishing messages.
  */
 void MqttClient::run()
 {
@@ -81,9 +103,10 @@ void MqttClient::run()
       m_lastPublishTimestamp_ms = millis();
     }
     // Publish data if delay has elapsed and buffer is not full
-    // if (Util::timeElapsed(1, m_lastPublishTimestamp_ms) && (mqtt_conn->send.len < 1000)) {
-    //     LOG_DEBUG("MQTT buffer length before send: " + String(mqtt_conn->send.len));
-    //     m_lastPublishTimestamp_ms = millis();
+    // if (Util::timeElapsed(1, m_lastPublishTimestamp_ms) &&
+    // (mqtt_conn->send.len < 1000)) {
+    //     LOG_DEBUG("MQTT buffer length before send: " +
+    //     String(mqtt_conn->send.len)); m_lastPublishTimestamp_ms = millis();
     //     publish();
     // }
   } else {
@@ -102,12 +125,18 @@ void MqttClient::subscribe()
 
   // Define topics to subscribe to
   std::vector<String> topics = {
-      m_mqttPrefix + "/pair",           m_mqttPrefix + "/settings/turn_type",
-      m_mqttPrefix + "/status",         m_mqttPrefix + "/settings/set_front",
-      m_mqttPrefix + "/unpair",         m_mqttPrefix + "/settings/set_rear",
-      m_mqttPrefix + "/start/single",   m_mqttPrefix + "/settings/max_half_speed",
-      m_mqttPrefix + "/start/infinite", m_mqttPrefix + "/settings/max_full_speed",
-      m_mqttPrefix + "/stop",           m_mqttPrefix + "/commands/up",
+      m_mqttPrefix + "/pair",
+      m_mqttPrefix + "/settings/turn_type",
+      m_mqttPrefix + "/status",
+      m_mqttPrefix + "/settings/set_front",
+      m_mqttPrefix + "/unpair",
+      m_mqttPrefix + "/settings/set_rear",
+      m_mqttPrefix + "/start/single",
+      m_mqttPrefix + "/settings/max_half_speed",
+      m_mqttPrefix + "/start/infinite",
+      m_mqttPrefix + "/settings/max_full_speed",
+      m_mqttPrefix + "/stop",
+      m_mqttPrefix + "/commands/up",
       m_mqttPrefix + "/commands/down",
   };
 
@@ -119,7 +148,8 @@ void MqttClient::subscribe()
 }
 
 /**
- * @brief do the cleaning stuff when the mqtt is closed and restart the connection
+ * @brief do the cleaning stuff when the mqtt is closed and restart the
+ * connection
  *
  */
 void MqttClient::close()
@@ -134,12 +164,15 @@ void MqttClient::close()
   // Reconnect if the fail count is within limits
   if (m_failCount < 5 && !m_stopped) {
     LOG_INFO("Reconnecting in 5 seconds");
-    mg_timer_add(&m_mgr, 5000, 0, [](void *arg) { static_cast<MqttClient *>(arg)->restart(); }, this);
+    mg_timer_add(
+        &m_mgr, 5000, 0,
+        [](void *arg) { static_cast<MqttClient *>(arg)->restart(); }, this);
   }
 }
 
 /**
- * @brief Publishes data to the specified MQTT topic with an optional retain flag.
+ * @brief Publishes data to the specified MQTT topic with an optional retain
+ * flag.
  * @param topic The MQTT topic to publish to.
  * @param data The message payload.
  * @param retain Flag indicating whether the message should be retained.
@@ -176,7 +209,8 @@ bool MqttClient::isClientConnected()
  * @param topic The MQTT topic to publish to.
  * @param data The message payload.
  */
-void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic, const String &data)
+void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
+                                   const String &data)
 {
   if (topic == m_mqttPrefix + "/pair") {
     handlePair(c, data);
@@ -219,7 +253,9 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
   }
 
   if (doc["type"].as<String>() == "request") {
-    publishData(m_mqttPrefix + "/pair", "{\"type\":\"response\",\"status\":\"accepted\",\"message\":\"Device paired successfully\"}");
+    publishData(m_mqttPrefix + "/pair",
+                "{\"type\":\"response\",\"status\":\"accepted\","
+                "\"message\":\"Device paired successfully\"}");
     LOG_INFO("Pairing response published successfully");
   }
 }
@@ -251,7 +287,8 @@ void MqttClient::handleStartSingle(struct mg_connection *c, const String &data)
   m_hwController.setNextState(HardwareController::State::SingleTurn);
 }
 
-void MqttClient::handleStartInfinite(struct mg_connection *c, const String &data)
+void MqttClient::handleStartInfinite(struct mg_connection *c,
+                                     const String &data)
 {
   LOG_INFO("Handle Start Infinite");
 
@@ -274,7 +311,8 @@ void MqttClient::handleStop(struct mg_connection *c, const String &data)
   m_hwController.setNextState(HardwareController::State::Stop);
 }
 
-void MqttClient::handleSettingTurnType(struct mg_connection *c, const String &data)
+void MqttClient::handleSettingTurnType(struct mg_connection *c,
+                                       const String &data)
 {
   LOG_INFO("Handle Set Turn Type");
 
@@ -297,21 +335,24 @@ void MqttClient::handleSettingTurnType(struct mg_connection *c, const String &da
   m_config.hardware.setTurnType(turnType);
 }
 
-void MqttClient::handleSettingFrontPos(struct mg_connection *c, const String &data)
+void MqttClient::handleSettingFrontPos(struct mg_connection *c,
+                                       const String &data)
 {
   LOG_INFO("Handle Set Front Pos");
 
   m_hwController.setFrontPos();
 }
 
-void MqttClient::handleSettingRearPos(struct mg_connection *c, const String &data)
+void MqttClient::handleSettingRearPos(struct mg_connection *c,
+                                      const String &data)
 {
   LOG_INFO("Handle Set Rear Pos");
 
   m_hwController.setRearPos();
 }
 
-void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c, const String &data)
+void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c,
+                                           const String &data)
 {
   LOG_INFO("Handle Set Max Half Speed");
 
@@ -326,7 +367,8 @@ void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c, const String
   m_config.hardware.setMaxHalfSpeed(maxHalfSpeed);
 }
 
-void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c, const String &data)
+void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c,
+                                           const String &data)
 {
   LOG_INFO("Handle Set Max Full Speed");
 
@@ -358,7 +400,8 @@ void MqttClient::handleCommandDown(struct mg_connection *c, const String &data)
 }
 
 /**
- * @brief Handles events from the MQTT connection, such as opening, messages, and errors.
+ * @brief Handles events from the MQTT connection, such as opening, messages,
+ * and errors.
  * @param c The MQTT connection.
  * @param ev The event type.
  * @param ev_data Additional event data.
@@ -368,7 +411,7 @@ void MqttClient::eventHandler(struct mg_connection *c, int ev, void *ev_data)
   if (ev == MG_EV_OPEN) {
     LOG_INFO("MQTT Opened");
   } else if (ev == MG_EV_ERROR) {
-    MG_ERROR(("%lu ERROR %s", c->id, (char *)ev_data));
+    MG_ERROR(("%lu ERROR %s", c->id, (char *) ev_data));
     c->is_draining = 1; // Mark connection for closure
   } else if (ev == MG_EV_MQTT_OPEN) {
     LOG_INFO("MQTT Connected, resetting fail count");
@@ -376,11 +419,16 @@ void MqttClient::eventHandler(struct mg_connection *c, int ev, void *ev_data)
     m_connected = true;
     m_lastPublishTimestamp_ms = 0;
   } else if (ev == MG_EV_MQTT_MSG) {
-    struct mg_mqtt_message *mm = (struct mg_mqtt_message *)ev_data;
+    struct mg_mqtt_message *mm = (struct mg_mqtt_message *) ev_data;
     String topic = String(mm->topic.buf, mm->topic.len);
     String data = String(mm->data.buf, mm->data.len);
     onMessageReceived(c, topic, data);
     c->recv.len = 0; // Clear received data
+  } else if (ev == MG_EV_POLL) {
+    if (millis() - m_lastMqttPing_ms >= MQTT_PING_INTERVAL_MS) {
+      mg_mqtt_ping(c);
+      m_lastMqttPing_ms = millis();
+    }
   } else if (ev == MG_EV_CLOSE) {
     close();
   }
