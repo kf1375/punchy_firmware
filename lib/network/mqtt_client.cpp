@@ -217,7 +217,7 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
   } else if (topic == m_mqttPrefix + "/commands/down") {
     handleCommandDown(c, data);
   } else if (topic == m_mqttPrefix + "/commands/update") {
-
+    handleCommandUpdate(c, data);
   } else if (topic == m_mqttPrefix + "/settings/turn_type") {
     handleSettingTurnType(c, data);
   } else if (topic == m_mqttPrefix + "/settings/set_front") {
