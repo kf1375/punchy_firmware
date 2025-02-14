@@ -21,11 +21,12 @@ public:
 private:
   Configuration &m_config;
 
-  const String m_deviceName = "testiwhisk-nodemcu-32s";
+  const String m_deviceName = "testiwhisk-device";
   String m_deviceVersion;
   esp32FOTA *m_esp32FOTA;
   void updateFinishedCallback(int partition, bool restart_after);
 
-  const char *m_manifestUrl = "http://updates.myremotedevice.com/index.json";
+  const char *m_manifestUrl =
+      "http://myremotedevice.com/api/update/manifest.json";
 };
 #endif // WEB_UPDATER_H
