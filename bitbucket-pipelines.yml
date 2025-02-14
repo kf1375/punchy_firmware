@@ -37,7 +37,7 @@ pipelines:
 
             # Run PlatformIO build
             - platformio run
-            - platformio --target buildfs
+            - platformio run --target buildfs
 
             # Find the generated binary files
             - FIRMWARE_PATH=$(find .pio -name "firmware.bin" | head -n 1)
