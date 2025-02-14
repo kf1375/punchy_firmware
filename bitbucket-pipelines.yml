@@ -51,12 +51,8 @@ pipelines:
 
             # Upload firmware.bin
             - echo "Uploading firmware $FIRMWARE_BIN"
-            - curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" \
-              -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" \
-              -F "files=@$FIRMWARE_PATH;filename=${FIRMWARE_BIN}"
+            - curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" -F "files=@$FIRMWARE_PATH;filename=${FIRMWARE_BIN}"
 
             # Upload littlefs.bin
             - echo "Uploading LittleFS $LITTLEFS_BIN"
-            - curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" \
-              -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" \
-              -F "files=@$LITTLEFS_PATH;filename=${LITTLEFS_BIN}"
+            - curl -u "$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD" -X POST "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPOSITORY/downloads" -F "files=@$LITTLEFS_PATH;filename=${LITTLEFS_BIN}"
