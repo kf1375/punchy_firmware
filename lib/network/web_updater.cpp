@@ -22,6 +22,10 @@ void WebUpdater::setup()
   // Set the URL for the OTA manifest
   m_esp32FOTA->setManifestURL(m_manifestUrl);
 
+  auto cfg = m_esp32FOTA->getConfig();
+  cfg.unsafe = true; // disable certificate check when using TLS
+  m_esp32FOTA->setConfig(cfg);
+
   // Bind and register the callback function to handle actions after update
   // finishes
   m_esp32FOTA->setUpdateFinishedCb(

@@ -219,6 +219,7 @@ void NetworkManager::setupMqtt()
 {
   m_mqttClient.setup();
   m_webServer.setup();
+  m_webUpdater.setup();
 }
 
 void NetworkManager::clearMqttConnection()

@@ -27,6 +27,6 @@ private:
   void updateFinishedCallback(int partition, bool restart_after);
 
   const char *m_manifestUrl =
-      "http://myremotedevice.com/api/update/manifest.json";
+      "https://myremotedevice.com/api/update/manifest.json";
 };
 #endif // WEB_UPDATER_H
