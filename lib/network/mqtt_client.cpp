@@ -113,21 +113,20 @@ void MqttClient::subscribe()
   memset(&sub_opts, 0, sizeof(sub_opts));
 
   // Define topics to subscribe to
-  std::vector<String> topics = {
-      m_mqttPrefix + "/pair",
-      m_mqttPrefix + "/settings/turn_type",
-      m_mqttPrefix + "/status",
-      m_mqttPrefix + "/settings/set_front",
-      m_mqttPrefix + "/unpair",
-      m_mqttPrefix + "/settings/set_rear",
-      m_mqttPrefix + "/start/single",
-      m_mqttPrefix + "/settings/max_half_speed",
-      m_mqttPrefix + "/start/infinite",
-      m_mqttPrefix + "/settings/max_full_speed",
-      m_mqttPrefix + "/stop",
-      m_mqttPrefix + "/commands/up",
-      m_mqttPrefix + "/commands/down",
-  };
+  std::vector<String> topics = {m_mqttPrefix + "/pair",
+                                m_mqttPrefix + "/settings/turn_type",
+                                m_mqttPrefix + "/status",
+                                m_mqttPrefix + "/settings/set_front",
+                                m_mqttPrefix + "/unpair",
+                                m_mqttPrefix + "/settings/set_rear",
+                                m_mqttPrefix + "/start/single",
+                                m_mqttPrefix + "/settings/max_half_speed",
+                                m_mqttPrefix + "/start/infinite",
+                                m_mqttPrefix + "/settings/max_full_speed",
+                                m_mqttPrefix + "/stop",
+                                m_mqttPrefix + "/commands/up",
+                                m_mqttPrefix + "/commands/down",
+                                m_mqttPrefix + "/commands/update"};
 
   // Subscribe to each topic
   for (auto topic : topics) {
