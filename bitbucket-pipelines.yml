@@ -45,8 +45,8 @@ pipelines:
 
             # Check if both files were generated
             - if [ ! -f "$FIRMWARE_PATH" ] || [ ! -f "$LITTLEFS_PATH" ]; then
-              echo "One or both binary files not found!"
-              exit 1
+              echo "One or both binary files not found!";
+              exit 1;
               fi
 
             # Upload firmware.bin
