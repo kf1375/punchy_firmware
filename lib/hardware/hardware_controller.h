@@ -24,6 +24,8 @@ public:
   void begin();
   void loop();
 
+  State state() const { return m_state; };
+
   void setNextState(HardwareController::State state);
   void setFrontPos()
   {

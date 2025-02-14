@@ -59,6 +59,7 @@ private:
   void handleSettingMaxFullSpeed(struct mg_connection *c, const String &data);
   void handleCommandUp(struct mg_connection *c, const String &data);
   void handleCommandDown(struct mg_connection *c, const String &data);
+  void handleCommandUpdate(struct mg_connection *c, const String &data);
 
   void eventHandler(struct mg_connection *c, int ev, void *ev_data);
 };

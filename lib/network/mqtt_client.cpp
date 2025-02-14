@@ -217,6 +217,8 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
     handleCommandUp(c, data);
   } else if (topic == m_mqttPrefix + "/commands/down") {
     handleCommandDown(c, data);
+  } else if (topic == m_mqttPrefix + "/commands/update") {
+
   } else if (topic == m_mqttPrefix + "/settings/turn_type") {
     handleSettingTurnType(c, data);
   } else if (topic == m_mqttPrefix + "/settings/set_front") {
@@ -464,6 +466,22 @@ void MqttClient::handleCommandDown(struct mg_connection *c, const String &data)
 
   m_hwController.setManualCommand(HardwareController::ManualCommand::Backward);
   m_hwController.setNextState(HardwareController::State::ManualTurn);
+}
+
+/**
+ * @brief Handle the incoming message on /commands/update topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload
+ */
+void MqttClient::handleCommandUpdate(struct mg_connection *c,
+                                     const String &data)
+{
+  LOG_INFO("Handle Command Update");
+
+  if (m_hwController.state() == HardwareController::State::Idle) {
+    m_config.firmware.setStartUpdate(true);
+  }
 }
 
 /**

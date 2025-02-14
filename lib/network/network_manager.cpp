@@ -294,7 +294,7 @@ void NetworkManager::changeStateConnectedToCloud()
     setupMqtt();
     changeState(CONNECT_TO_CLOUD);
   } else {
-    // m_webUpdater.loop();
+    m_webUpdater.loop();
     m_mqttClient.run();
   }
 }
