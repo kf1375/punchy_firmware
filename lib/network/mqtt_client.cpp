@@ -172,7 +172,7 @@ void MqttClient::publishData(String topic, String data, bool retain)
 
   struct mg_mqtt_opts pub_opts;
   memset(&pub_opts, 0, sizeof(pub_opts));
-  pub_opts.qos = 0;
+  pub_opts.qos = 1;
   pub_opts.topic = mg_str(topic.c_str());
   pub_opts.message = mg_str(data.c_str());
   pub_opts.retain = retain;
@@ -250,7 +250,8 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
 
   publishData(m_mqttPrefix + "/pair/res",
               "{\"status\":\"accepted\","
-              "\"message\":\"Device paired successfully\"}");
+              "\"message\":\"Device paired successfully\"}",
+              true);
   LOG_INFO("Pairing response published successfully");
 }
 
@@ -263,6 +264,12 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
 void MqttClient::handleStatus(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Status");
+
+  publishData(m_mqttPrefix + "/status/res",
+              "{\"status\":\"Ok\","
+              "\"message\":\"Everything is fine.\"}",
+              true);
+  LOG_INFO("Pairing response published successfully");
 }
 
 /**
