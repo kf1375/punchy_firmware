@@ -52,14 +52,14 @@ private:
   void handleStartSingle(struct mg_connection *c, const String &data);
   void handleStartInfinite(struct mg_connection *c, const String &data);
   void handleStop(struct mg_connection *c, const String &data);
-  void handleSettingTurnType(struct mg_connection *c, const String &data);
-  void handleSettingFrontPos(struct mg_connection *c, const String &data);
-  void handleSettingRearPos(struct mg_connection *c, const String &data);
-  void handleSettingMaxHalfSpeed(struct mg_connection *c, const String &data);
-  void handleSettingMaxFullSpeed(struct mg_connection *c, const String &data);
-  void handleCommandUp(struct mg_connection *c, const String &data);
-  void handleCommandDown(struct mg_connection *c, const String &data);
-  void handleCommandUpdate(struct mg_connection *c, const String &data);
+  void handleSetTurnType(struct mg_connection *c, const String &data);
+  void handleSetFrontPos(struct mg_connection *c, const String &data);
+  void handleSetRearPos(struct mg_connection *c, const String &data);
+  void handleSetMaxHalfSpeed(struct mg_connection *c, const String &data);
+  void handleSetMaxFullSpeed(struct mg_connection *c, const String &data);
+  void handleCmdUp(struct mg_connection *c, const String &data);
+  void handleCmdDown(struct mg_connection *c, const String &data);
+  void handleCmdUpdate(struct mg_connection *c, const String &data);
 
   void eventHandler(struct mg_connection *c, int ev, void *ev_data);
 };

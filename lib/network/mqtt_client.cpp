@@ -113,20 +113,20 @@ void MqttClient::subscribe()
   memset(&sub_opts, 0, sizeof(sub_opts));
 
   // Define topics to subscribe to
-  std::vector<String> topics = {m_mqttPrefix + "/pair",
-                                m_mqttPrefix + "/settings/turn_type",
-                                m_mqttPrefix + "/status",
-                                m_mqttPrefix + "/settings/set_front",
-                                m_mqttPrefix + "/unpair",
-                                m_mqttPrefix + "/settings/set_rear",
-                                m_mqttPrefix + "/start/single",
-                                m_mqttPrefix + "/settings/max_half_speed",
-                                m_mqttPrefix + "/start/infinite",
-                                m_mqttPrefix + "/settings/max_full_speed",
-                                m_mqttPrefix + "/stop",
-                                m_mqttPrefix + "/commands/up",
-                                m_mqttPrefix + "/commands/down",
-                                m_mqttPrefix + "/commands/update"};
+  std::vector<String> topics = {m_mqttPrefix + "/pair/req",
+                                m_mqttPrefix + "/unpair/req",
+                                m_mqttPrefix + "/status/req",
+                                m_mqttPrefix + "/start/single/req",
+                                m_mqttPrefix + "/start/inf/req",
+                                m_mqttPrefix + "/stop/req",
+                                m_mqttPrefix + "/set/turn_type/req",
+                                m_mqttPrefix + "/set/set_front/req",
+                                m_mqttPrefix + "/set/set_rear/req",
+                                m_mqttPrefix + "/set/max_half_speed/req",
+                                m_mqttPrefix + "/set/max_full_speed/req",
+                                m_mqttPrefix + "/cmd/up/req",
+                                m_mqttPrefix + "/cmd/down/req",
+                                m_mqttPrefix + "/cmd/update/req"};
 
   // Subscribe to each topic
   for (auto topic : topics) {
@@ -200,34 +200,34 @@ bool MqttClient::isClientConnected()
 void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
                                    const String &data)
 {
-  if (topic == m_mqttPrefix + "/pair") {
+  if (topic == m_mqttPrefix + "/pair/req") {
     handlePair(c, data);
-  } else if (topic == m_mqttPrefix + "/unpair") {
+  } else if (topic == m_mqttPrefix + "/unpair/req") {
     handleUnpair(c, data);
-  } else if (topic == m_mqttPrefix + "/status") {
+  } else if (topic == m_mqttPrefix + "/status/req") {
     handleStatus(c, data);
-  } else if (topic == m_mqttPrefix + "/start/single") {
+  } else if (topic == m_mqttPrefix + "/start/single/req") {
     handleStartSingle(c, data);
-  } else if (topic == m_mqttPrefix + "/start/infinite") {
+  } else if (topic == m_mqttPrefix + "/start/inf/req") {
     handleStartInfinite(c, data);
-  } else if (topic == m_mqttPrefix + "/stop") {
+  } else if (topic == m_mqttPrefix + "/stop/req") {
     handleStop(c, data);
-  } else if (topic == m_mqttPrefix + "/commands/up") {
-    handleCommandUp(c, data);
-  } else if (topic == m_mqttPrefix + "/commands/down") {
-    handleCommandDown(c, data);
-  } else if (topic == m_mqttPrefix + "/commands/update") {
-    handleCommandUpdate(c, data);
-  } else if (topic == m_mqttPrefix + "/settings/turn_type") {
-    handleSettingTurnType(c, data);
-  } else if (topic == m_mqttPrefix + "/settings/set_front") {
-    handleSettingFrontPos(c, data);
-  } else if (topic == m_mqttPrefix + "/settings/set_rear") {
-    handleSettingRearPos(c, data);
-  } else if (topic == m_mqttPrefix + "/settings/max_half_speed") {
-    handleSettingMaxHalfSpeed(c, data);
-  } else if (topic == m_mqttPrefix + "/settings/max_full_speed") {
-    handleSettingMaxFullSpeed(c, data);
+  } else if (topic == m_mqttPrefix + "/cmd/up/req") {
+    handleCmdUp(c, data);
+  } else if (topic == m_mqttPrefix + "/cmd/down/req") {
+    handleCmdDown(c, data);
+  } else if (topic == m_mqttPrefix + "/cmd/update/req") {
+    handleCmdUpdate(c, data);
+  } else if (topic == m_mqttPrefix + "/set/turn_type/req") {
+    handleSetTurnType(c, data);
+  } else if (topic == m_mqttPrefix + "/set/set_front/req") {
+    handleSetFrontPos(c, data);
+  } else if (topic == m_mqttPrefix + "/set/set_rear/req") {
+    handleSetRearPos(c, data);
+  } else if (topic == m_mqttPrefix + "/set/max_half_speed/req") {
+    handleSetMaxHalfSpeed(c, data);
+  } else if (topic == m_mqttPrefix + "/set/max_full_speed/req") {
+    handleSetMaxFullSpeed(c, data);
   }
 }
 
@@ -248,12 +248,10 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
     return;
   }
 
-  if (doc["type"].as<String>() == "request") {
-    publishData(m_mqttPrefix + "/pair",
-                "{\"type\":\"response\",\"status\":\"accepted\","
-                "\"message\":\"Device paired successfully\"}");
-    LOG_INFO("Pairing response published successfully");
-  }
+  publishData(m_mqttPrefix + "/pair/res",
+              "{\"type\":\"response\",\"status\":\"accepted\","
+              "\"message\":\"Device paired successfully\"}");
+  LOG_INFO("Pairing response published successfully");
 }
 
 /**
@@ -343,8 +341,7 @@ void MqttClient::handleStop(struct mg_connection *c, const String &data)
  * @param c The MQTT connection
  * @param data The message payload { value: (turn_type) }
  */
-void MqttClient::handleSettingTurnType(struct mg_connection *c,
-                                       const String &data)
+void MqttClient::handleSetTurnType(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Turn Type");
 
@@ -373,8 +370,7 @@ void MqttClient::handleSettingTurnType(struct mg_connection *c,
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleSettingFrontPos(struct mg_connection *c,
-                                       const String &data)
+void MqttClient::handleSetFrontPos(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Front Pos");
 
@@ -387,8 +383,7 @@ void MqttClient::handleSettingFrontPos(struct mg_connection *c,
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleSettingRearPos(struct mg_connection *c,
-                                      const String &data)
+void MqttClient::handleSetRearPos(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Set Rear Pos");
 
@@ -401,8 +396,8 @@ void MqttClient::handleSettingRearPos(struct mg_connection *c,
  * @param c The MQTT connection
  * @param data The message payload { value: (speed [RPM]) }
  */
-void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c,
-                                           const String &data)
+void MqttClient::handleSetMaxHalfSpeed(struct mg_connection *c,
+                                       const String &data)
 {
   LOG_INFO("Handle Set Max Half Speed");
 
@@ -423,8 +418,8 @@ void MqttClient::handleSettingMaxHalfSpeed(struct mg_connection *c,
  * @param c The MQTT connection
  * @param data The message payload { value: (speed [RPM]) }
  */
-void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c,
-                                           const String &data)
+void MqttClient::handleSetMaxFullSpeed(struct mg_connection *c,
+                                       const String &data)
 {
   LOG_INFO("Handle Set Max Full Speed");
 
@@ -445,7 +440,7 @@ void MqttClient::handleSettingMaxFullSpeed(struct mg_connection *c,
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleCommandUp(struct mg_connection *c, const String &data)
+void MqttClient::handleCmdUp(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Up");
 
@@ -459,7 +454,7 @@ void MqttClient::handleCommandUp(struct mg_connection *c, const String &data)
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleCommandDown(struct mg_connection *c, const String &data)
+void MqttClient::handleCmdDown(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Down");
 
@@ -473,8 +468,7 @@ void MqttClient::handleCommandDown(struct mg_connection *c, const String &data)
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleCommandUpdate(struct mg_connection *c,
-                                     const String &data)
+void MqttClient::handleCmdUpdate(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Update");
 
