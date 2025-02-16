@@ -13,8 +13,8 @@
         "front_position": 0,
         "single_speed": 100,
         "infinite_speed": 200,
-        "max_half_speed": 100,
-        "max_full_speed": 100
+        "max_half_speed": 1000,
+        "max_full_speed": 1000
     },
     "firmware": {
         "version": "0.0.1"
