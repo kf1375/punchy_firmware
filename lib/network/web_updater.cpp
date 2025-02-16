@@ -67,9 +67,10 @@ void WebUpdater::loop()
  */
 void WebUpdater::setUpdatedVersion()
 {
-  char versionBuffer[32];
+  char versionBuffer[32] = {0};
   m_esp32FOTA->getPayloadVersion(versionBuffer);
   m_config.firmware.setVersion(String(versionBuffer));
+  LOG_INFO("Device updated to: " + m_config.firmware.version());
 }
 
 /**
