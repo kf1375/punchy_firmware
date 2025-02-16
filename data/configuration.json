@@ -6,8 +6,7 @@
     "mqtt": {
         "address": "mqtt://myremotedevice.com/mqtt:443",
         "username": "null",
-        "password": "null",
-        "enabled": true
+        "password": "null"
     },
     "hardware": {
         "turn_type": "HALF_TURN",
@@ -16,5 +15,8 @@
         "infinite_speed": 200,
         "max_half_speed": 100,
         "max_full_speed": 100
+    },
+    "firmware": {
+        "version": "0.0.1"
     }
 }

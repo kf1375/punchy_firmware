@@ -7,7 +7,7 @@
 #include "abstract_config.h"
 
 //************************************************************************************************
-// Config Class for various safety relevant variables
+// Config Class for various hardware relevant variables
 // Provides getters and setters for those
 // ***********************************************************************************************
 class HardwareConfig : public AbstractConfig
@@ -15,11 +15,12 @@ class HardwareConfig : public AbstractConfig
 public:
   enum class TurnType { HalfTurn, FullTurn };
 
-  HardwareConfig() {}
+  HardwareConfig() {};
   HardwareConfig(JsonObject json);
-  ~HardwareConfig() {}
+  ~HardwareConfig() {};
 
-  TurnType turnType() { return m_turnType; }
+  TurnType turnType() { return m_turnType; };
+  String turnTypeString() { return turnTypeToString(m_turnType); };
   int frontPosition() { return m_frontPos; };
   int singleSpeed() { return m_singleSpeed; }
   int infiniteSpeed() { return m_infiniteSpeed; }

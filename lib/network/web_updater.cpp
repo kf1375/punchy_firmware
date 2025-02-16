@@ -14,7 +14,7 @@
 void WebUpdater::setup()
 {
   // Get the current firmware version from the configuration
-  m_deviceVersion = m_config.firmware.getVersion();
+  m_deviceVersion = m_config.firmware.version();
 
   // Initialize the esp32FOTA object with device name and firmware version
   m_esp32FOTA = new esp32FOTA(m_deviceName, m_deviceVersion);
@@ -54,11 +54,22 @@ void WebUpdater::loop()
     }
 
     // If an update is available and the start flag is set, initiate OTA
-    if (m_config.firmware.getUpdateAvailable() &&
-        m_config.firmware.getStartUpdate()) {
+    if (m_config.firmware.updateAvailable() &&
+        m_config.firmware.startUpdate()) {
       m_esp32FOTA->execOTA();
     }
   }
+}
+
+/**
+ * @brief update the version of the firmware in FirmwareConfig
+ *
+ */
+void WebUpdater::setUpdatedVersion()
+{
+  char versionBuffer[32];
+  m_esp32FOTA->getPayloadVersion(versionBuffer);
+  m_config.firmware.setVersion(versionBuffer);
 }
 
 /**
@@ -83,6 +94,7 @@ void WebUpdater::updateFinishedCallback(int partition, bool restart_after)
   // If the SPIFFS partition was updated, save the running configuration
   if (partition == U_SPIFFS) {
     LOG_INFO("Saving running configuration to disk...");
+    setUpdatedVersion();
     m_config.serializeConfig();
   }
 

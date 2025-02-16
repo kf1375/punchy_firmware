@@ -3,49 +3,40 @@
 
 #include "Arduino.h"
 #include "ArduinoJson.h"
+
 #include "abstract_config.h"
 
-#ifndef DEVICE_VERSION
-#define DEVICE_VERSION "0.0.1"
-#endif
-
 //************************************************************************************************
-// Config Class for various driver relevant variables
+// Config Class for various firmware relevant variables
 // Provides getters and setters for those
 // ***********************************************************************************************
 class FirmwareConfig : public AbstractConfig
 {
 public:
-  FirmwareConfig() {}
-  ~FirmwareConfig() {}
+  FirmwareConfig() {};
+  FirmwareConfig(JsonObject json);
+  ~FirmwareConfig() {};
 
-  String getVersion() { return version; }
-  bool getUpdateAvailable() { return update_available; }
-  bool getStartUpdate() { return start_update; }
-  void setVersion(String new_version)
-  {
-    changeStringConfig(version, new_version);
-  }
-  void setUpdateAvailable(bool new_update_available)
-  {
-    update_available = new_update_available;
-  }
-  void setStartUpdate(bool new_start_update)
-  {
-    start_update = new_start_update;
-  }
+  String version() { return m_version; };
+  bool updateAvailable() { return m_updateAvailable; };
+  bool startUpdate() { return m_startUpdate; };
 
-  void asJson(JsonObject &json)
+  void setVersion(String newVersion)
   {
-    json["version"] = version;
-    json["update_available"] = update_available;
-  }
+    changeStringConfig(m_version, newVersion);
+  };
+  void setUpdateAvailable(bool updateAvailable)
+  {
+    m_updateAvailable = updateAvailable;
+  };
+  void setStartUpdate(bool startUpdate) { m_startUpdate = startUpdate; };
+
+  void asJson(JsonObject &json);
 
 private:
-  String version = DEVICE_VERSION;
-
-  bool update_available = false;
-  bool start_update = false;
+  String m_version;
+  bool m_updateAvailable = false;
+  bool m_startUpdate = false;
 };
 
 #endif

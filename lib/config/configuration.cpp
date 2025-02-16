@@ -71,14 +71,17 @@ void Configuration::deserializeConfig()
   }
   file.close();
 
-  JsonObject wifi_json = doc["wifi"].as<JsonObject>();
-  wifi = WifiConfig(wifi_json);
+  JsonObject wifiJson = doc["wifi"].as<JsonObject>();
+  wifi = WifiConfig(wifiJson);
 
-  JsonObject mqtt_json = doc["mqtt"].as<JsonObject>();
-  mqtt = MqttConfig(mqtt_json);
+  JsonObject mqttJson = doc["mqtt"].as<JsonObject>();
+  mqtt = MqttConfig(mqttJson);
 
-  JsonObject hardware_config = doc["hardware"].as<JsonObject>();
-  hardware = HardwareConfig(hardware_config);
+  JsonObject hardwareJson = doc["hardware"].as<JsonObject>();
+  hardware = HardwareConfig(hardwareJson);
+
+  JsonObject firmwareJson = doc["firmware"].as<JsonObject>();
+  firmware = FirmwareConfig(firmwareJson);
 
   LOG_INFO(fileContent);
   LOG_INFO("Deserialization done!");
@@ -99,14 +102,17 @@ void Configuration::serializeConfig()
 
   JsonDocument doc;
 
-  JsonObject wifi_json = doc["wifi"].to<JsonObject>();
-  wifi.asJson(wifi_json);
+  JsonObject wifiJson = doc["wifi"].to<JsonObject>();
+  wifi.asJson(wifiJson);
 
-  JsonObject mqtt_json = doc["mqtt"].to<JsonObject>();
-  mqtt.asJson(mqtt_json);
+  JsonObject mqttJson = doc["mqtt"].to<JsonObject>();
+  mqtt.asJson(mqttJson);
 
-  JsonObject hardware_json = doc["hardware"].to<JsonObject>();
-  hardware.asJson(hardware_json);
+  JsonObject hardwareJson = doc["hardware"].to<JsonObject>();
+  hardware.asJson(hardwareJson);
+
+  JsonObject firmwareJson = doc["firmware"].to<JsonObject>();
+  firmware.asJson(firmwareJson);
 
   if (serializeJsonPretty(doc, file) == 0) {
     LOG_INFO("Failed to write to file");

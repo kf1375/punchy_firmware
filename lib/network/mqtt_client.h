@@ -31,7 +31,6 @@ private:
   struct mg_connection *m_mqttConn;
   String m_mqttPrefix;
 
-  unsigned long m_lastPublishTimestamp_ms = 0;
   bool m_discoveryIsNecessary = true;
   size_t m_failCount = 0;
   bool m_stopped = false;
@@ -42,7 +41,7 @@ private:
   void subscribe();
   void restart();
   void close();
-  void publishData(String topic, String data, bool retain = false);
+  void publish(String topic, String data, bool retain = false);
 
   void onMessageReceived(struct mg_connection *c, const String &topic,
                          const String &data);

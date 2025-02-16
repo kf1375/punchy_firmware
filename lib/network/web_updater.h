@@ -24,6 +24,7 @@ private:
   const String m_deviceName = "testiwhisk-device";
   String m_deviceVersion;
   esp32FOTA *m_esp32FOTA;
+  void setUpdatedVersion();
   void updateFinishedCallback(int partition, bool restart_after);
 
   const char *m_manifestUrl =

@@ -89,15 +89,7 @@ void MqttClient::run()
     if (m_discoveryIsNecessary) {
       m_discoveryIsNecessary = false;
       subscribe();
-      m_lastPublishTimestamp_ms = millis();
     }
-    // Publish data if delay has elapsed and buffer is not full
-    // if (Util::timeElapsed(1, m_lastPublishTimestamp_ms) &&
-    // (mqtt_conn->send.len < 1000)) {
-    //     LOG_DEBUG("MQTT buffer length before send: " +
-    //     String(mqtt_conn->send.len)); m_lastPublishTimestamp_ms = millis();
-    //     publish();
-    // }
   } else {
     m_discoveryIsNecessary = true;
   }
@@ -148,6 +140,7 @@ void MqttClient::close()
   m_connected = false;
 
   // Stop the device
+  m_hwController.setNextState(HardwareController::State::Stop);
 
   // Reconnect if the fail count is within limits
   if (m_failCount < 5 && !m_stopped) {
@@ -165,7 +158,7 @@ void MqttClient::close()
  * @param data The message payload.
  * @param retain Flag indicating whether the message should be retained.
  */
-void MqttClient::publishData(String topic, String data, bool retain)
+void MqttClient::publish(String topic, String data, bool retain)
 {
   if (!m_mqttConn)
     return;
@@ -248,10 +241,10 @@ void MqttClient::handlePair(struct mg_connection *c, const String &data)
     return;
   }
 
-  publishData(m_mqttPrefix + "/pair/res",
-              "{\"status\":\"accepted\","
-              "\"message\":\"Device paired successfully\"}",
-              true);
+  publish(m_mqttPrefix + "/pair/res",
+          "{\"status\":\"accepted\","
+          "\"message\":\"Device paired successfully\"}",
+          true);
   LOG_INFO("Pairing response published successfully");
 }
 
@@ -265,10 +258,22 @@ void MqttClient::handleStatus(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Status");
 
-  publishData(m_mqttPrefix + "/status/res",
-              "{\"status\":\"Ok\","
-              "\"message\":\"Everything is fine.\"}",
-              true);
+  String dataStr;
+  JsonDocument doc;
+
+  // Populate JSON with device status
+  doc["status"] = "Ok";
+  doc["firmware_version"] = m_config.firmware.version();
+  doc["turn_type"] = m_config.hardware.turnTypeString();
+  doc["single_speed"] = m_config.hardware.singleSpeed();
+  doc["infinite_speed"] = m_config.hardware.infiniteSpeed();
+  doc["max_half_speed"] = m_config.hardware.maxHalfSpeed();
+  doc["max_full_speed"] = m_config.hardware.maxFullSpeed();
+
+  String topic = m_mqttPrefix + "/status/res";
+
+  serializeJson(doc, dataStr);
+  publish(topic, dataStr, true);
   LOG_INFO("Pairing response published successfully");
 }
 
@@ -502,7 +507,6 @@ void MqttClient::eventHandler(struct mg_connection *c, int ev, void *ev_data)
     LOG_INFO("MQTT Connected, resetting fail count");
     m_failCount = 0;
     m_connected = true;
-    m_lastPublishTimestamp_ms = 0;
   } else if (ev == MG_EV_MQTT_MSG) {
     struct mg_mqtt_message *mm = (struct mg_mqtt_message *) ev_data;
     String topic = String(mm->topic.buf, mm->topic.len);

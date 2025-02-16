@@ -3,11 +3,12 @@
 #include "logging.h"
 
 /**
- * @brief Construct a new SpeedConfig object from a JSON object.
+ * @brief Construct a new HardwareConfig object from a JSON object.
  *
- * Initializes the SpeedConfig object using data from the provided JSON object.
+ * Initializes the HardwareConfig object using data from the provided JSON
+ * object.
  *
- * @param json JSON object containing the safety configuration parameters.
+ * @param json JSON object containing the hardware configuration parameters.
  */
 HardwareConfig::HardwareConfig(JsonObject json)
 {
@@ -21,14 +22,14 @@ HardwareConfig::HardwareConfig(JsonObject json)
 }
 
 /**
- * @brief Fill a given JSON object with the SpeedConfig data.
+ * @brief Fill a given JSON object with the HardwareConfig data.
  *
  * This method serializes the safety configuration parameters into the provided
  * JSON object.
  *
- * @param json JSON object to populate with the safety configuration parameters.
+ * @param json JSON object to populate with the hardware configuration
+ * parameters.
  */
-
 void HardwareConfig::asJson(JsonObject &json)
 {
   json["turn_type"] = turnTypeToString(m_turnType);
