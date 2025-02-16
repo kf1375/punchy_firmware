@@ -15,23 +15,25 @@ public:
   WifiConfig(JsonObject json);
   ~WifiConfig() {}
 
+  String ssid() const;
+  String password() const;
+  bool stored() { return m_stored; }
+
   void setSSID(String ssid);
   void setPassword(String pass);
-  String getSSID() const;
-  String getPassword() const;
-  void setFailed(bool failed) { m_connection_failed = failed; }
+  void setFailed(bool failed) { m_connectionFailed = failed; }
+  void setStored(bool stored) { m_stored = stored; }
 
-  bool stored() { return m_stored; }
-  void stored(bool stored) { m_stored = stored; }
-  void asJson(JsonObject &json);
   void reset(bool restart = false);
-  bool failed() { return m_connection_failed; }
+  bool failed() { return m_connectionFailed; }
+
+  void asJson(JsonObject &json);
 
 private:
   String m_ssid;
   String m_pass;
   bool m_stored = false; // true if credentials are stored
-  bool m_connection_failed = false;
+  bool m_connectionFailed = false;
 };
 
 #endif

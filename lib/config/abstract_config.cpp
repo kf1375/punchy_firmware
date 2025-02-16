@@ -18,6 +18,24 @@ bool AbstractConfig::changed()
 }
 
 /**
+ * @brief change a int value in the config
+ *
+ * Changes the int value in the config if it changed
+ * it will return true if it changed significantly
+ *
+ * @return true if it changed
+ */
+bool AbstractConfig::changeIntConfig(int &old_config, int new_value)
+{
+  if (old_config == new_value)
+    return false;
+
+  m_changed = true;
+  old_config = new_value;
+  return true;
+}
+
+/**
  * @brief change a float value in the config
  *
  * Changes the float value in the config if it changed significantly

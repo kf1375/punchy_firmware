@@ -27,12 +27,12 @@ public:
   int maxHalfSpeed() { return m_maxHalfSpeed; }
   int maxFullSpeed() { return m_maxFullSpeed; }
 
-  void setTurnType(TurnType turnType) { m_turnType = turnType; };
-  void setFrontPosition(int frontPos) { m_frontPos = frontPos; };
-  void setSingleSpeed(int speed) { m_singleSpeed = speed; };
-  void setInfiniteSpeed(int speed) { m_infiniteSpeed = speed; };
-  void setMaxHalfSpeed(int value) { m_maxHalfSpeed = value; };
-  void setMaxFullSpeed(int value) { m_maxFullSpeed = value; };
+  void setTurnType(TurnType turnType);
+  void setFrontPosition(int frontPos);
+  void setSingleSpeed(int speed);
+  void setInfiniteSpeed(int speed);
+  void setMaxHalfSpeed(int value);
+  void setMaxFullSpeed(int value);
 
   void asJson(JsonObject &json);
 

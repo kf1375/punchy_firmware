@@ -16,13 +16,13 @@ public:
   MqttConfig(JsonObject json);
   ~MqttConfig() {}
 
-  String getAddress() const { return m_address; }
-  String getUser() const { return m_username; }
-  String getPass() const { return m_password; }
+  String address() const { return m_address; }
+  String user() const { return m_username; }
+  String pass() const { return m_password; }
 
-  void setUser(String username) { changeStringConfig(m_username, username); }
-  void setPass(String password) { changeStringConfig(m_password, password); }
-  void setAddress(String address) { changeStringConfig(m_address, address); }
+  void setUser(String username);
+  void setPass(String password);
+  void setAddress(String address);
 
   bool credentialsStored()
   {

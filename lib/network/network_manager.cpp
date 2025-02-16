@@ -18,7 +18,7 @@ void NetworkManager::WiFiEvent(WiFiEvent_t event)
     m_config.wifi.setFailed(false);
     break;
   case SYSTEM_EVENT_STA_GOT_IP:
-    LOG_INFO("Connected to " + m_config.wifi.getSSID() +
+    LOG_INFO("Connected to " + m_config.wifi.ssid() +
              " and got IP: " + WiFi.localIP().toString());
     break;
   default:
@@ -126,8 +126,8 @@ void NetworkManager::connectToWifi()
 {
   // Attempt to connect to the stored SSID
   m_config.wifi.setFailed(false);
-  String ssid = m_config.wifi.getSSID();
-  String pass = m_config.wifi.getPassword();
+  String ssid = m_config.wifi.ssid();
+  String pass = m_config.wifi.password();
   LOG_INFO("Connecting to WiFi " + ssid);
   WiFi.begin(ssid.c_str(), pass.c_str());
   delay(100); // you have to wait until event SYSTEM_EVENT_STA_START fired

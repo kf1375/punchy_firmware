@@ -44,7 +44,7 @@ void WifiConfig::setPassword(String pass)
  *
  * @return the ssid
  */
-String WifiConfig::getSSID() const
+String WifiConfig::ssid() const
 {
   return m_ssid;
 }
@@ -54,7 +54,7 @@ String WifiConfig::getSSID() const
  *
  * @return the password
  */
-String WifiConfig::getPassword() const
+String WifiConfig::password() const
 {
   return m_pass;
 }
@@ -66,8 +66,8 @@ String WifiConfig::getPassword() const
  */
 void WifiConfig::asJson(JsonObject &wifi_json)
 {
-  wifi_json["ssid"] = getSSID();
-  wifi_json["pass"] = getPassword();
+  wifi_json["ssid"] = ssid();
+  wifi_json["pass"] = password();
 }
 
 /**

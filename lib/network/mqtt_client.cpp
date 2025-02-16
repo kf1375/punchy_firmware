@@ -27,8 +27,8 @@ void MqttClient::setup()
   LOG_INFO("Setting up new MqttClient instance with prefix " + m_mqttPrefix);
 
   // Copy credentials locally
-  String userString = m_config.mqtt.getUser();
-  String passString = m_config.mqtt.getPass();
+  String userString = m_config.mqtt.user();
+  String passString = m_config.mqtt.pass();
   String willString = m_mqttPrefix + "/will";
   String clientIDString = m_mqttPrefix + "_client";
 
@@ -46,7 +46,7 @@ void MqttClient::setup()
   };
 
   // Establish MQTT connection
-  String brokerUrl = m_config.mqtt.getAddress();
+  String brokerUrl = m_config.mqtt.address();
   m_mqttConn = mg_mqtt_connect(
       &m_mgr, brokerUrl.c_str(), &opts,
       [](mg_connection *c, int ev, void *ev_data) {

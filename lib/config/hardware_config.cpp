@@ -22,6 +22,88 @@ HardwareConfig::HardwareConfig(JsonObject json)
 }
 
 /**
+ * @brief Sets the turn type for the hardware configuration.
+ *
+ * This function updates the turn type value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param turnType The new turn type
+ */
+void HardwareConfig::setTurnType(TurnType turnType)
+{
+  if (m_turnType == turnType)
+    m_changed = false;
+
+  m_turnType = turnType;
+  m_changed = true;
+}
+
+/**
+ * @brief Sets the frontPos for the hardware configuration.
+ *
+ * This function updates the frontPos value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param frontPos The new frontPos
+ */
+void HardwareConfig::setFrontPosition(int frontPos)
+{
+  m_changed = changeIntConfig(m_frontPos, frontPos);
+}
+
+/**
+ * @brief Sets the single speed for the hardware configuration.
+ *
+ * This function updates the single speed value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param speed The new single speed
+ */
+void HardwareConfig::setSingleSpeed(int speed)
+{
+  m_changed = changeIntConfig(m_singleSpeed, speed);
+}
+
+/**
+ * @brief Sets the infinite speed for the hardware configuration.
+ *
+ * This function updates the infinite speed value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param speed The new infinite speed
+ */
+void HardwareConfig::setInfiniteSpeed(int speed)
+{
+  m_changed = changeIntConfig(m_infiniteSpeed, speed);
+}
+
+/**
+ * @brief Sets the max half speed for the hardware configuration.
+ *
+ * This function updates the max half speed value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param value The new max half speed
+ */
+void HardwareConfig::setMaxHalfSpeed(int value)
+{
+  m_changed = changeIntConfig(m_maxHalfSpeed, value);
+}
+
+/**
+ * @brief Sets the max full speed for the hardware configuration.
+ *
+ * This function updates the max full speed value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param value The new max full speed
+ */
+void HardwareConfig::setMaxFullSpeed(int value)
+{
+  m_changed = changeIntConfig(m_maxHalfSpeed, value);
+}
+
+/**
  * @brief Fill a given JSON object with the HardwareConfig data.
  *
  * This method serializes the safety configuration parameters into the provided

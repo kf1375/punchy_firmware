@@ -21,15 +21,9 @@ public:
   bool updateAvailable() { return m_updateAvailable; };
   bool startUpdate() { return m_startUpdate; };
 
-  void setVersion(String newVersion)
-  {
-    changeStringConfig(m_version, newVersion);
-  };
-  void setUpdateAvailable(bool updateAvailable)
-  {
-    m_updateAvailable = updateAvailable;
-  };
-  void setStartUpdate(bool startUpdate) { m_startUpdate = startUpdate; };
+  void setVersion(String newVersion);
+  void setUpdateAvailable(bool updateAvailable);
+  void setStartUpdate(bool startUpdate);
 
   void asJson(JsonObject &json);
 

@@ -39,15 +39,13 @@ void Configuration::begin()
  */
 void Configuration::loop()
 {
-  if (wifi.changed() || m_changed || mqtt.changed()) {
+  if (wifi.changed() || mqtt.changed() || hardware.changed() ||
+      firmware.changed()) {
     serializeConfig();
-    m_changed = false;
-    if (wifi.getSSID().length() > 0) {
-      wifi.stored(true);
+    if (wifi.ssid().length() > 0) {
+      wifi.setStored(true);
     }
   }
-  if (millis() > m_restart_at && m_restart_at != 0)
-    ESP.restart();
 }
 
 /**

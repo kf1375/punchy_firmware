@@ -17,6 +17,7 @@ public:
   AbstractConfig() : m_changed(false) {}
   ~AbstractConfig() {}
 
+  bool changeIntConfig(int &old_config, int new_value);
   bool changeFloatConfig(float &old_config, float new_value);
   bool changeBoolConfig(bool &old_config, bool new_value);
   bool changeStringConfig(String &old_config, String new_value);

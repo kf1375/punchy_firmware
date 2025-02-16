@@ -27,19 +27,12 @@ public:
   MqttConfig mqtt;
   HardwareConfig hardware;
 
-  void scheduleRestart(int seconds)
-  {
-    m_restart_at = millis() + seconds * 1000;
-  };
   void serializeConfig();
 
 private:
   const char *path = "/configuration.json";
 
   void deserializeConfig();
-
-  bool m_changed;
-  unsigned long m_restart_at = 0;
 };
 
 #endif // CONFIGURATION_H
