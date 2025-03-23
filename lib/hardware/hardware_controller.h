@@ -5,6 +5,8 @@
 #include "configuration.h"
 #include "motor.h"
 
+#define SIMULATION_MODE
+
 class HardwareController
 {
 public:
@@ -57,6 +59,9 @@ private:
   void handleInfiniteTurnState();
   void handleManualTurnState();
   void handleStopState();
+
+  void sendStateToSerial();
+  void sendPositionToSerial();
 };
 
 #endif // HARDWARE_CONTROLLER_H
