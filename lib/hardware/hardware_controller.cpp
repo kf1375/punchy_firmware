@@ -55,16 +55,13 @@ void HardwareController::loop()
   if (m_nextState != m_state) {
     if (m_turnFinished) {
       m_state = m_nextState;
-#ifdef SIMULATION_MODE
-      sendStateToSerial();
-#endif
     }
   }
 
 #ifdef SIMULATION_MODE
   // Send motor position periodically
   static unsigned long lastUpdate = 0;
-  if (millis() - lastUpdate > 500) { // Update position every 500ms
+  if (millis() - lastUpdate > 100) { // Update position every 100ms
     lastUpdate = millis();
     sendPositionToSerial();
   }
@@ -274,34 +271,13 @@ void HardwareController::handleStopState()
   m_state = State::Idle;
 }
 
-// Send state to Serial
-void HardwareController::sendStateToSerial()
-{
-  String stateStr;
-  switch (m_state) {
-  case State::Idle:
-    stateStr = "Idle";
-    break;
-  case State::Stop:
-    stateStr = "Stop";
-    break;
-  case State::SingleTurn:
-    stateStr = "SingleTurn";
-    break;
-  case State::InfiniteTurn:
-    stateStr = "InfiniteTurn";
-    break;
-  case State::ManualTurn:
-    stateStr = "ManualTurn";
-    break;
-  }
-
-  Serial.println("STATE:" + stateStr);
-}
-
 void HardwareController::sendPositionToSerial()
 {
-  Serial.print("POSITION:");
-  Serial.println(
-      m_motor.currentPosition()); // Assume currentPosition() returns an angle
+  static int32_t lastPosition = 0;
+  if (lastPosition == m_motor.currentPosition())
+    return;
+
+  Serial1.print("POSITION:");
+  Serial1.println(m_motor.currentPosition());
+  lastPosition = m_motor.currentPosition();
 }

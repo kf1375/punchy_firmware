@@ -60,7 +60,6 @@ private:
   void handleManualTurnState();
   void handleStopState();
 
-  void sendStateToSerial();
   void sendPositionToSerial();
 };
 

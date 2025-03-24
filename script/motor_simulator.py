@@ -30,13 +30,9 @@ class MotorSimulator(QWidget):
         self.btnConnect.clicked.connect(self.connect)
         layout.addWidget(self.btnConnect)
 
-        # Display Motor State
-        self.labelState = QLabel("State: Idle", self)
-        layout.addWidget(self.labelState)
-
         # Motor Dial (shows motor position)
         self.dialMotor = QDial(self)
-        self.dialMotor.setRange(0, 360)  # Assuming 0 to 360 degrees
+        self.dialMotor.setRange(0, 200)  # Assuming 0 to 200 steps
         self.dialMotor.setNotchesVisible(True)
         self.dialMotor.setWrapping(True)  # Allows circular rotation
         self.dialMotor.setEnabled(False)  # Read-only
@@ -76,15 +72,12 @@ class MotorSimulator(QWidget):
 
     def read(self):
         """Read incoming state updates and motor position from ESP32."""
-        if self.serialPort and self.serial_port.isOpen():
+        if self.serialPort and self.serialPort.isOpen():
             while self.serialPort.bytesAvailable() > 0:
-                line = self.serialPort.readline().decode("utf-8").strip()
-                if line.startswith("STATE:"):
-                    state = line.split("STATE:")[1]
-                    self.label_state.setText(f"State: {state}")
-                elif line.startswith("POSITION:"):
+                line = self.serialPort.readLine().data().decode("utf-8").strip()
+                if line.startswith("POSITION:"):
                     position = int(line.split("POSITION:")[1])
-                    self.motorPosition = position % 360  # Keep within 0-360
+                    self.motorPosition = position % 200  # Keep within 0-200
                     self.dialMotor.setValue(self.motorPosition)
 
                 self.log(f"{line}")
