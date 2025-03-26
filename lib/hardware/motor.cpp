@@ -24,9 +24,9 @@ uint32_t Motor::speed()
   return ((m_stepper.getSpeedSteps() * 6.0) / StepsPerRevolution);
 }
 
-void Motor::setZero()
+void Motor::setZero(long zeroPoint)
 {
-  m_stepper.setZero();
+  m_stepper.setZero(zeroPoint);
 }
 
 // Set speed (rpm)

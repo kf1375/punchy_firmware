@@ -8,10 +8,14 @@ class Motor
 public:
   enum class State {
     Start,
-    RotateForward,
-    PauseForward,
-    RotateBack,
-    PauseBack
+    Prepare,
+    PausePrepare,
+    ToHit,
+    PauseHit,
+    ToRest,
+    PauseRest,
+    RotateCW,
+    RotateCCW
   };
 
   static const int StepsPerRevolution = 200;
@@ -24,7 +28,7 @@ public:
   // Get Speed (RPM)
   uint32_t speed();
 
-  void setZero();
+  void setZero(long zeroPoint);
   // Set speed (RPM)
   void setSpeed(uint32_t speed);
   void setRampLen(uint32_t ramp_len);
