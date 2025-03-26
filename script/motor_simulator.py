@@ -17,7 +17,7 @@ class MotorSimulator(QWidget):
         self.serialPort.readyRead.connect(self.read)
 
     def initUI(self):
-        self.setWindowTitle("Motor Controller")
+        self.setWindowTitle("Motor Sim")
         self.setGeometry(100, 100, 400, 400)
         layout = QVBoxLayout()
 

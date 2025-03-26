@@ -273,8 +273,9 @@ void MqttClient::handleStatus(struct mg_connection *c, const String &data)
   String topic = m_mqttPrefix + "/status/res";
 
   serializeJson(doc, dataStr);
-  publish(topic, dataStr, true);
-  LOG_INFO("Pairing response published successfully");
+  publish(topic, dataStr, false);
+  LOG_INFO("Status response published successfully");
+  LOG_INFO(dataStr);
 }
 
 /**
