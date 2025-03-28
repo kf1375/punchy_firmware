@@ -98,8 +98,23 @@ void HardwareController::handleSingleTurnState()
   case Motor::State::Start:
     m_turnFinished = false;
     m_motor.setSpeed(m_config.hardware.singleSpeed());
-    m_motor.moveTo(m_config.hardware.rearPosition());
-    m_motor.setState(Motor::State::Prepare);
+    if (m_motor.currentPosition() != m_config.hardware.rearPosition()) {
+      m_motor.moveTo(m_config.hardware.rearPosition());
+      m_motor.setState(Motor::State::Prepare);
+    } else {
+      if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
+        m_motor.moveTo(m_config.hardware.frontPosition());
+      } else if (m_config.hardware.turnType() ==
+                 HardwareConfig::TurnType::FullTurn) {
+        if (m_config.hardware.frontPosition() >=
+            m_config.hardware.rearPosition()) {
+          m_motor.move(Motor::StepsPerRevolution);
+        } else {
+          m_motor.move(-Motor::StepsPerRevolution);
+        }
+      }
+      m_motor.setState(Motor::State::ToHit);
+    }
     LOG_INFO("Single mode started. Speed: " +
              String(m_config.hardware.singleSpeed()));
     break;
@@ -183,8 +198,15 @@ void HardwareController::handleInfiniteTurnState()
   case Motor::State::Start:
     m_turnFinished = false;
     m_motor.setSpeed(m_config.hardware.infiniteSpeed());
-    m_motor.moveTo(m_config.hardware.rearPosition());
-    m_motor.setState(Motor::State::Prepare);
+    if (m_motor.currentPosition() != m_config.hardware.rearPosition()) {
+      m_motor.moveTo(m_config.hardware.rearPosition());
+      m_motor.setState(Motor::State::Prepare);
+    } else {
+      if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
+        m_motor.moveTo(m_config.hardware.frontPosition());
+      }
+      m_motor.setState(Motor::State::ToHit);
+    }
     LOG_INFO("Infinite mode started. Speed: " +
              String(m_config.hardware.infiniteSpeed()));
     break;
