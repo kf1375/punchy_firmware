@@ -112,8 +112,8 @@ void MqttClient::subscribe()
                                 m_mqttPrefix + "/start/inf/req",
                                 m_mqttPrefix + "/stop/req",
                                 m_mqttPrefix + "/set/turn_type/req",
-                                m_mqttPrefix + "/set/set_front/req",
-                                m_mqttPrefix + "/set/set_rear/req",
+                                m_mqttPrefix + "/set/set_hit/req",
+                                m_mqttPrefix + "/set/set_rest/req",
                                 m_mqttPrefix + "/set/max_half_speed/req",
                                 m_mqttPrefix + "/set/max_full_speed/req",
                                 m_mqttPrefix + "/set/hit_direction/req",
@@ -207,17 +207,17 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
   } else if (topic == m_mqttPrefix + "/stop/req") {
     handleStop(c, data);
   } else if (topic == m_mqttPrefix + "/cmd/left/req") {
-    handleCmdUp(c, data);
+    handleCmdLeft(c, data);
   } else if (topic == m_mqttPrefix + "/cmd/right/req") {
-    handleCmdDown(c, data);
+    handleCmdRight(c, data);
   } else if (topic == m_mqttPrefix + "/cmd/update/req") {
     handleCmdUpdate(c, data);
   } else if (topic == m_mqttPrefix + "/set/turn_type/req") {
     handleSetTurnType(c, data);
-  } else if (topic == m_mqttPrefix + "/set/set_front/req") {
-    handleSetFrontPos(c, data);
-  } else if (topic == m_mqttPrefix + "/set/set_rear/req") {
-    handleSetRearPos(c, data);
+  } else if (topic == m_mqttPrefix + "/set/set_hit/req") {
+    handleSetHitPos(c, data);
+  } else if (topic == m_mqttPrefix + "/set/set_rest/req") {
+    handleSetRestPos(c, data);
   } else if (topic == m_mqttPrefix + "/set/max_half_speed/req") {
     handleSetMaxHalfSpeed(c, data);
   } else if (topic == m_mqttPrefix + "/set/max_full_speed/req") {
@@ -384,29 +384,29 @@ void MqttClient::handleSetTurnType(struct mg_connection *c, const String &data)
 }
 
 /**
- * @brief Handle the incoming message on /settings/set_front topic
+ * @brief Handle the incoming message on /settings/set_hit topic
  *
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleSetFrontPos(struct mg_connection *c, const String &data)
+void MqttClient::handleSetHitPos(struct mg_connection *c, const String &data)
 {
-  LOG_INFO("Handle Set Front Pos");
+  LOG_INFO("Handle Set Hit Pos");
 
-  m_hwController.setFrontPos();
+  m_hwController.setHitPos();
 }
 
 /**
- * @brief Handle the incoming message on /settings/set_rear topic
+ * @brief Handle the incoming message on /settings/set_rest topic
  *
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleSetRearPos(struct mg_connection *c, const String &data)
+void MqttClient::handleSetRestPos(struct mg_connection *c, const String &data)
 {
-  LOG_INFO("Handle Set Rear Pos");
+  LOG_INFO("Handle Set Rest Pos");
 
-  m_hwController.setRearPos();
+  m_hwController.setRestPos();
 }
 
 /**
@@ -491,11 +491,11 @@ void MqttClient::handleSetHitDirection(struct mg_connection *c,
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleCmdUp(struct mg_connection *c, const String &data)
+void MqttClient::handleCmdLeft(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command Left");
 
-  m_hwController.setManualCommand(HardwareController::ManualCommand::Forward);
+  m_hwController.setManualCommand(HardwareController::ManualCommand::Left);
   m_hwController.setNextState(HardwareController::State::ManualTurn);
 }
 
@@ -505,11 +505,11 @@ void MqttClient::handleCmdUp(struct mg_connection *c, const String &data)
  * @param c The MQTT connection
  * @param data The message payload
  */
-void MqttClient::handleCmdDown(struct mg_connection *c, const String &data)
+void MqttClient::handleCmdRight(struct mg_connection *c, const String &data)
 {
   LOG_INFO("Handle Command right");
 
-  m_hwController.setManualCommand(HardwareController::ManualCommand::Backward);
+  m_hwController.setManualCommand(HardwareController::ManualCommand::Right);
   m_hwController.setNextState(HardwareController::State::ManualTurn);
 }
 

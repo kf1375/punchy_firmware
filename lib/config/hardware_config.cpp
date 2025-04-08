@@ -13,8 +13,8 @@
 HardwareConfig::HardwareConfig(JsonObject json)
 {
   m_turnType = turnTypeFromString(json["turn_type"].as<String>());
-  m_frontPos = json["front_position"].as<int>();
-  m_rearPos = json["rear_position"].as<int>();
+  m_hitPos = json["hit_position"].as<int>();
+  m_restPos = json["rest_position"].as<int>();
   m_singleSpeed = json["single_speed"].as<int>();
   m_infiniteSpeed = json["infinite_speed"].as<int>();
   m_maxHalfSpeed = json["max_half_speed"].as<int>();
@@ -42,29 +42,29 @@ void HardwareConfig::setTurnType(TurnType turnType)
 }
 
 /**
- * @brief Sets the frontPos for the hardware configuration.
+ * @brief Sets the hitPos for the hardware configuration.
  *
- * This function updates the frontPos value and marks the configuration as
+ * This function updates the hitPos value and marks the configuration as
  * changed. It also sets the stored flag to true.
  *
- * @param frontPos The new frontPos
+ * @param hitPos The new hitPos
  */
-void HardwareConfig::setFrontPosition(int frontPos)
+void HardwareConfig::setHitPosition(int hitPos)
 {
-  m_changed = changeIntConfig(m_frontPos, frontPos);
+  m_changed = changeIntConfig(m_hitPos, hitPos);
 }
 
 /**
- * @brief Sets the rearPos for the hardware configuration.
+ * @brief Sets the restPos for the hardware configuration.
  *
- * This function updates the rearPos value and marks the configuration as
+ * This function updates the restPos value and marks the configuration as
  * changed. It also sets the stored flag to true.
  *
- * @param rearPos The new rearPos
+ * @param restPos The new restPos
  */
-void HardwareConfig::setRearPosition(int rearPos)
+void HardwareConfig::setRestPosition(int restPos)
 {
-  m_changed = changeIntConfig(m_rearPos, rearPos);
+  m_changed = changeIntConfig(m_restPos, restPos);
 }
 
 /**
@@ -148,8 +148,8 @@ void HardwareConfig::setHitDirection(HitDirection hitDirection)
 void HardwareConfig::asJson(JsonObject &json)
 {
   json["turn_type"] = turnTypeToString(m_turnType);
-  json["front_position"] = m_frontPos;
-  json["rear_position"] = m_rearPos;
+  json["hit_position"] = m_hitPos;
+  json["rest_position"] = m_restPos;
   json["single_speed"] = m_singleSpeed;
   json["infinite_speed"] = m_infiniteSpeed;
   json["max_half_speed"] = m_maxHalfSpeed;

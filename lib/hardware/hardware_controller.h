@@ -5,7 +5,7 @@
 #include "configuration.h"
 #include "motor.h"
 
-// #define SIMULATION_MODE
+#define SIMULATION_MODE
 
 class HardwareController
 {
@@ -18,7 +18,7 @@ public:
     ManualTurn,
   };
 
-  enum class ManualCommand { Forward = 0, Backward };
+  enum class ManualCommand { Left = 0, Right };
 
   HardwareController(Configuration &config);
   ~HardwareController();
@@ -29,13 +29,13 @@ public:
   State state() const { return m_state; };
 
   void setNextState(HardwareController::State state);
-  void setFrontPos()
+  void setHitPos()
   {
-    m_config.hardware.setFrontPosition(m_motor.currentPosition());
+    m_config.hardware.setHitPosition(m_motor.currentPosition());
   };
-  void setRearPos()
+  void setRestPos()
   {
-    m_config.hardware.setRearPosition(m_motor.currentPosition());
+    m_config.hardware.setRestPosition(m_motor.currentPosition());
   };
   void setManualCommand(ManualCommand command) { m_manualCommand = command; };
 

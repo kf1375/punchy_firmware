@@ -22,8 +22,8 @@ public:
 
   TurnType turnType() { return m_turnType; };
   String turnTypeString() { return turnTypeToString(m_turnType); };
-  int frontPosition() { return m_frontPos; };
-  int rearPosition() { return m_rearPos; };
+  int hitPosition() { return m_hitPos; };
+  int restPosition() { return m_restPos; };
   int singleSpeed() { return m_singleSpeed; }
   int infiniteSpeed() { return m_infiniteSpeed; }
   int maxHalfSpeed() { return m_maxHalfSpeed; }
@@ -32,8 +32,8 @@ public:
   String hitDirectionString() { return hitDirectionToString(m_hitDirection); };
 
   void setTurnType(TurnType turnType);
-  void setFrontPosition(int frontPos);
-  void setRearPosition(int rearPos);
+  void setHitPosition(int hitPos);
+  void setRestPosition(int restPos);
   void setSingleSpeed(int speed);
   void setInfiniteSpeed(int speed);
   void setMaxHalfSpeed(int value);
@@ -44,8 +44,8 @@ public:
 
 private:
   TurnType m_turnType;
-  int m_frontPos;
-  int m_rearPos;
+  int m_hitPos;
+  int m_restPos;
   int m_singleSpeed;
   int m_infiniteSpeed;
   int m_maxHalfSpeed;

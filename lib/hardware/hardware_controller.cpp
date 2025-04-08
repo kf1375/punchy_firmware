@@ -98,16 +98,16 @@ void HardwareController::handleSingleTurnState()
   case Motor::State::Start:
     m_turnFinished = false;
     m_motor.setSpeed(m_config.hardware.singleSpeed());
-    if (m_motor.currentPosition() != m_config.hardware.rearPosition()) {
-      m_motor.moveTo(m_config.hardware.rearPosition());
+    if (m_motor.currentPosition() != m_config.hardware.restPosition()) {
+      m_motor.moveTo(m_config.hardware.restPosition());
       m_motor.setState(Motor::State::Prepare);
     } else {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.frontPosition());
+        m_motor.moveTo(m_config.hardware.restPosition());
       } else if (m_config.hardware.turnType() ==
                  HardwareConfig::TurnType::FullTurn) {
-        if (m_config.hardware.frontPosition() >=
-            m_config.hardware.rearPosition()) {
+        if (m_config.hardware.hitPosition() >=
+            m_config.hardware.restPosition()) {
           m_motor.move(Motor::StepsPerRevolution);
         } else {
           m_motor.move(-Motor::StepsPerRevolution);
@@ -127,11 +127,11 @@ void HardwareController::handleSingleTurnState()
   case Motor::State::PausePrepare:
     if (millis() - m_startPauseMillis > 1000) {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.frontPosition());
+        m_motor.moveTo(m_config.hardware.hitPosition());
       } else if (m_config.hardware.turnType() ==
                  HardwareConfig::TurnType::FullTurn) {
-        if (m_config.hardware.frontPosition() >=
-            m_config.hardware.rearPosition()) {
+        if (m_config.hardware.hitPosition() >=
+            m_config.hardware.restPosition()) {
           m_motor.move(Motor::StepsPerRevolution);
         } else {
           m_motor.move(-Motor::StepsPerRevolution);
@@ -154,20 +154,20 @@ void HardwareController::handleSingleTurnState()
       m_motor.setRampLen(10);
       m_motor.setSpeed(90);
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.rearPosition());
+        m_motor.moveTo(m_config.hardware.restPosition());
         m_motor.setState(Motor::State::ToRest);
       } else if (m_config.hardware.turnType() ==
                  HardwareConfig::TurnType::FullTurn) {
         m_motor.setState(Motor::State::Start);
-        m_config.hardware.setFrontPosition(m_motor.currentPosition() +
-                                           (m_config.hardware.frontPosition() -
-                                            m_config.hardware.rearPosition()));
-        m_config.hardware.setRearPosition(m_motor.currentPosition());
+        m_config.hardware.setHitPosition(m_motor.currentPosition() +
+                                         (m_config.hardware.hitPosition() -
+                                          m_config.hardware.restPosition()));
+        m_config.hardware.setRestPosition(m_motor.currentPosition());
         m_nextState = State::Stop;
         m_turnFinished = true;
         LOG_INFO("Single mode FULL_TURN finished. " +
-                 m_config.hardware.rearPosition() + " " +
-                 m_config.hardware.frontPosition());
+                 m_config.hardware.restPosition() + " " +
+                 m_config.hardware.hitPosition());
       }
     }
     break;
@@ -176,7 +176,7 @@ void HardwareController::handleSingleTurnState()
       m_motor.setState(Motor::State::Start);
       m_nextState = State::Stop;
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::FullTurn) {
-        m_motor.setZero(m_config.hardware.rearPosition());
+        m_motor.setZero(m_config.hardware.restPosition());
       }
       m_turnFinished = true;
       m_motor.setRampLen(0);
@@ -198,12 +198,12 @@ void HardwareController::handleInfiniteTurnState()
   case Motor::State::Start:
     m_turnFinished = false;
     m_motor.setSpeed(m_config.hardware.infiniteSpeed());
-    if (m_motor.currentPosition() != m_config.hardware.rearPosition()) {
-      m_motor.moveTo(m_config.hardware.rearPosition());
+    if (m_motor.currentPosition() != m_config.hardware.restPosition()) {
+      m_motor.moveTo(m_config.hardware.restPosition());
       m_motor.setState(Motor::State::Prepare);
     } else {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.frontPosition());
+        m_motor.moveTo(m_config.hardware.hitPosition());
       }
       m_motor.setState(Motor::State::ToHit);
     }
@@ -219,7 +219,7 @@ void HardwareController::handleInfiniteTurnState()
   case Motor::State::PausePrepare:
     if (millis() - m_startPauseMillis > 1000) {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.frontPosition());
+        m_motor.moveTo(m_config.hardware.hitPosition());
       }
       m_motor.setState(Motor::State::ToHit);
     }
@@ -233,26 +233,25 @@ void HardwareController::handleInfiniteTurnState()
     } else if (m_config.hardware.turnType() ==
                HardwareConfig::TurnType::FullTurn) {
       m_turnFinished = false;
-      if (m_config.hardware.frontPosition() >=
-          m_config.hardware.rearPosition()) {
+      if (m_config.hardware.hitPosition() >= m_config.hardware.restPosition()) {
         m_motor.runForward();
         if (m_motor.currentPosition() >=
-            m_config.hardware.rearPosition() + Motor::StepsPerRevolution) {
+            m_config.hardware.restPosition() + Motor::StepsPerRevolution) {
           // m_motor.setZero();
-          m_config.hardware.setFrontPosition(
-              m_motor.currentPosition() + (m_config.hardware.frontPosition() -
-                                           m_config.hardware.rearPosition()));
-          m_config.hardware.setRearPosition(m_motor.currentPosition());
+          m_config.hardware.setHitPosition(m_motor.currentPosition() +
+                                           (m_config.hardware.hitPosition() -
+                                            m_config.hardware.restPosition()));
+          m_config.hardware.setRestPosition(m_motor.currentPosition());
           m_turnFinished = true;
         }
       } else {
         m_motor.runBackward();
         if (m_motor.currentPosition() <=
-            m_config.hardware.rearPosition() - Motor::StepsPerRevolution) {
-          m_config.hardware.setFrontPosition(
-              m_motor.currentPosition() + (m_config.hardware.frontPosition() -
-                                           m_config.hardware.rearPosition()));
-          m_config.hardware.setRearPosition(m_motor.currentPosition());
+            m_config.hardware.restPosition() - Motor::StepsPerRevolution) {
+          m_config.hardware.setHitPosition(m_motor.currentPosition() +
+                                           (m_config.hardware.hitPosition() -
+                                            m_config.hardware.restPosition()));
+          m_config.hardware.setRestPosition(m_motor.currentPosition());
           m_turnFinished = true;
         }
       }
@@ -267,7 +266,7 @@ void HardwareController::handleInfiniteTurnState()
     if (millis() - m_startPauseMillis >= 1000) {
       m_motor.setRampLen(10);
       m_motor.setSpeed(90);
-      m_motor.moveTo(m_config.hardware.rearPosition());
+      m_motor.moveTo(m_config.hardware.restPosition());
       m_motor.setState(Motor::State::ToRest);
     }
     break;
@@ -302,13 +301,13 @@ void HardwareController::handleManualTurnState()
     m_turnFinished = false;
     m_motor.setRampLen(3);
     m_motor.setSpeed(30);
-    if (m_manualCommand == ManualCommand::Forward) {
-      m_motor.move(15);
-      m_motor.setState(Motor::State::RotateCW);
-      LOG_INFO("Manual move forward started. Speed: 30");
-    } else if (m_manualCommand == ManualCommand::Backward) {
+    if (m_manualCommand == ManualCommand::Left) {
       m_motor.move(-15);
       m_motor.setState(Motor::State::RotateCCW);
+      LOG_INFO("Manual move forward started. Speed: 30");
+    } else if (m_manualCommand == ManualCommand::Right) {
+      m_motor.move(15);
+      m_motor.setState(Motor::State::RotateCW);
       LOG_INFO("Manual move backward started. Speed: 30");
     }
     break;

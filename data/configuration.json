@@ -10,8 +10,8 @@
     },
     "hardware": {
         "turn_type": "HALF_TURN",
-        "front_position": 0,
-        "rear_position": 0,
+        "hit_position": 0,
+        "rest_position": 0,
         "single_speed": 100,
         "infinite_speed": 200,
         "max_half_speed": 500,
