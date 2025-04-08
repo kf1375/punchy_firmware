@@ -5,7 +5,7 @@
 #include "configuration.h"
 #include "motor.h"
 
-#define SIMULATION_MODE
+// #define SIMULATION_MODE
 
 class HardwareController
 {

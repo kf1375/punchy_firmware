@@ -103,14 +103,33 @@ void HardwareController::handleSingleTurnState()
       m_motor.setState(Motor::State::Prepare);
     } else {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.restPosition());
+        // ----------------- S
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition() -
+                           Motor::StepsPerRevolution);
+          }
+        } else {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition() +
+                           Motor::StepsPerRevolution);
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          }
+        }
+        // ----------------- E
       } else if (m_config.hardware.turnType() ==
                  HardwareConfig::TurnType::FullTurn) {
-        if (m_config.hardware.hitPosition() >=
-            m_config.hardware.restPosition()) {
-          m_motor.move(Motor::StepsPerRevolution);
-        } else {
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
           m_motor.move(-Motor::StepsPerRevolution);
+        } else {
+          m_motor.move(Motor::StepsPerRevolution);
         }
       }
       m_motor.setState(Motor::State::ToHit);
@@ -127,14 +146,33 @@ void HardwareController::handleSingleTurnState()
   case Motor::State::PausePrepare:
     if (millis() - m_startPauseMillis > 1000) {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.hitPosition());
+        // ----------------- S
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition() -
+                           Motor::StepsPerRevolution);
+          }
+        } else {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition() +
+                           Motor::StepsPerRevolution);
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          }
+        }
+        // ----------------- E
       } else if (m_config.hardware.turnType() ==
                  HardwareConfig::TurnType::FullTurn) {
-        if (m_config.hardware.hitPosition() >=
-            m_config.hardware.restPosition()) {
-          m_motor.move(Motor::StepsPerRevolution);
-        } else {
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
           m_motor.move(-Motor::StepsPerRevolution);
+        } else {
+          m_motor.move(Motor::StepsPerRevolution);
         }
       }
       m_motor.setState(Motor::State::ToHit);
@@ -159,10 +197,18 @@ void HardwareController::handleSingleTurnState()
       } else if (m_config.hardware.turnType() ==
                  HardwareConfig::TurnType::FullTurn) {
         m_motor.setState(Motor::State::Start);
-        m_config.hardware.setHitPosition(m_motor.currentPosition() +
-                                         (m_config.hardware.hitPosition() -
-                                          m_config.hardware.restPosition()));
-        m_config.hardware.setRestPosition(m_motor.currentPosition());
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
+          m_config.hardware.setHitPosition(m_config.hardware.hitPosition() -
+                                           Motor::StepsPerRevolution);
+          m_config.hardware.setRestPosition(m_config.hardware.restPosition() -
+                                            Motor::StepsPerRevolution);
+        } else {
+          m_config.hardware.setHitPosition(m_config.hardware.hitPosition() +
+                                           Motor::StepsPerRevolution);
+          m_config.hardware.setRestPosition(m_config.hardware.restPosition() +
+                                            Motor::StepsPerRevolution);
+        }
         m_nextState = State::Stop;
         m_turnFinished = true;
         LOG_INFO("Single mode FULL_TURN finished. " +
@@ -175,9 +221,6 @@ void HardwareController::handleSingleTurnState()
     if (!m_motor.isRunning()) {
       m_motor.setState(Motor::State::Start);
       m_nextState = State::Stop;
-      if (m_config.hardware.turnType() == HardwareConfig::TurnType::FullTurn) {
-        m_motor.setZero(m_config.hardware.restPosition());
-      }
       m_turnFinished = true;
       m_motor.setRampLen(0);
       LOG_INFO("Single mode HALF_TURN finished.");
@@ -203,7 +246,26 @@ void HardwareController::handleInfiniteTurnState()
       m_motor.setState(Motor::State::Prepare);
     } else {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.hitPosition());
+        // ----------------- S
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition() -
+                           Motor::StepsPerRevolution);
+          }
+        } else {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition() +
+                           Motor::StepsPerRevolution);
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          }
+        }
+        // ----------------- E
       }
       m_motor.setState(Motor::State::ToHit);
     }
@@ -219,7 +281,26 @@ void HardwareController::handleInfiniteTurnState()
   case Motor::State::PausePrepare:
     if (millis() - m_startPauseMillis > 1000) {
       if (m_config.hardware.turnType() == HardwareConfig::TurnType::HalfTurn) {
-        m_motor.moveTo(m_config.hardware.hitPosition());
+        // ----------------- S
+        if (m_config.hardware.hitDirection() ==
+            HardwareConfig::HitDirection::Left) {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition() -
+                           Motor::StepsPerRevolution);
+          }
+        } else {
+          if (m_config.hardware.hitPosition() <=
+              m_config.hardware.restPosition()) {
+            m_motor.moveTo(m_config.hardware.hitPosition() +
+                           Motor::StepsPerRevolution);
+          } else {
+            m_motor.moveTo(m_config.hardware.hitPosition());
+          }
+        }
+        // ----------------- E
       }
       m_motor.setState(Motor::State::ToHit);
     }
@@ -233,11 +314,11 @@ void HardwareController::handleInfiniteTurnState()
     } else if (m_config.hardware.turnType() ==
                HardwareConfig::TurnType::FullTurn) {
       m_turnFinished = false;
-      if (m_config.hardware.hitPosition() >= m_config.hardware.restPosition()) {
-        m_motor.runForward();
-        if (m_motor.currentPosition() >=
-            m_config.hardware.restPosition() + Motor::StepsPerRevolution) {
-          // m_motor.setZero();
+      if (m_config.hardware.hitDirection() ==
+          HardwareConfig::HitDirection::Left) {
+        m_motor.runBackward();
+        if (m_motor.currentPosition() <=
+            m_config.hardware.restPosition() - Motor::StepsPerRevolution) {
           m_config.hardware.setHitPosition(m_motor.currentPosition() +
                                            (m_config.hardware.hitPosition() -
                                             m_config.hardware.restPosition()));
@@ -245,9 +326,9 @@ void HardwareController::handleInfiniteTurnState()
           m_turnFinished = true;
         }
       } else {
-        m_motor.runBackward();
-        if (m_motor.currentPosition() <=
-            m_config.hardware.restPosition() - Motor::StepsPerRevolution) {
+        m_motor.runForward();
+        if (m_motor.currentPosition() >=
+            m_config.hardware.restPosition() + Motor::StepsPerRevolution) {
           m_config.hardware.setHitPosition(m_motor.currentPosition() +
                                            (m_config.hardware.hitPosition() -
                                             m_config.hardware.restPosition()));
