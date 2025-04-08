@@ -116,8 +116,9 @@ void MqttClient::subscribe()
                                 m_mqttPrefix + "/set/set_rear/req",
                                 m_mqttPrefix + "/set/max_half_speed/req",
                                 m_mqttPrefix + "/set/max_full_speed/req",
-                                m_mqttPrefix + "/cmd/up/req",
-                                m_mqttPrefix + "/cmd/down/req",
+                                m_mqttPrefix + "/set/hit_direction/req",
+                                m_mqttPrefix + "/cmd/left/req",
+                                m_mqttPrefix + "/cmd/right/req",
                                 m_mqttPrefix + "/cmd/update/req"};
 
   // Subscribe to each topic
@@ -205,9 +206,9 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
     handleStartInfinite(c, data);
   } else if (topic == m_mqttPrefix + "/stop/req") {
     handleStop(c, data);
-  } else if (topic == m_mqttPrefix + "/cmd/up/req") {
+  } else if (topic == m_mqttPrefix + "/cmd/left/req") {
     handleCmdUp(c, data);
-  } else if (topic == m_mqttPrefix + "/cmd/down/req") {
+  } else if (topic == m_mqttPrefix + "/cmd/right/req") {
     handleCmdDown(c, data);
   } else if (topic == m_mqttPrefix + "/cmd/update/req") {
     handleCmdUpdate(c, data);
@@ -221,6 +222,10 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
     handleSetMaxHalfSpeed(c, data);
   } else if (topic == m_mqttPrefix + "/set/max_full_speed/req") {
     handleSetMaxFullSpeed(c, data);
+  } else if (topic == m_mqttPrefix + "/set/hit_direction/req") {
+    handleSetHitDirection(c, data);
+  } else {
+    LOG_INFO("Unknown topic: " + topic);
   }
 }
 
@@ -269,6 +274,7 @@ void MqttClient::handleStatus(struct mg_connection *c, const String &data)
   doc["infinite_speed"] = m_config.hardware.infiniteSpeed();
   doc["max_half_speed"] = m_config.hardware.maxHalfSpeed();
   doc["max_full_speed"] = m_config.hardware.maxFullSpeed();
+  doc["hit_direction"] = m_config.hardware.hitDirectionString();
 
   String topic = m_mqttPrefix + "/status/res";
 
@@ -448,28 +454,60 @@ void MqttClient::handleSetMaxFullSpeed(struct mg_connection *c,
 }
 
 /**
- * @brief Handle the incoming message on /commands/up topic
+ * @brief Handle the incoming message on /settings/hit_direction topic
+ *
+ * @param c The MQTT connection
+ * @param data The message payload { value: (direction [left/right]) }
+ */
+void MqttClient::handleSetHitDirection(struct mg_connection *c,
+                                       const String &data)
+{
+  LOG_INFO("Handle Set Hit Direction");
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, data);
+  if (error) {
+    LOG_INFO("Failed to parse JSON");
+    return;
+  }
+
+  HardwareConfig::HitDirection hitDirection;
+  String hitDirectionStr = doc["value"].as<String>();
+  if (hitDirectionStr == "Left")
+    hitDirection = HardwareConfig::HitDirection::Left;
+  else if (hitDirectionStr == "Right")
+    hitDirection = HardwareConfig::HitDirection::Right;
+  else
+    hitDirection = HardwareConfig::HitDirection::Left;
+
+  m_config.hardware.setHitDirection(hitDirection);
+
+  LOG_INFO("Hit direction set to " + hitDirectionStr);
+}
+
+/**
+ * @brief Handle the incoming message on /commands/left topic
  *
  * @param c The MQTT connection
  * @param data The message payload
  */
 void MqttClient::handleCmdUp(struct mg_connection *c, const String &data)
 {
-  LOG_INFO("Handle Command Up");
+  LOG_INFO("Handle Command Left");
 
   m_hwController.setManualCommand(HardwareController::ManualCommand::Forward);
   m_hwController.setNextState(HardwareController::State::ManualTurn);
 }
 
 /**
- * @brief Handle the incoming message on /commands/down topic
+ * @brief Handle the incoming message on /commands/right topic
  *
  * @param c The MQTT connection
  * @param data The message payload
  */
 void MqttClient::handleCmdDown(struct mg_connection *c, const String &data)
 {
-  LOG_INFO("Handle Command Down");
+  LOG_INFO("Handle Command right");
 
   m_hwController.setManualCommand(HardwareController::ManualCommand::Backward);
   m_hwController.setNextState(HardwareController::State::ManualTurn);

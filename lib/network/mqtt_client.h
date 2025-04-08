@@ -56,6 +56,7 @@ private:
   void handleSetRearPos(struct mg_connection *c, const String &data);
   void handleSetMaxHalfSpeed(struct mg_connection *c, const String &data);
   void handleSetMaxFullSpeed(struct mg_connection *c, const String &data);
+  void handleSetHitDirection(struct mg_connection *c, const String &data);
   void handleCmdUp(struct mg_connection *c, const String &data);
   void handleCmdDown(struct mg_connection *c, const String &data);
   void handleCmdUpdate(struct mg_connection *c, const String &data);

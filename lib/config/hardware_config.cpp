@@ -19,6 +19,8 @@ HardwareConfig::HardwareConfig(JsonObject json)
   m_infiniteSpeed = json["infinite_speed"].as<int>();
   m_maxHalfSpeed = json["max_half_speed"].as<int>();
   m_maxFullSpeed = json["max_full_speed"].as<int>();
+  m_hitDirection = hitDirectionFromString(json["hit_direction"].as<String>());
+
   LOG_INFO("Hardware configuration loaded.");
 }
 
@@ -118,6 +120,23 @@ void HardwareConfig::setMaxFullSpeed(int value)
 }
 
 /**
+ * @brief Sets the hit direction for the hardware configuration.
+ *
+ * This function updates the hit direction value and marks the configuration as
+ * changed. It also sets the stored flag to true.
+ *
+ * @param hitDirection The new turn type
+ */
+void HardwareConfig::setHitDirection(HitDirection hitDirection)
+{
+  if (m_hitDirection == hitDirection)
+    m_changed = false;
+
+  m_hitDirection = hitDirection;
+  m_changed = true;
+}
+
+/**
  * @brief Fill a given JSON object with the HardwareConfig data.
  *
  * This method serializes the safety configuration parameters into the provided
@@ -135,6 +154,7 @@ void HardwareConfig::asJson(JsonObject &json)
   json["infinite_speed"] = m_infiniteSpeed;
   json["max_half_speed"] = m_maxHalfSpeed;
   json["max_full_speed"] = m_maxFullSpeed;
+  json["hit_direction"] = hitDirectionToString(m_hitDirection);
 }
 
 /**
@@ -173,5 +193,44 @@ String HardwareConfig::turnTypeToString(TurnType turnType) const
     return "FULL_TURN";
   } else {
     return "HALF_TURN";
+  }
+}
+
+/**
+ * @brief Convert a string to a hit direction enum.
+ *
+ * This method converts a string to a hit direction enum.
+ *
+ * @param hitDirectionStr String representation of the hit direction.
+ * @return HardwareController::HitDirection The hit direction enum.
+ */
+HardwareConfig::HitDirection
+HardwareConfig::hitDirectionFromString(const String &hitDirectionStr)
+{
+  if (hitDirectionStr == "LEFT") {
+    return HitDirection::Left;
+  } else if (hitDirectionStr == "RIGHT") {
+    return HitDirection::Right;
+  } else {
+    return HitDirection::Left;
+  }
+}
+
+/**
+ * @brief Convert a HitDirection enum to a string.
+ *
+ * This method converts a HitDirection enum to a string.
+ *
+ * @param hitDirection The HitDirection enum.
+ * @return String The string representation of the HitDirection.
+ */
+String HardwareConfig::hitDirectionToString(HitDirection hitDirection) const
+{
+  if (hitDirection == HitDirection::Left) {
+    return "LEFT";
+  } else if (hitDirection == HitDirection::Right) {
+    return "RIGHT";
+  } else {
+    return "LEFT";
   }
 }

@@ -14,6 +14,7 @@ class HardwareConfig : public AbstractConfig
 {
 public:
   enum class TurnType { HalfTurn, FullTurn };
+  enum class HitDirection { Left, Right };
 
   HardwareConfig() {};
   HardwareConfig(JsonObject json);
@@ -27,6 +28,8 @@ public:
   int infiniteSpeed() { return m_infiniteSpeed; }
   int maxHalfSpeed() { return m_maxHalfSpeed; }
   int maxFullSpeed() { return m_maxFullSpeed; }
+  HitDirection hitDirection() { return m_hitDirection; };
+  String hitDirectionString() { return hitDirectionToString(m_hitDirection); };
 
   void setTurnType(TurnType turnType);
   void setFrontPosition(int frontPos);
@@ -35,6 +38,7 @@ public:
   void setInfiniteSpeed(int speed);
   void setMaxHalfSpeed(int value);
   void setMaxFullSpeed(int value);
+  void setHitDirection(HitDirection hitDirection);
 
   void asJson(JsonObject &json);
 
@@ -46,9 +50,13 @@ private:
   int m_infiniteSpeed;
   int m_maxHalfSpeed;
   int m_maxFullSpeed;
+  HitDirection m_hitDirection;
 
   TurnType turnTypeFromString(const String &turnTypeStr);
   String turnTypeToString(TurnType turnType) const;
+
+  HitDirection hitDirectionFromString(const String &hitDirectionStr);
+  String hitDirectionToString(HitDirection hitDirection) const;
 };
 
 #endif
