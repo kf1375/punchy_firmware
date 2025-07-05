@@ -8,7 +8,11 @@
  * @param config
  */
 HardwareController::HardwareController(Configuration &config)
-    : m_config(config), m_motor(), m_state(State::Idle), m_turnFinished(true)
+    : m_config(config),
+      m_motor(),
+      m_rgbLed(),
+      m_state(State::Idle),
+      m_turnFinished(true)
 {
 }
 
@@ -31,6 +35,7 @@ void HardwareController::begin()
 #endif
   m_motor.begin();
   m_motor.setRampLen(0);
+  m_rgbLed.begin();
   LOG_INFO("Hardware controller initialized.");
 }
 
@@ -70,20 +75,26 @@ void HardwareController::loop()
 
   switch (m_state) {
   case State::SingleTurn:
+    m_rgbLed.setColor(255, 0, 0);
     handleSingleTurnState();
     break;
   case State::InfiniteTurn:
+    m_rgbLed.setColor(0, 255, 0);
     handleInfiniteTurnState();
     break;
   case State::ManualTurn:
+    m_rgbLed.setColor(0, 0, 255);
     handleManualTurnState();
     break;
   case State::Stop:
     handleStopState();
+    m_rgbLed.turnOff();
     break;
   case State::Idle:
+    m_rgbLed.turnOff();
     break;
   default:
+    m_rgbLed.turnOff();
     LOG_INFO("Unknown turn mode.");
   }
 }

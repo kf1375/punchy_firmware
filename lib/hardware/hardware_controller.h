@@ -4,6 +4,7 @@
 #include "MobaTools.h"
 #include "configuration.h"
 #include "motor.h"
+#include "rgb_led.h"
 
 // #define SIMULATION_MODE
 
@@ -42,6 +43,7 @@ public:
 private:
   Configuration &m_config;
   Motor m_motor;
+  RGBLed m_rgbLed;
 
   State m_state;
   State m_nextState;
