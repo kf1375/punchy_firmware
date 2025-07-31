@@ -1,23 +1,20 @@
 #include "rgb_led.h"
 
-// Constructor
-RGBLed::RGBLed() : m_pexels(m_numPexels, pin, NEO_GRB + NEO_KHZ800) {}
+RGBLed::RGBLed() {}
 
-// Initialize the LED
 void RGBLed::begin()
 {
-  m_pexels.begin();
+  FastLED.addLeds<WS2812B, pin, GRB>(leds, numLeds);
 }
 
-// Set color
 void RGBLed::setColor(uint8_t r, uint8_t g, uint8_t b)
 {
-  m_pexels.setPixelColor(0, m_pexels.Color(r, g, b));
-  m_pexels.show();
+  leds[0] = CRGB(r, g, b);
+  FastLED.show();
 }
 
-// Turn off the LED
 void RGBLed::turnOff()
 {
-  m_pexels.clear();
+  leds[0] = CRGB::Black;
+  FastLED.show();
 }

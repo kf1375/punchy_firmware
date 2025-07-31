@@ -36,7 +36,6 @@ void HardwareController::begin()
   m_motor.begin();
   m_motor.setRampLen(0);
   m_rgbLed.begin();
-  m_rgbLed.turnOff();
   LOG_INFO("Hardware controller initialized.");
 }
 

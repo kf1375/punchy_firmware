@@ -1,17 +1,20 @@
-#include <Adafruit_NeoPixel.h>
+#ifndef RGB_LED_H
+#define RGB_LED_H
+
+#include <FastLED.h>
 
 class RGBLed
 {
 public:
   RGBLed();
-
   void begin();
   void setColor(uint8_t r, uint8_t g, uint8_t b);
   void turnOff();
 
 private:
-  Adafruit_NeoPixel m_pexels;
-
-  const uint8_t pin = 18;
-  const uint8_t m_numPexels = 1; // How many WS2812B are attached?
+  static constexpr uint8_t pin = 18;
+  static constexpr uint8_t numLeds = 1;
+  CRGB leds[numLeds];
 };
+
+#endif // RGB_LED_H
