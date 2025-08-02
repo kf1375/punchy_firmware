@@ -21,6 +21,8 @@ public:
 
   enum class ManualCommand { Left = 0, Right };
 
+  enum class LEDState { Orange = 0, Green };
+
   HardwareController(Configuration &config);
   ~HardwareController();
 
@@ -39,6 +41,7 @@ public:
     m_config.hardware.setRestPosition(m_motor.currentPosition());
   };
   void setManualCommand(ManualCommand command) { m_manualCommand = command; };
+  void setLEDState(LEDState led_state);
 
 private:
   Configuration &m_config;

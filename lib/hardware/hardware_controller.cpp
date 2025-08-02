@@ -75,26 +75,20 @@ void HardwareController::loop()
 
   switch (m_state) {
   case State::SingleTurn:
-    m_rgbLed.setColor(255, 0, 0);
     handleSingleTurnState();
     break;
   case State::InfiniteTurn:
-    m_rgbLed.setColor(0, 255, 0);
     handleInfiniteTurnState();
     break;
   case State::ManualTurn:
-    m_rgbLed.setColor(0, 0, 255);
     handleManualTurnState();
     break;
   case State::Stop:
     handleStopState();
-    m_rgbLed.turnOff();
     break;
   case State::Idle:
-    m_rgbLed.turnOff();
     break;
   default:
-    m_rgbLed.turnOff();
     LOG_INFO("Unknown turn mode.");
   }
 }
@@ -448,4 +442,19 @@ void HardwareController::sendPositionToSerial()
   Serial1.print("POSITION:");
   Serial1.println(m_motor.currentPosition());
   lastPosition = m_motor.currentPosition();
+}
+
+void HardwareController::setLEDState(LEDState led_state)
+{
+  switch (led_state) {
+  case LEDState::Green:
+    m_rgbLed.setColor(0, 255, 0);
+    break;
+  case LEDState::Orange:
+    m_rgbLed.setColor(255, 165, 0);
+    break;
+  default:
+    m_rgbLed.setColor(255, 0, 0);
+    break;
+  }
 }

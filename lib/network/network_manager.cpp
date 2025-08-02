@@ -232,6 +232,7 @@ void NetworkManager::clearMqttConnection()
 void NetworkManager::changeStateInitState()
 {
   LOG_INFO("Starting network manager...");
+  m_hwController.setLEDState(HardwareController::LEDState::Orange);
   if (m_config.wifi.stored()) {
     connectToWifi();
     changeState(CONNECTION_ONGOING);
@@ -267,6 +268,7 @@ void NetworkManager::changeStateConnectionOngoing()
     startAP();
     m_config.wifi.reset();
     changeState(AP_MODE);
+    m_hwController.setLEDState(HardwareController::LEDState::Orange);
   }
 }
 
@@ -276,8 +278,10 @@ void NetworkManager::changeStateConnectToCloud()
     clearMqttConnection();
     clearWifiConnection();
     changeState(WAIT_BEFORE_NEW_CONNECTION);
+    m_hwController.setLEDState(HardwareController::LEDState::Orange);
   } else if (m_mqttClient.isClientConnected()) {
     changeState(CONNECTED_TO_CLOUD);
+    m_hwController.setLEDState(HardwareController::LEDState::Green);
   } else if (m_mqttClient.failed()) {
     LOG_INFO("MQTT Connection Failed, Resetting System");
     assert(false);
@@ -290,10 +294,12 @@ void NetworkManager::changeStateConnectedToCloud()
     clearMqttConnection();
     clearWifiConnection();
     changeState(WAIT_BEFORE_NEW_CONNECTION);
+    m_hwController.setLEDState(HardwareController::LEDState::Orange);
   } else if (!m_mqttClient.isClientConnected()) {
     clearMqttConnection();
     setupMqtt();
     changeState(CONNECT_TO_CLOUD);
+    m_hwController.setLEDState(HardwareController::LEDState::Orange);
   } else {
     m_webUpdater.loop();
     m_mqttClient.run();
@@ -306,5 +312,6 @@ void NetworkManager::changeStateWaitBeforeNewConnection()
     // WiFi.mode(WIFI_AP_STA);
     connectToWifi();
     changeState(CONNECTION_ONGOING);
+    m_hwController.setLEDState(HardwareController::LEDState::Orange);
   }
 }
