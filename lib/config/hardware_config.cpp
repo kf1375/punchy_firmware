@@ -17,8 +17,8 @@ HardwareConfig::HardwareConfig(JsonObject json)
   m_restPos = json["rest_position"].as<int>();
   m_singleSpeed = json["single_speed"].as<int>();
   m_infiniteSpeed = json["infinite_speed"].as<int>();
-  m_maxHalfSpeed = json["max_half_speed"].as<int>();
-  m_maxFullSpeed = json["max_full_speed"].as<int>();
+  m_maxSingleSpeed = json["max_single_speed"].as<int>();
+  m_maxInfiniteSpeed = json["max_infinite_speed"].as<int>();
   m_hitDirection = hitDirectionFromString(json["hit_direction"].as<String>());
 
   LOG_INFO("Hardware configuration loaded.");
@@ -94,29 +94,29 @@ void HardwareConfig::setInfiniteSpeed(int speed)
 }
 
 /**
- * @brief Sets the max half speed for the hardware configuration.
+ * @brief Sets the max single speed for the hardware configuration.
  *
- * This function updates the max half speed value and marks the configuration as
- * changed. It also sets the stored flag to true.
+ * This function updates the max single speed value and marks the configuration
+ * as changed. It also sets the stored flag to true.
  *
- * @param value The new max half speed
+ * @param value The new max single speed
  */
-void HardwareConfig::setMaxHalfSpeed(int value)
+void HardwareConfig::setMaxSingleSpeed(int value)
 {
-  m_changed = changeIntConfig(m_maxHalfSpeed, value);
+  m_changed = changeIntConfig(m_maxSingleSpeed, value);
 }
 
 /**
- * @brief Sets the max full speed for the hardware configuration.
+ * @brief Sets the max infinite speed for the hardware configuration.
  *
- * This function updates the max full speed value and marks the configuration as
- * changed. It also sets the stored flag to true.
+ * This function updates the max infinite speed value and marks the
+ * configuration as changed. It also sets the stored flag to true.
  *
- * @param value The new max full speed
+ * @param value The new max infinite speed
  */
-void HardwareConfig::setMaxFullSpeed(int value)
+void HardwareConfig::setMaxInfiniteSpeed(int value)
 {
-  m_changed = changeIntConfig(m_maxHalfSpeed, value);
+  m_changed = changeIntConfig(m_maxSingleSpeed, value);
 }
 
 /**
@@ -152,8 +152,8 @@ void HardwareConfig::asJson(JsonObject &json)
   json["rest_position"] = m_restPos;
   json["single_speed"] = m_singleSpeed;
   json["infinite_speed"] = m_infiniteSpeed;
-  json["max_half_speed"] = m_maxHalfSpeed;
-  json["max_full_speed"] = m_maxFullSpeed;
+  json["max_single_speed"] = m_maxSingleSpeed;
+  json["max_infinite_speed"] = m_maxInfiniteSpeed;
   json["hit_direction"] = hitDirectionToString(m_hitDirection);
 }
 

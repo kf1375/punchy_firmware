@@ -26,8 +26,8 @@ public:
   int restPosition() { return m_restPos; };
   int singleSpeed() { return m_singleSpeed; }
   int infiniteSpeed() { return m_infiniteSpeed; }
-  int maxHalfSpeed() { return m_maxHalfSpeed; }
-  int maxFullSpeed() { return m_maxFullSpeed; }
+  int maxSingleSpeed() { return m_maxSingleSpeed; }
+  int maxInfiniteSpeed() { return m_maxInfiniteSpeed; }
   HitDirection hitDirection() { return m_hitDirection; };
   String hitDirectionString() { return hitDirectionToString(m_hitDirection); };
 
@@ -36,8 +36,8 @@ public:
   void setRestPosition(int restPos);
   void setSingleSpeed(int speed);
   void setInfiniteSpeed(int speed);
-  void setMaxHalfSpeed(int value);
-  void setMaxFullSpeed(int value);
+  void setMaxSingleSpeed(int value);
+  void setMaxInfiniteSpeed(int value);
   void setHitDirection(HitDirection hitDirection);
 
   void asJson(JsonObject &json);
@@ -48,8 +48,8 @@ private:
   int m_restPos;
   int m_singleSpeed;
   int m_infiniteSpeed;
-  int m_maxHalfSpeed;
-  int m_maxFullSpeed;
+  int m_maxSingleSpeed;
+  int m_maxInfiniteSpeed;
   HitDirection m_hitDirection;
 
   TurnType turnTypeFromString(const String &turnTypeStr);

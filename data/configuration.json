@@ -1,6 +1,6 @@
 {
     "wifi": {
-        "ssid": "MyEden",
+        "ssid": "K6123",
         "pass": "Kazem1375"
     },
     "mqtt": {
@@ -14,8 +14,8 @@
         "rest_position": 0,
         "single_speed": 100,
         "infinite_speed": 200,
-        "max_half_speed": 500,
-        "max_full_speed": 500,
+        "max_single_speed": 500,
+        "max_infinite_speed": 500,
         "hit_direction": "LEFT"
     },
     "firmware": {

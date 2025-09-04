@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="w3.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <div class="header">Stepper Control</div>
@@ -16,13 +18,17 @@
             <button class="button-setting" onclick="openLoginDialog()">Login</button>
         </div>
 
-        <button id="singleTurnButton" class="button button-single" onclick="toggleCheckbox('single_turn_start')">Start Single Turn</button>
+        <button id="singleTurnButton" class="button button-single" onclick="toggleCheckbox('single_turn_start')">Start
+            Single Turn</button>
         <div class="speed-label">Single Speed: <span id="single-speed-value">10</span></div>
-        <input type="range" id="single-speed" min="0" max="100" value="0" class="slider" oninput="updateSpeed('single')">
+        <input type="range" id="single-speed" min="0" max="100" value="0" class="slider"
+            oninput="updateSpeed('single')">
 
-        <button id="infiniteTurnButton" class="button button-infinite" onclick="toggleStart_Stop_infinite()">Start Infinite Turn</button>
+        <button id="infiniteTurnButton" class="button button-infinite" onclick="toggleStart_Stop_infinite()">Start
+            Infinite Turn</button>
         <div class="speed-label">Infinite Speed: <span id="infinite-speed-value">10</span></div>
-        <input type="range" id="infinite-speed" min="0" max="100" value="0" class="slider" oninput="updateSpeed('infinite')">
+        <input type="range" id="infinite-speed" min="0" max="100" value="0" class="slider"
+            oninput="updateSpeed('infinite')">
 
         <div class="speed-info">
             <div class="speed-info-header">Current Motor Speeds</div>
@@ -32,8 +38,8 @@
                     <p>Infinite Turn Speed: <span id="current-infinite-speed">0</span></p>
                 </div>
                 <div class="max-speed-info">
-                    <p>Max Half Turn Speed: <span id="current-max-single-speed">0</span></p>
-                    <p>Max Full Turn Speed: <span id="current-max-infinite-speed">0</span></p>
+                    <p>Max Single Turn Speed: <span id="current-max-single-speed">0</span></p>
+                    <p>Max Infinite Turn Speed: <span id="current-max-infinite-speed">0</span></p>
                 </div>
             </div>
         </div>
@@ -42,16 +48,17 @@
     <!-- Settings Dialog -->
     <div id="settingsDialog" class="w3-modal">
         <div class="w3-modal-content w3-animate-zoom w3-card-4 dialog">
-            <header class="w3-container"> 
-                <span onclick="closeSettingsDialog()" 
-                class="w3-button w3-xlarge w3-display-topright">&times;</span>
+            <header class="w3-container">
+                <span onclick="closeSettingsDialog()" class="w3-button w3-xlarge w3-display-topright">&times;</span>
                 <h2>Settings</h2>
             </header>
             <div class="w3-container">
                 <!-- Tabs -->
                 <div class="w3-bar settings-tab-bar">
-                    <button class="w3-bar-item w3-button tab-link w3-white" onclick="openTab(event, 'TurnSettings')">Turn Settings</button>
-                    <button class="w3-bar-item w3-button tab-link" onclick="openTab(event, 'MaxSpeed')">Max Speed</button>
+                    <button class="w3-bar-item w3-button tab-link w3-white"
+                        onclick="openTab(event, 'TurnSettings')">Turn Settings</button>
+                    <button class="w3-bar-item w3-button tab-link" onclick="openTab(event, 'MaxSpeed')">Max
+                        Speed</button>
                 </div>
 
                 <!-- Tab Content -->
@@ -59,8 +66,10 @@
                     <div class="settingSection">
                         <h4>Turn Setting</h4>
                         <div class="turn-modes-containter">
-                            <button id="halfButton" class="button turn-modes-button" onclick="setActiveButton('half')">Half Turn</button>
-                            <button id="fullButton" class="button turn-modes-button" onclick="setActiveButton('full')">Full Turn</button>
+                            <button id="halfButton" class="button turn-modes-button"
+                                onclick="setActiveButton('half')">Half Turn</button>
+                            <button id="fullButton" class="button turn-modes-button"
+                                onclick="setActiveButton('full')">Full Turn</button>
                         </div>
                     </div>
                     <div class="settingSection">
@@ -70,8 +79,10 @@
                             <button class="button button-position" onclick="toggleCheckbox('arrowDown')">▼ Down</button>
                         </div>
                         <div class="turn-modes-containter">
-                            <button class="button button-position" onclick="toggleCheckbox('submitFrontPos')">Set Front</button>
-                            <button class="button button-position" onclick="toggleCheckbox('submitRearPos')">Set Rear</button>
+                            <button class="button button-position" onclick="toggleCheckbox('submitFrontPos')">Set
+                                Front</button>
+                            <button class="button button-position" onclick="toggleCheckbox('submitRearPos')">Set
+                                Rear</button>
                         </div>
                     </div>
                 </div>
@@ -79,10 +90,14 @@
                 <div id="MaxSpeed" class="w3-container tab-content" style="display:none">
                     <div class="settingSection">
                         <h4>Max Speed Settings</h4>
-                        <div class="speed-label">Max Half Turn Speed: <span id="max-single-speed-value">100</span></div>
-                        <input type="range" id="max-single-speed" min="0" max="1000" value="0" class="slider" oninput="updateMaxSpeed('single')">
-                        <div class="speed-label">Max Full Turn Speed: <span id="max-infinite-speed-value">100</span></div>
-                        <input type="range" id="max-infinite-speed" min="0" max="1000" value="0" class="slider" oninput="updateMaxSpeed('infinite')">
+                        <div class="speed-label">Max Single Turn Speed: <span id="max-single-speed-value">100</span>
+                        </div>
+                        <input type="range" id="max-single-speed" min="0" max="1000" value="0" class="slider"
+                            oninput="updateMaxSpeed('single')">
+                        <div class="speed-label">Max Infinite Turn Speed: <span id="max-infinite-speed-value">100</span>
+                        </div>
+                        <input type="range" id="max-infinite-speed" min="0" max="1000" value="0" class="slider"
+                            oninput="updateMaxSpeed('infinite')">
                     </div>
                 </div>
             </div>
@@ -91,12 +106,12 @@
 
     <!-- Login Dialog -->
     <div id="loginDialog" class="w3-modal dialog">
-        <header class="w3-container"> 
-            <span onclick="closeLoginDialog()" 
-            class="w3-button w3-xlarge w3-display-topright">&times;</span>
+        <header class="w3-container">
+            <span onclick="closeLoginDialog()" class="w3-button w3-xlarge w3-display-topright">&times;</span>
         </header>
 
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>

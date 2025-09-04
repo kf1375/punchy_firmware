@@ -114,8 +114,8 @@ void MqttClient::subscribe()
                                 m_mqttPrefix + "/set/turn_type/req",
                                 m_mqttPrefix + "/set/set_hit/req",
                                 m_mqttPrefix + "/set/set_rest/req",
-                                m_mqttPrefix + "/set/max_half_speed/req",
-                                m_mqttPrefix + "/set/max_full_speed/req",
+                                m_mqttPrefix + "/set/max_single_speed/req",
+                                m_mqttPrefix + "/set/max_infinite_speed/req",
                                 m_mqttPrefix + "/set/hit_direction/req",
                                 m_mqttPrefix + "/cmd/left/req",
                                 m_mqttPrefix + "/cmd/right/req",
@@ -218,10 +218,10 @@ void MqttClient::onMessageReceived(struct mg_connection *c, const String &topic,
     handleSetHitPos(c, data);
   } else if (topic == m_mqttPrefix + "/set/set_rest/req") {
     handleSetRestPos(c, data);
-  } else if (topic == m_mqttPrefix + "/set/max_half_speed/req") {
-    handleSetMaxHalfSpeed(c, data);
-  } else if (topic == m_mqttPrefix + "/set/max_full_speed/req") {
-    handleSetMaxFullSpeed(c, data);
+  } else if (topic == m_mqttPrefix + "/set/max_single_speed/req") {
+    handleSetMaxSingleSpeed(c, data);
+  } else if (topic == m_mqttPrefix + "/set/max_infinite_speed/req") {
+    handleSetMaxInfiniteSpeed(c, data);
   } else if (topic == m_mqttPrefix + "/set/hit_direction/req") {
     handleSetHitDirection(c, data);
   } else {
@@ -272,8 +272,8 @@ void MqttClient::handleStatus(struct mg_connection *c, const String &data)
   doc["turn_type"] = m_config.hardware.turnTypeString();
   doc["single_speed"] = m_config.hardware.singleSpeed();
   doc["infinite_speed"] = m_config.hardware.infiniteSpeed();
-  doc["max_half_speed"] = m_config.hardware.maxHalfSpeed();
-  doc["max_full_speed"] = m_config.hardware.maxFullSpeed();
+  doc["max_single_speed"] = m_config.hardware.maxSingleSpeed();
+  doc["max_infinite_speed"] = m_config.hardware.maxInfiniteSpeed();
   doc["hit_direction"] = m_config.hardware.hitDirectionString();
 
   String topic = m_mqttPrefix + "/status/res";
@@ -410,15 +410,15 @@ void MqttClient::handleSetRestPos(struct mg_connection *c, const String &data)
 }
 
 /**
- * @brief Handle the incoming message on /settings/max_half_speed topic
+ * @brief Handle the incoming message on /settings/max_single_speed topic
  *
  * @param c The MQTT connection
  * @param data The message payload { value: (speed [RPM]) }
  */
-void MqttClient::handleSetMaxHalfSpeed(struct mg_connection *c,
-                                       const String &data)
+void MqttClient::handleSetMaxSingleSpeed(struct mg_connection *c,
+                                         const String &data)
 {
-  LOG_INFO("Handle Set Max Half Speed");
+  LOG_INFO("Handle Set Max Single Speed");
 
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, data);
@@ -427,20 +427,20 @@ void MqttClient::handleSetMaxHalfSpeed(struct mg_connection *c,
     return;
   }
 
-  int maxHalfSpeed = doc["value"].as<int>();
-  m_config.hardware.setMaxHalfSpeed(maxHalfSpeed);
+  int maxSingleSpeed = doc["value"].as<int>();
+  m_config.hardware.setMaxSingleSpeed(maxSingleSpeed);
 }
 
 /**
- * @brief Handle the incoming message on /settings/max_full_speed topic
+ * @brief Handle the incoming message on /settings/max_infinite_speed topic
  *
  * @param c The MQTT connection
  * @param data The message payload { value: (speed [RPM]) }
  */
-void MqttClient::handleSetMaxFullSpeed(struct mg_connection *c,
-                                       const String &data)
+void MqttClient::handleSetMaxInfiniteSpeed(struct mg_connection *c,
+                                           const String &data)
 {
-  LOG_INFO("Handle Set Max Full Speed");
+  LOG_INFO("Handle Set Max Infinite Speed");
 
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, data);
@@ -449,8 +449,8 @@ void MqttClient::handleSetMaxFullSpeed(struct mg_connection *c,
     return;
   }
 
-  int maxFullSpeed = doc["value"].as<int>();
-  m_config.hardware.setMaxFullSpeed(maxFullSpeed);
+  int maxInfiniteSpeed = doc["value"].as<int>();
+  m_config.hardware.setMaxInfiniteSpeed(maxInfiniteSpeed);
 }
 
 /**

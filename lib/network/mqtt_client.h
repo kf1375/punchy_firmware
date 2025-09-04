@@ -54,8 +54,8 @@ private:
   void handleSetTurnType(struct mg_connection *c, const String &data);
   void handleSetHitPos(struct mg_connection *c, const String &data);
   void handleSetRestPos(struct mg_connection *c, const String &data);
-  void handleSetMaxHalfSpeed(struct mg_connection *c, const String &data);
-  void handleSetMaxFullSpeed(struct mg_connection *c, const String &data);
+  void handleSetMaxSingleSpeed(struct mg_connection *c, const String &data);
+  void handleSetMaxInfiniteSpeed(struct mg_connection *c, const String &data);
   void handleSetHitDirection(struct mg_connection *c, const String &data);
   void handleCmdLeft(struct mg_connection *c, const String &data);
   void handleCmdRight(struct mg_connection *c, const String &data);
