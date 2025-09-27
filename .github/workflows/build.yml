@@ -72,4 +72,4 @@ jobs:
             ${{ steps.binaries.outputs.firmware }}
             ${{ steps.binaries.outputs.littlefs }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
