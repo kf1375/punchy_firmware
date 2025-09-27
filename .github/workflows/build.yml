@@ -1,0 +1,75 @@
+name: Build and Upload Firmware
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install dependencies (Python + PlatformIO + jq)
+      - name: Setup PlatformIO
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip jq
+          pip3 install platformio
+
+      # Read version
+      - name: Read version
+        id: version
+        run: |
+          if [ -f version.txt ]; then
+            VERSION=$(cat version.txt)
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "version.txt file not found!"
+            exit 1
+          fi
+
+      # Build firmware + littlefs
+      - name: Build firmware
+        run: |
+          platformio run
+          platformio run --target buildfs
+
+      # Find generated binaries
+      - name: Locate binaries
+        id: binaries
+        run: |
+          FIRMWARE_PATH=$(find .pio -name "firmware.bin" | head -n 1)
+          LITTLEFS_PATH=$(find .pio -name "littlefs.bin" | head -n 1)
+
+          if [ ! -f "$FIRMWARE_PATH" ] || [ ! -f "$LITTLEFS_PATH" ]; then
+            echo "One or both binary files not found!"
+            exit 1
+          fi
+
+          echo "firmware=$FIRMWARE_PATH" >> $GITHUB_OUTPUT
+          echo "littlefs=$LITTLEFS_PATH" >> $GITHUB_OUTPUT
+
+      # Upload artifacts for debugging (keeps them in Actions)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-build
+          path: |
+            ${{ steps.binaries.outputs.firmware }}
+            ${{ steps.binaries.outputs.littlefs }}
+
+      # Create a GitHub Release (or update if exists)
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          files: |
+            ${{ steps.binaries.outputs.firmware }}
+            ${{ steps.binaries.outputs.littlefs }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
