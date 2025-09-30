@@ -49,13 +49,19 @@ void WebUpdater::loop()
     // Perform the update check every 10 seconds
     if (Util::timeElapsed(10, last_run)) {
       // Check for available updates and update the configuration state
-      m_config.firmware.setUpdateAvailable(m_esp32FOTA->execHTTPcheck());
+      if (m_esp32FOTA->execHTTPcheck()) {
+        LOG_INFO("Update available: " + m_esp32FOTA->getPayloadVersion());
+        m_config.firmware.setUpdateAvailable(true);
+      } else {
+        LOG_INFO("No update available");
+      }
       last_run = millis();
     }
 
     // If an update is available and the start flag is set, initiate OTA
     if (m_config.firmware.updateAvailable() &&
         m_config.firmware.startUpdate()) {
+      LOG_INFO("Starting OTA update...");
       m_esp32FOTA->execOTA();
     }
   }

@@ -525,6 +525,7 @@ void MqttClient::handleCmdUpdate(struct mg_connection *c, const String &data)
 
   if (m_hwController.state() == HardwareController::State::Idle) {
     m_config.firmware.setStartUpdate(true);
+    LOG_INFO("Update Requested");
   }
 }
 
