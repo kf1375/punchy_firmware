@@ -116,7 +116,7 @@ void HardwareConfig::setMaxSingleSpeed(int value)
  */
 void HardwareConfig::setMaxInfiniteSpeed(int value)
 {
-  m_changed = changeIntConfig(m_maxSingleSpeed, value);
+  m_changed = changeIntConfig(m_maxInfiniteSpeed, value);
 }
 
 /**

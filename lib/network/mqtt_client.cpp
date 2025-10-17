@@ -429,6 +429,7 @@ void MqttClient::handleSetMaxSingleSpeed(struct mg_connection *c,
 
   int maxSingleSpeed = doc["value"].as<int>();
   m_config.hardware.setMaxSingleSpeed(maxSingleSpeed);
+  LOG_INFO("Setting max single speed to " + String(maxSingleSpeed));
 }
 
 /**
@@ -451,6 +452,7 @@ void MqttClient::handleSetMaxInfiniteSpeed(struct mg_connection *c,
 
   int maxInfiniteSpeed = doc["value"].as<int>();
   m_config.hardware.setMaxInfiniteSpeed(maxInfiniteSpeed);
+  LOG_INFO("Setting max infinite speed to " + String(maxInfiniteSpeed));
 }
 
 /**
