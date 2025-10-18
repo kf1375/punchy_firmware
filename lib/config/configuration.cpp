@@ -117,5 +117,5 @@ void Configuration::serializeConfig()
   }
   file.close();
 
-  LOG_INFO("Stored new configuration");
+  // LOG_INFO("Stored new configuration");
 }

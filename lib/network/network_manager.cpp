@@ -300,9 +300,11 @@ void NetworkManager::changeStateConnectedToCloud()
     setupMqtt();
     changeState(CONNECT_TO_CLOUD);
     m_hwController.setLEDState(HardwareController::LEDState::Orange);
-  } else {
-    m_webUpdater.loop();
+  } else { 
     m_mqttClient.run();
+    if (m_hwController.state() == HardwareController::State::Idle) {
+      m_webUpdater.loop();
+    }
   }
 }
 
