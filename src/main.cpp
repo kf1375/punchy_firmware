@@ -29,6 +29,8 @@ void setup()
 
 void loop()
 {
-  config.loop();
   hardwareController.loop();
+  if (hardwareController.state() == HardwareController::State::Idle) {
+    config.loop();
+  }
 }
