@@ -13,22 +13,19 @@
         <div class="header">Wi-Fi Configuration</div>
         <div class="form-container">
             <form onsubmit="sendConfig(event)">
-                <!-- <legend>Connect to Wi-Fi</legend> -->
                 <input type="text" id="ssid" placeholder="SSID" name="ssid">
-                <input type="password" id="password" placeholder="Password" name="password">
+                <div class="password-container">
+                    <input type="password" id="password" placeholder="Password" name="password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+                </div>
                 <input type="submit" value="Connect">
             </form>
-            <!-- <label class="label">Or</label>
-            <a href="http://172.217.28.1/" class="link">Continue in Access Point Mode</a>
-            <div id="status-message" class="status-message"></div> -->
-
         </div>
         <div class="wifi-status-container">
             <h5>Wi-Fi Status</h5>
             <p id="cstatus">Loading...</p>
             <p id="cssid"></p>
             <p id="cip"></p>
-            <!-- <button id="copy-button" class="copy-button" onclick="copyIpAddress()">Copy IP Address</button> -->
         </div>
     </div>
 </body>
@@ -67,18 +64,12 @@
                 const ipElement = document.getElementById('cip');
                 const copyButton = document.getElementById('copy-button');
 
-                if (data.status == 0) {
+                if (data.status === 0) {
                     statusElement.style.color = 'green';
                     statusElement.textContent = 'Connected';
-                    // ssidElement.textContent = 'SSID: ' + data.ssid;
-                    // ipElement.textContent = data.ip;
-                    // copyButton.style.display = 'block';
                 } else {
                     statusElement.style.color = 'red';
                     statusElement.textContent = 'Disconnected';
-                    // ssidElement.textContent = '';
-                    // ipElement.textContent = '';
-                    // copyButton.style.display = 'none';
                 }
             })
             .catch(error => {
@@ -91,28 +82,18 @@
         setInterval(fetchWiFiStatus, 5000); // Refresh every 5 seconds
     }
 
-    // function copyIpAddress() {
-    //     const ipElement = document.getElementById('cip').innerHTML;
-    //     if (navigator.clipboard) { // If normal copy method available, use it
-    //         navigator.clipboard.writeText(ipElement);
-    //     } else { // Otherwise fallback to the above function
-    //         unsecuredCopyToClipboard(ipElement);
-    //     }
-    // }
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const toggleButton = document.querySelector(".toggle-password");
 
-    // function unsecuredCopyToClipboard(text) {
-    //     const textArea = document.createElement("textarea");
-    //     textArea.value = text;
-    //     document.body.appendChild(textArea);
-    //     textArea.focus();
-    //     textArea.select();
-    //     try {
-    //         document.execCommand('copy');
-    //     } catch (err) {
-    //         console.error('Unable to copy to clipboard', err);
-    //     }
-    //     document.body.removeChild(textArea);
-    // }
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleButton.textContent = "Hide";
+        } else {
+            passwordInput.type = "password";
+            toggleButton.textContent = "Show";
+        }
+    }
 </script>
 
 </html>

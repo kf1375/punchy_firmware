@@ -478,3 +478,33 @@ form input[type="submit"]:hover {
 .copy-button:hover {
   background-color: #e1d3c8;
 }
+
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+  width: 100%;
+  padding-right: 50px; /* Space for the toggle button */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  transform: translateY(-115%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password:hover {
+  color: #000;
+}
